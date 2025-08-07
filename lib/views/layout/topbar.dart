@@ -1,6 +1,9 @@
 import 'package:admin/constants/colors.dart';
+import 'package:admin/controller/app_controller.dart';
 import 'package:admin/theme/text_theme.dart';
+import 'package:admin/views/settings/settings.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 
 class TopBar extends StatelessWidget {
@@ -25,6 +28,8 @@ class TopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+        final drawerController = Get.find<AppController>();
+
     final currentLocation = GoRouterState.of(context).uri.path;
     final title = _getTitle(currentLocation);
     return Container(
@@ -59,7 +64,11 @@ class TopBar extends StatelessWidget {
                   child: Icon(Icons.notifications_none)),
               SizedBox(width: 16),
               GestureDetector(
-                onTap: onSettingsPressed,
+                onTap: (){
+                  drawerController.toggleDrawer(
+                content:Settings()
+              );
+                },
                 child: CircleAvatar(
                     backgroundImage: NetworkImage(
                         "https://www.w3schools.com/howto/img_avatar.png")),
