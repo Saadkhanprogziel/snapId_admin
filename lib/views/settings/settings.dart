@@ -1,33 +1,21 @@
+import 'package:admin/controller/settings_controller/settings_controller.dart';
 import 'package:admin/theme/text_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-class Settings extends StatefulWidget {
+class Settings extends StatelessWidget {
   const Settings({Key? key}) : super(key: key);
 
   @override
-  State<Settings> createState() => _SettingsState();
-}
-
-class _SettingsState extends State<Settings> {
-  bool ticketNotifications = true;
-  bool newOrderNotifications = false;
-  String selectedScreen = 'Profile Info';
-
-  final TextEditingController nameController =
-      TextEditingController(text: 'Marco Kasper');
-  final TextEditingController emailController =
-      TextEditingController(text: 'admin@SnapID.app');
-  final TextEditingController phoneController =
-      TextEditingController(text: '+1 789 937 5988');
-
-  @override
   Widget build(BuildContext context) {
+    // Initialize the controller
+    final SettingsController controller = Get.put(SettingsController());
+
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       body: SafeArea(
-        // Add SafeArea for top spacing
         child: Padding(
-          padding: const EdgeInsets.only(top: 70), //
+          padding: const EdgeInsets.only(top: 70),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -38,33 +26,31 @@ class _SettingsState extends State<Settings> {
                   color: Colors.white,
                   child: Column(
                     children: [
-                      _buildSidebarItem(
-                        title: 'Profile Info',
-                        isActive: selectedScreen == 'Profile Info',
-                        onTap: () =>
-                            setState(() => selectedScreen = 'Profile Info'),
-                      ),
+                      Obx(() => _buildSidebarItem(
+                            title: 'Profile Info',
+                            isActive: controller.selectedScreen.value ==
+                                'Profile Info',
+                            onTap: () => controller.changeScreen('Profile Info'),
+                          )),
                       const SizedBox(height: 8),
-                      _buildSidebarItem(
-                        title: 'Security',
-                        isActive: selectedScreen == 'Security',
-                        onTap: () =>
-                            setState(() => selectedScreen = 'Security'),
-                      ),
+                      Obx(() => _buildSidebarItem(
+                            title: 'Security',
+                            isActive:
+                                controller.selectedScreen.value == 'Security',
+                            onTap: () => controller.changeScreen('Security'),
+                          )),
                       const SizedBox(height: 8),
-                      _buildSidebarItem(
-                        title: 'Notifications',
-                        isActive: selectedScreen == 'Notifications',
-                        onTap: () =>
-                            setState(() => selectedScreen = 'Notifications'),
-                      ),
+                      Obx(() => _buildSidebarItem(
+                            title: 'Notifications',
+                            isActive:
+                                controller.selectedScreen.value == 'Notifications',
+                            onTap: () => controller.changeScreen('Notifications'),
+                          )),
                       const SizedBox(height: 8),
-                      _buildThemeSwitcher(),
+                      _buildThemeSwitcher(controller),
                       const Spacer(),
-                      // Decorative gears at bottom
                       Container(
                         height: 120,
-                        decoration: BoxDecoration(),
                         width: double.infinity,
                         padding: const EdgeInsets.all(20),
                         child: Stack(
@@ -114,37 +100,65 @@ class _SettingsState extends State<Settings> {
                   ),
                 ),
               ),
+
               // Main content
               Expanded(
                 flex: 2,
                 child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 20),
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(25),
-                      border: Border.all(width: 0.4, color: Colors.grey)),
+                    borderRadius: BorderRadius.circular(25),
+                    border: Border.all(width: 0.4, color: Colors.grey),
+                  ),
                   padding: const EdgeInsets.all(50),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Title
-                      Text(
-                        selectedScreen,
-                        style: const TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF1F2937),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return SingleChildScrollView(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minHeight: constraints.maxHeight,
+                          ),
+                          child: IntrinsicHeight(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Obx(() => Text(
+                                      controller.selectedScreen.value,
+                                      style: const TextStyle(
+                                        fontSize: 32,
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xFF1F2937),
+                                      ),
+                                    )),
+                                const SizedBox(height: 40),
+                                Obx(() {
+                                  if (controller.selectedScreen.value ==
+                                      'Profile Info') {
+                                    return Column(
+                                      children:
+                                          _buildProfileInfoContent(controller),
+                                    );
+                                  } else if (controller.selectedScreen.value ==
+                                      'Security') {
+                                    return Column(
+                                      children: _buildSecurityContent(),
+                                    );
+                                  } else if (controller.selectedScreen.value ==
+                                      'Notifications') {
+                                    return Column(
+                                      children:
+                                          _buildNotificationsContent(controller),
+                                    );
+                                  }
+                                  return const SizedBox();
+                                }),
+                                const Spacer(),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 40),
-
-                      // Content based on selected screen
-                      if (selectedScreen == 'Profile Info')
-                        ..._buildProfileInfoContent(context)
-                      else if (selectedScreen == 'Security')
-                        ..._buildSecurityContent()
-                      else if (selectedScreen == 'Notifications')
-                        ..._buildNotificationsContent(),
-                    ],
+                      );
+                    },
                   ),
                 ),
               ),
@@ -155,9 +169,8 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  List<Widget> _buildProfileInfoContent(BuildContext context) {
+  List<Widget> _buildProfileInfoContent(SettingsController controller) {
     return [
-      // Profile Picture and Label on the left
       Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -211,195 +224,80 @@ class _SettingsState extends State<Settings> {
           ),
         ],
       ),
-
       const SizedBox(height: 40),
-
-      // Row 1: Name and Email
       Row(
         children: [
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Name',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF374151),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: nameController,
-                  decoration: InputDecoration(
-                    hintText: 'Enter your name',
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Color(0xFF6366F1)),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 24),
-                  ),
-                ),
-              ],
-            ),
+            child: _buildTextField(
+                'Name', 'Enter your name', controller.nameController),
           ),
           const SizedBox(width: 24),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Email',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF374151),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: emailController,
-                  decoration: InputDecoration(
-                    hintText: 'Enter your email',
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Color(0xFF6366F1)),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 24),
-                  ),
-                ),
-              ],
-            ),
+            child: _buildTextField(
+                'Email', 'Enter your email', controller.emailController),
           ),
         ],
       ),
-
       const SizedBox(height: 24),
-
-      // Row 2: Phone Number and Empty
       Row(
         children: [
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Phone Number',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF374151),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: phoneController,
-                  decoration: InputDecoration(
-                    hintText: 'Enter phone number',
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Color(0xFF6366F1)),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 24),
-                  ),
-                ),
-              ],
-            ),
+            child: _buildTextField('Phone Number', 'Enter phone number',
+                controller.phoneController),
           ),
           const SizedBox(width: 24),
-          const Expanded(child: SizedBox()), // Empty for alignment
+          const Expanded(child: SizedBox()),
         ],
       ),
-
       const SizedBox(height: 40),
-
-      // Action buttons
       Row(
         children: [
-          OutlinedButton(
-            onPressed: () {
-              // Handle cancel
-            },
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
-              side: const BorderSide(color: Color(0xFFD1D5DB)),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(
-                color: Color(0xFF374151),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
+          _buildOutlinedButton('Cancel', controller.cancelChanges),
           const SizedBox(width: 16),
-          ElevatedButton(
-            onPressed: () {
-              // Handle save
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF6366F1),
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              elevation: 0,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: const [
-                Icon(Icons.save_outlined, size: 18, color: Colors.white),
-                SizedBox(width: 8),
-                Text(
-                  'Save',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          _buildElevatedButton('Save', controller.saveSettings),
         ],
       ),
     ];
+  }
+
+  Widget _buildTextField(
+      String label, String hint, TextEditingController controller) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF374151),
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: controller,
+          decoration: InputDecoration(
+            hintText: hint,
+            filled: true,
+            fillColor: Colors.white,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0xFF6366F1)),
+            ),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+          ),
+        ),
+      ],
+    );
   }
 
   List<Widget> _buildSecurityContent() {
@@ -414,13 +312,39 @@ class _SettingsState extends State<Settings> {
     ];
   }
 
-  List<Widget> _buildNotificationsContent() {
-  return [
-    // Notification Card 1
-    Align(
+  List<Widget> _buildNotificationsContent(SettingsController controller) {
+    return [
+      Obx(() => _buildNotificationToggle(
+            label: 'Ticket Notifications',
+            value: controller.ticketNotifications.value,
+            onChanged: controller.toggleTicketNotifications,
+          )),
+      const SizedBox(height: 16),
+      Obx(() => _buildNotificationToggle(
+            label: 'New Order Notifications',
+            value: controller.newOrderNotifications.value,
+            onChanged: controller.toggleNewOrderNotifications,
+          )),
+      const SizedBox(height: 40),
+      Row(
+        children: [
+          _buildOutlinedButton('Cancel', controller.cancelChanges),
+          const SizedBox(width: 16),
+          _buildElevatedButton('Save', controller.saveSettings),
+        ],
+      ),
+    ];
+  }
+
+  Widget _buildNotificationToggle({
+    required String label,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return Align(
       alignment: Alignment.centerLeft,
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 500), // ← Adjust width here
+        constraints: const BoxConstraints(maxWidth: 500),
         child: Container(
           padding: const EdgeInsets.all(15),
           decoration: BoxDecoration(
@@ -431,9 +355,9 @@ class _SettingsState extends State<Settings> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Ticket Notifications',
-                style: TextStyle(
+              Text(
+                label,
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                   color: Color(0xFF374151),
@@ -442,12 +366,8 @@ class _SettingsState extends State<Settings> {
               Transform.scale(
                 scale: 0.8,
                 child: Switch(
-                  value: ticketNotifications,
-                  onChanged: (value) {
-                    setState(() {
-                      ticketNotifications = value;
-                    });
-                  },
+                  value: value,
+                  onChanged: onChanged,
                   activeColor: Colors.white,
                   activeTrackColor: const Color(0xFF6366F1),
                   inactiveThumbColor: Colors.white,
@@ -459,118 +379,65 @@ class _SettingsState extends State<Settings> {
           ),
         ),
       ),
-    ),
+    );
+  }
 
-    const SizedBox(height: 16),
-
-    // Notification Card 2
-    Align(
-      alignment: Alignment.centerLeft,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 500), // ← Same width
-        child: Container(
-          padding: const EdgeInsets.all(15),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(width: 0.4, color: Colors.grey),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'New Order Notifications',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF374151),
-                ),
-              ),
-              Transform.scale(
-                scale: 0.8,
-                child: Switch(
-                  value: newOrderNotifications,
-                  onChanged: (value) {
-                    setState(() {
-                      newOrderNotifications = value;
-                    });
-                  },
-                  activeColor: Colors.white,
-                  activeTrackColor: const Color(0xFF6366F1),
-                  inactiveThumbColor: Colors.white,
-                  inactiveTrackColor: const Color(0xFFE5E7EB),
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-              ),
-            ],
-          ),
+  Widget _buildOutlinedButton(String text, VoidCallback onPressed) {
+    return OutlinedButton(
+      onPressed: onPressed,
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+        side: const BorderSide(color: Color(0xFFD1D5DB)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
         ),
       ),
-    ),
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: Color(0xFF374151),
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
 
-    const SizedBox(height: 40),
-
-    // Action buttons
-    Row(
-      children: [
-        OutlinedButton(
-          onPressed: () {
-            // Handle cancel
-          },
-          style: OutlinedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-            side: const BorderSide(color: Color(0xFFD1D5DB)),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          child: const Text(
-            'Cancel',
-            style: TextStyle(
-              color: Color(0xFF374151),
+  Widget _buildElevatedButton(String text, VoidCallback onPressed) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF6366F1),
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        elevation: 0,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.save_outlined, size: 18, color: Colors.white),
+          const SizedBox(width: 8),
+          Text(
+            text,
+            style: const TextStyle(
+              color: Colors.white,
               fontWeight: FontWeight.w500,
             ),
           ),
-        ),
-        const SizedBox(width: 16),
-        ElevatedButton(
-          onPressed: () {
-            // Handle save
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF6366F1),
-            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            elevation: 0,
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: const [
-              Icon(Icons.save_outlined, size: 18, color: Colors.white),
-              SizedBox(width: 8),
-              Text(
-                'Save',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    ),
-  ];
-}
+        ],
+      ),
+    );
+  }
 
-
-  Widget _buildSidebarItem(
-      {required String title, required bool isActive, VoidCallback? onTap}) {
+  Widget _buildSidebarItem({
+    required String title,
+    required bool isActive,
+    VoidCallback? onTap,
+  }) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 40),
-      padding: EdgeInsets.symmetric(vertical: 5),
+      padding: const EdgeInsets.symmetric(vertical: 5),
       decoration: BoxDecoration(
         border: !isActive ? Border.all(width: 0.4, color: Colors.grey) : null,
         color: isActive ? const Color(0xFF6366F1) : Colors.transparent,
@@ -582,7 +449,7 @@ class _SettingsState extends State<Settings> {
           title,
           style: CustomTextTheme.regular14.copyWith(
             color: isActive ? Colors.white : Colors.black,
-            fontWeight: isActive ? FontWeight.w500 : FontWeight.w500,
+            fontWeight: FontWeight.w500,
             fontSize: 16,
           ),
         ),
@@ -591,7 +458,7 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  Widget _buildThemeSwitcher() {
+  Widget _buildThemeSwitcher(SettingsController controller) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 40),
       padding: const EdgeInsets.all(16),
@@ -621,21 +488,21 @@ class _SettingsState extends State<Settings> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('Switch Theme', style: CustomTextTheme.regular14),
-                  Text(
-                    'Light Mode',
-                    style: TextStyle(
-                      color: Color(0xFF9CA3AF),
-                      fontSize: 12,
-                    ),
-                  ),
+                  Obx(() => Text(
+                        controller.isLightTheme.value ? 'Light Mode' : 'Dark Mode',
+                        style: const TextStyle(
+                          color: Color(0xFF9CA3AF),
+                          fontSize: 12,
+                        ),
+                      )),
                 ],
               ),
             ],
           ),
-          Switch(
-            value: true,
-            onChanged: (value) {},
-          )
+          Obx(() => Switch(
+                value: controller.isLightTheme.value,
+                onChanged: controller.toggleTheme,
+              )),
         ],
       ),
     );

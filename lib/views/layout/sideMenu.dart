@@ -51,9 +51,9 @@ class SideMenu extends StatelessWidget {
                   route: "/analytics",
                   selected: currentRoute == '/analytics',
                 ),
-                 _sideMenuItem(
+                _sideMenuItem(
                   context,
-                  icon: "assets/icons/setting.svg",
+                  icon: "assets/icons/manage_user.svg",
                   label: "Manage Users",
                   route: "/users",
                   selected: currentRoute == '/users',
@@ -67,14 +67,34 @@ class SideMenu extends StatelessWidget {
                   route: "/orders",
                   selected: currentRoute == '/orders',
                 ),
-                 _sideMenuItem(
+                _sideMenuItem(
+                  context,
+                  icon: "assets/icons/support.svg",
+                  label: "Support",
+                  route: "/support",
+                  selected: currentRoute == '/support',
+                ),
+                _sideMenuItem(
+                  context,
+                  icon: "assets/icons/price_setting.svg",
+                  label: "Price Setting",
+                  route: "/price-settings",
+                  selected: currentRoute == '/price-settings',
+                ),
+                _sideMenuItem(
+                  context,
+                  icon: "assets/icons/activity.svg",
+                  label: "User Activity",
+                  route: "/user-activity",
+                  selected: currentRoute == '/user-activity',
+                ),
+                _sideMenuItem(
                   context,
                   icon: "assets/icons/analytics.svg",
                   label: "Setting",
                   route: "/settings",
                   selected: currentRoute == '/settings',
                 ),
-               
               ],
             ),
           ),
@@ -97,16 +117,28 @@ class SideMenu extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20),
         margin: const EdgeInsets.symmetric(vertical: 3),
         decoration: BoxDecoration(
-          color: selected ? Color.fromARGB(255,96, 66, 255,) : Colors.white,
+          color: selected
+              ? Color.fromARGB(
+                  255,
+                  96,
+                  66,
+                  255,
+                )
+              : Colors.white,
           borderRadius: BorderRadius.circular(15),
         ),
         child: Row(
           children: [
-            SvgPicture.asset(icon,color: selected ? Colors.white : AppColors.themeText,),
+            SvgPicture.asset(
+              icon,
+              color: selected ? Colors.white : AppColors.themeText,
+            ),
             const SizedBox(width: 20),
             Text(
               label,
-              style: CustomTextTheme.regular16.copyWith(color: selected ? Colors.white : AppColors.themeText,fontWeight: FontWeight.w500),
+              style: CustomTextTheme.regular16.copyWith(
+                  color: selected ? Colors.white : AppColors.themeText,
+                  fontWeight: FontWeight.w500),
             ),
           ],
         ),
@@ -114,3 +146,33 @@ class SideMenu extends StatelessWidget {
     );
   }
 }
+
+
+
+
+
+class Support extends StatelessWidget {
+  const Support({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text("Support"),
+    );
+  }
+}
+
+
+
+class PriceSetting extends StatelessWidget {
+  const PriceSetting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text("Price Setting"),
+    );
+  }
+}
+
+

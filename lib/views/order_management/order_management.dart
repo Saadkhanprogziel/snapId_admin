@@ -29,40 +29,36 @@ class OrderManagement extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               _buildStatCardsSection(isDesktop, isTablet, isMobile),
-
               SizedBox(
                   height: isMobile
                       ? 20
                       : isTablet
                           ? 24
                           : 30),
-
-         
               _buildChartsSection(controller, isDesktop, isTablet, isMobile),
-               SizedBox(
+              SizedBox(
                   height: isMobile
                       ? 20
                       : isTablet
                           ? 24
                           : 30),
               Container(
-                    height: isMobile
-                        ? 400
-                        : isTablet
-                            ? 450
-                            : 500,
-                    decoration: BoxDecoration(
-                      border: Border.all(width: 0.4, color: Colors.grey),
-                      borderRadius: BorderRadius.circular(isMobile ? 16 : 25),
-                    ),
-                    child: OrdersListWidget(
-                      controller: controller,
-                      isMobile: isMobile,
-                      isTablet: isTablet,
-                    ),
-                  ),
+                height: isMobile
+                    ? 600
+                    : isTablet
+                        ? 600
+                        : 700,
+                decoration: BoxDecoration(
+                  border: Border.all(width: 0.4, color: Colors.grey),
+                  borderRadius: BorderRadius.circular(isMobile ? 16 : 25),
+                ),
+                child: OrdersListWidget(
+                  controller: controller,
+                  isMobile: isMobile,
+                  isTablet: isTablet,
+                ),
+              ),
             ],
           ),
         );
@@ -130,7 +126,6 @@ class OrderManagement extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.grey, width: 0.4),
-        
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

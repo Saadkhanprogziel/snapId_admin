@@ -7,6 +7,7 @@ class AnalyticsController extends GetxController {
 
 var selectedTopTab = 0.obs; // 0 = Top Countries, 1 = Top Buyers
 
+  var currentPage = 0.obs;
 
 
 List<UserActivityModel> dummyActivities = [
@@ -22,6 +23,34 @@ List<UserActivityModel> dummyActivities = [
       name: "Alice Smith",
       email: "alice.smith@example.com",
       activity: "Signed Up (Google)",
+      plateform: "iOS",
+    ),
+    UserActivityModel(
+      time: "2023-05-15 12:45 PM",
+      name: "Bob Johnson",
+      email: "bob.johnson@example.com",
+      activity: "Made a payment (\$29.99)",
+      plateform: "Android",
+    ),
+    UserActivityModel(
+      time: "2023-05-16 09:20 AM",
+      name: "Emma Wilson",
+      email: "emma.wilson@example.com",
+      activity: "Uploaded Photo",
+      plateform: "iOS",
+    ),
+    UserActivityModel(
+      time: "2023-05-16 02:10 PM",
+      name: "Michael Brown",
+      email: "michael.brown@example.com",
+      activity: "Signed Up (Email)",
+      plateform: "Android",
+    ),
+    UserActivityModel(
+      time: "2023-05-17 03:45 PM",
+      name: "Sarah Davis",
+      email: "sarah.davis@example.com",
+      activity: "Made a payment (\$9.99)",
       plateform: "iOS",
     ),
     UserActivityModel(

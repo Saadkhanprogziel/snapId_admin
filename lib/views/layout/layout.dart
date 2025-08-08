@@ -1,3 +1,4 @@
+import 'package:admin/constants/colors.dart';
 import 'package:admin/controller/app_controller.dart';
 import 'package:admin/views/app_routes.dart';
 import 'package:admin/views/layout/sideMenu.dart';
@@ -35,7 +36,7 @@ class AdminLayout extends StatelessWidget {
     final drawerController = Get.find<AppController>();
     final screenWidth = MediaQuery.of(context).size.width;
     final isSmallScreen = screenWidth < 1000;
-    final rightDrawerWidth = screenWidth * 0.75;
+    final rightDrawerWidth = screenWidth * 0.70;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -96,32 +97,23 @@ class AdminLayout extends StatelessWidget {
               : const SizedBox.shrink()),
           // Right Drawer
           Obx(() => AnimatedPositioned(
-                duration: const Duration(milliseconds: 300),
+                duration: const Duration(milliseconds: 400),
                 curve: Curves.easeInOut,
                 top: 0,
                 bottom: 0,
-                right: drawerController.isRightDrawerOpen ? 0 : -rightDrawerWidth,
+                right:
+                    drawerController.isRightDrawerOpen ? 0 : -rightDrawerWidth,
                 child: Material(
                   elevation: 16,
-                  child: Container(
+                  child: SizedBox(
                     width: rightDrawerWidth,
-                    color: Colors.blue[50],
                     child: Column(
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          alignment: Alignment.centerRight,
-                          child: IconButton(
-                            icon: const Icon(Icons.close),
-                            onPressed: drawerController.closeDrawer,
-                          ),
-                        ),
                         Expanded(
-                          child: drawerController.drawerContent ??
-                              const Center(
-                                child: Text('No content provided'),
-                              ),
-                        ),
+                            child: drawerController.drawerContent ??
+                                Scaffold(
+                                  backgroundColor: AppColors.whiteColor,
+                                )),
                       ],
                     ),
                   ),
@@ -132,4 +124,3 @@ class AdminLayout extends StatelessWidget {
     );
   }
 }
-

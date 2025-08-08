@@ -6,9 +6,81 @@ import 'package:get/get.dart';
 enum DataRange { weekly, monthly, }
 
 class OrderManagementController extends GetxController {
-
+var currentPage = 0.obs;
   var isRightDrawerOpen = true.obs;
   final RxList<OrderData> orderList = <OrderData>[
+    OrderData(
+        orderId: 'ORD-1001',
+        userEmail: 'john.doe@example.com',
+        notes: 'Please deliver ASAP',
+        date: '2025-08-01',
+        subscription: 'Gold',
+        amount: 150.00,
+        status: 'Pending',
+      ),
+    OrderData(
+        orderId: 'ORD-1001',
+        userEmail: 'john.doe@example.com',
+        notes: 'Please deliver ASAP',
+        date: '2025-08-01',
+        subscription: 'Gold',
+        amount: 150.00,
+        status: 'Pending',
+      ),
+    OrderData(
+        orderId: 'ORD-1001',
+        userEmail: 'john.doe@example.com',
+        notes: 'Please deliver ASAP',
+        date: '2025-08-01',
+        subscription: 'Gold',
+        amount: 150.00,
+        status: 'Pending',
+      ),
+    OrderData(
+        orderId: 'ORD-1001',
+        userEmail: 'john.doe@example.com',
+        notes: 'Please deliver ASAP',
+        date: '2025-08-01',
+        subscription: 'Gold',
+        amount: 150.00,
+        status: 'Pending',
+      ),
+    OrderData(
+        orderId: 'ORD-1001',
+        userEmail: 'john.doe@example.com',
+        notes: 'Please deliver ASAP',
+        date: '2025-08-01',
+        subscription: 'Gold',
+        amount: 150.00,
+        status: 'Pending',
+      ),
+    OrderData(
+        orderId: 'ORD-1001',
+        userEmail: 'john.doe@example.com',
+        notes: 'Please deliver ASAP',
+        date: '2025-08-01',
+        subscription: 'Gold',
+        amount: 150.00,
+        status: 'Pending',
+      ),
+    OrderData(
+        orderId: 'ORD-1001',
+        userEmail: 'john.doe@example.com',
+        notes: 'Please deliver ASAP',
+        date: '2025-08-01',
+        subscription: 'Gold',
+        amount: 150.00,
+        status: 'Pending',
+      ),
+    OrderData(
+        orderId: 'ORD-1001',
+        userEmail: 'john.doe@example.com',
+        notes: 'Please deliver ASAP',
+        date: '2025-08-01',
+        subscription: 'Gold',
+        amount: 150.00,
+        status: 'Pending',
+      ),
     OrderData(
         orderId: 'ORD-1001',
         userEmail: 'john.doe@example.com',

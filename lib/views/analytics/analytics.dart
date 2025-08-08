@@ -59,10 +59,10 @@ class Analytics extends StatelessWidget {
                   // Top Countries/Buyers Section LIST WIDGET
                   Container(
                     height: isMobile
-                        ? 400
+                        ? 500
                         : isTablet
-                            ? 450
-                            : 500,
+                            ? 600
+                            : 700,
                     decoration: BoxDecoration(
                       border: Border.all(width: 0.4, color: Colors.grey),
                       borderRadius: BorderRadius.circular(isMobile ? 16 : 25),
@@ -265,15 +265,6 @@ class Analytics extends StatelessWidget {
               analyticsController.selectedPeriod.value = value;
             },
           )),
-    );
-  }
-}
-
-class ManageUsersContent extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text("Manage Users Content", style: TextStyle(fontSize: 24)),
     );
   }
 }

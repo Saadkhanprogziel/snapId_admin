@@ -1,6 +1,8 @@
 import 'package:admin/views/analytics/analytics.dart';
 import 'package:admin/views/dashboard/dashboard.dart';
 import 'package:admin/views/layout/layout.dart';
+import 'package:admin/views/layout/sideMenu.dart';
+import 'package:admin/views/order_management/order_info_content/order_info_content.dart';
 import 'package:admin/views/order_management/order_management.dart';
 import 'package:admin/views/settings/settings.dart';
 import 'package:admin/views/user_management/user_management.dart';
@@ -29,6 +31,18 @@ final router = GoRouter(
         GoRoute(
           path: '/users',
           builder: (context, state) => UserManagement(),
+        ),
+        GoRoute(
+          path: '/support',
+          builder: (context, state) => Support(),
+        ),
+        GoRoute(
+          path: '/user-activity',
+          builder: (context, state) => OrderDetailScreen(),
+        ),
+        GoRoute(
+          path: '/price-settings',
+          builder: (context, state) => PriceSetting(),
         ),
         GoRoute(
           path: '/settings',

@@ -73,10 +73,10 @@ class UserManagement extends StatelessWidget {
                   const SizedBox(height: 20),
                   Container(
                     height: isMobile
-                        ? 400
+                        ? 500
                         : isTablet
-                            ? 450
-                            : 500,
+                            ? 600
+                            : 700,
                     decoration: BoxDecoration(
                       border: Border.all(width: 0.4, color: Colors.grey),
                       borderRadius: BorderRadius.circular(isMobile ? 16 : 25),
