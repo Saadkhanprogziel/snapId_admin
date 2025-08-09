@@ -1,110 +1,12 @@
-import 'package:admin/models/country_data.dart';
+import 'package:admin/models/chartsTablesModel.dart';
 import 'package:get/get.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class UserManagementController extends GetxController {
   var currentPage = 0.obs;
-  final RxList<UserTableModel> orderList = <UserTableModel>[
-    UserTableModel(
-      userId: '001',
-      name: 'Alice Smith',
-      email: 'alice@example.com',
-      signupDate: DateTime(2023, 1, 10),
-      subscription: 'Free',
-      signupMethod: 'Email',
-      platform: 'iOS',
-      status: 'active',
-    ),
-    UserTableModel(
-      userId: '002',
-      name: 'Bob Johnson',
-      email: 'bob@example.com',
-      signupDate: DateTime(2023, 2, 15),
-      subscription: 'Premium',
-      signupMethod: 'Google',
-      platform: 'Android',
-      status: 'active',
-    ),
-    UserTableModel(
-      userId: '001',
-      name: 'Alice Smith',
-      email: 'alice@example.com',
-      signupDate: DateTime(2023, 1, 10),
-      subscription: 'Free',
-      signupMethod: 'Email',
-      platform: 'iOS',
-      status: 'active',
-    ),
-    UserTableModel(
-      userId: '002',
-      name: 'Bob Johnson',
-      email: 'bob@example.com',
-      signupDate: DateTime(2023, 2, 15),
-      subscription: 'Premium',
-      signupMethod: 'Google',
-      platform: 'Android',
-      status: 'active',
-    ),
-    UserTableModel(
-      userId: '001',
-      name: 'Alice Smith',
-      email: 'alice@example.com',
-      signupDate: DateTime(2023, 1, 10),
-      subscription: 'Free',
-      signupMethod: 'Email',
-      platform: 'iOS',
-      status: 'active',
-    ),
-    UserTableModel(
-      userId: '002',
-      name: 'Bob Johnson',
-      email: 'bob@example.com',
-      signupDate: DateTime(2023, 2, 15),
-      subscription: 'Premium',
-      signupMethod: 'Google',
-      platform: 'Android',
-      status: 'active',
-    ),
-    UserTableModel(
-      userId: '001',
-      name: 'Alice Smith',
-      email: 'alice@example.com',
-      signupDate: DateTime(2023, 1, 10),
-      subscription: 'Free',
-      signupMethod: 'Email',
-      platform: 'iOS',
-      status: 'active',
-    ),
-    UserTableModel(
-      userId: '002',
-      name: 'Bob Johnson',
-      email: 'bob@example.com',
-      signupDate: DateTime(2023, 2, 15),
-      subscription: 'Premium',
-      signupMethod: 'Google',
-      platform: 'Android',
-      status: 'active',
-    ),
-    UserTableModel(
-      userId: '001',
-      name: 'Alice Smith',
-      email: 'alice@example.com',
-      signupDate: DateTime(2023, 1, 10),
-      subscription: 'Free',
-      signupMethod: 'Email',
-      platform: 'iOS',
-      status: 'active',
-    ),
-    UserTableModel(
-      userId: '002',
-      name: 'Bob Johnson',
-      email: 'bob@example.com',
-      signupDate: DateTime(2023, 2, 15),
-      subscription: 'Premium',
-      signupMethod: 'Google',
-      platform: 'Android',
-      status: 'active',
-    ),
+
+  // Master list (all users, unfiltered)
+  final RxList<UserTableModel> allUsers = <UserTableModel>[
     UserTableModel(
       userId: '001',
       name: 'Alice Smith',
@@ -133,7 +35,7 @@ class UserManagementController extends GetxController {
       subscription: 'Basic',
       signupMethod: 'Facebook',
       platform: 'Web',
-      status: 'inactive',
+      status: 'Block',
     ),
     UserTableModel(
       userId: '004',
@@ -143,7 +45,7 @@ class UserManagementController extends GetxController {
       subscription: 'Free',
       signupMethod: 'Apple',
       platform: 'iOS',
-      status: 'banned',
+      status: 'Block',
     ),
     UserTableModel(
       userId: '005',
@@ -163,7 +65,7 @@ class UserManagementController extends GetxController {
       subscription: 'Basic',
       signupMethod: 'Google',
       platform: 'Web',
-      status: 'inactive',
+      status: 'Block',
     ),
     UserTableModel(
       userId: '007',
@@ -187,25 +89,24 @@ class UserManagementController extends GetxController {
     ),
   ].obs;
 
-  // Observable variables for reactive updates
+  // Filtered list (used in UI)
+  final RxList<UserTableModel> orderList = <UserTableModel>[].obs;
+
+  // Observable variables for stats
   final RxInt totalUsers = 12480.obs;
   final RxDouble growthPercentage = 28.4.obs;
   final RxString growthPeriod = 'Since Mar 2025'.obs;
 
-  // Platform data
   final RxInt mobileUsers = 3780.obs;
   final RxInt webUsers = 2520.obs;
 
-  // User status data
   final RxInt activeUsers = 11350.obs;
   final RxInt suspendedUsers = 1190.obs;
 
-  // Signup methods data
   final RxInt googleSignups = 6300.obs;
   final RxInt appleSignups = 3000.obs;
   final RxInt emailSignups = 3240.obs;
 
-  // Line chart data points
   final RxList<FlSpot> chartSpots = <FlSpot>[
     const FlSpot(0, 3),
     const FlSpot(1, 1),
@@ -221,7 +122,6 @@ class UserManagementController extends GetxController {
     const FlSpot(11, 4),
   ].obs;
 
-  // Pie chart touched index
   final RxnInt touchedIndex = RxnInt();
 
   // Computed getters
@@ -230,7 +130,22 @@ class UserManagementController extends GetxController {
   int get totalSignupUsers =>
       googleSignups.value + appleSignups.value + emailSignups.value;
 
-  // Methods to update data (you can call these from API responses)
+  // Filtering method
+  void filterUsers(String query) {
+    if (query.isEmpty) {
+      orderList.assignAll(allUsers);
+    } else {
+      final lowerQuery = query.toLowerCase();
+      orderList.assignAll(allUsers.where((user) {
+        return (user.name ?? '').toLowerCase().contains(lowerQuery) ||
+               (user.email ?? '').toLowerCase().contains(lowerQuery) ||
+               (user.userId ?? '').toLowerCase().contains(lowerQuery);
+      }));
+    }
+    currentPage.value = 0; // Reset pagination
+  }
+
+  // Data update methods
   void updateTotalUsers(int users, double growth, String period) {
     totalUsers.value = users;
     growthPercentage.value = growth;
@@ -261,12 +176,9 @@ class UserManagementController extends GetxController {
     touchedIndex.value = index;
   }
 
-  // Simulate API call to fetch data
+  // Simulated API call
   Future<void> fetchUserData() async {
-    // Simulate network delay
     await Future.delayed(const Duration(seconds: 1));
-
-    // Update with new data (replace with actual API calls)
     updateTotalUsers(15230, 32.1, 'Since Apr 2025');
     updatePlatformUsers(4200, 2800);
     updateUserStatus(13500, 980);
@@ -276,7 +188,7 @@ class UserManagementController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-
+    orderList.assignAll(allUsers); // Initially show all users
     fetchUserData();
   }
 }

@@ -1,4 +1,4 @@
-import 'package:admin/models/country_data.dart';
+import 'package:admin/models/chartsTablesModel.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

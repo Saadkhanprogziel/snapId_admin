@@ -1,17 +1,17 @@
 import 'package:admin/controller/app_controller.dart';
-import 'package:admin/controller/orders_management_controller/order_management.dart';
+import 'package:admin/controller/support_controller/support_controller.dart';
 import 'package:admin/models/chartsTablesModel.dart';
 import 'package:admin/theme/text_theme.dart';
 import 'package:admin/views/order_management/order_info_content/order_info_content.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class OrdersListWidget extends StatelessWidget {
-  final OrderManagementController controller;
+class SupportListWidget extends StatelessWidget {
+  final SupportController controller;
   final bool isMobile;
   final bool isTablet;
 
-  const OrdersListWidget({
+  const SupportListWidget({
     Key? key,
     required this.controller,
     this.isMobile = false,
@@ -20,7 +20,7 @@ class OrdersListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final drawerController = Get.find<AppController>();
+    // final drawerController = Get.find<AppController>();
 
     return Container(
       padding: EdgeInsets.all(isMobile
@@ -52,15 +52,15 @@ class OrdersListWidget extends StatelessWidget {
               // Calculate pagination
               const itemsPerPage = 10;
               final totalPages =
-                  (controller.orderList.length / itemsPerPage).ceil();
+                  (controller.ticketList.length / itemsPerPage).ceil();
               final currentPage = controller.currentPage.value;
               final startIndex = currentPage * itemsPerPage;
               final endIndex =
-                  (startIndex + itemsPerPage) > controller.orderList.length
-                      ? controller.orderList.length
+                  (startIndex + itemsPerPage) > controller.ticketList.length
+                      ? controller.ticketList.length
                       : (startIndex + itemsPerPage);
               final paginatedList =
-                  controller.orderList.sublist(startIndex, endIndex);
+                  controller.ticketList.sublist(startIndex, endIndex);
 
               return ListView.builder(
                 itemCount: paginatedList.length,
@@ -74,7 +74,7 @@ class OrdersListWidget extends StatelessWidget {
           Obx(() {
             const itemsPerPage = 10;
             final totalPages =
-                (controller.orderList.length / itemsPerPage).ceil();
+                (controller.ticketList.length / itemsPerPage).ceil();
             final currentPage = controller.currentPage.value;
 
             return Container(
@@ -123,7 +123,7 @@ class OrdersListWidget extends StatelessWidget {
     );
   }
 
-   Widget _buildHeaderSection() {
+ Widget _buildHeaderSection() {
   if (isMobile) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -142,10 +142,10 @@ class OrdersListWidget extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          "Orders",
-          style: CustomTextTheme.regular20,
-        ),
+     Text(
+              "All Support Messages",
+              style: CustomTextTheme.regular20,
+            ),
         Row(
           children: [
             // 🔍 Search Bar
@@ -184,8 +184,7 @@ class OrdersListWidget extends StatelessWidget {
                 },
               ),
             ),
-            const SizedBox(width: 12),
-            _buildActionButton(Icons.download, "Export"),
+          
             const SizedBox(width: 8),
             _buildActionButton(Icons.filter_list, "Filter"),
           ],
@@ -195,6 +194,7 @@ class OrdersListWidget extends StatelessWidget {
   }
 }
 
+
   Widget _buildTableHeader() {
     if (isMobile) {
       // Mobile: Show simplified header
@@ -202,8 +202,8 @@ class OrdersListWidget extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
         child: Row(
           children: const [
-            Expanded(flex: 2, child: Text('Order ID', style: _headerStyle)),
-            Expanded(flex: 3, child: Text('Amount', style: _headerStyle)),
+            Expanded(flex: 2, child: Text('Name', style: _headerStyle)),
+            Expanded(flex: 3, child: Text('Subject', style: _headerStyle)),
             Expanded(flex: 2, child: Text('Status', style: _headerStyle)),
             SizedBox(width: 60, child: Text('Actions', style: _headerStyle)),
           ],
@@ -214,11 +214,11 @@ class OrdersListWidget extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         child: Row(children: const [
-          Expanded(flex: 1, child: Text('Order ID', style: _headerStyle)),
-          Expanded(flex: 2, child: Text('Email', style: _headerStyle)),
-          Expanded(flex: 2, child: Text('Amount', style: _headerStyle)),
+          Expanded(flex: 1, child: Text('User ID', style: _headerStyle)),
+          Expanded(flex: 2, child: Text('Name', style: _headerStyle)),
+          Expanded(flex: 2, child: Text('Subject', style: _headerStyle)),
+          Expanded(flex: 2, child: Text('Date', style: _headerStyle)),
           Expanded(flex: 2, child: Text('Status', style: _headerStyle)),
-          Expanded(flex: 2, child: Text('Subscription', style: _headerStyle)),
           SizedBox(width: 70, child: Text('Actions', style: _headerStyle)),
         ]),
       );
@@ -227,13 +227,12 @@ class OrdersListWidget extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(children: const [
-          Expanded(flex: 1, child: Text('Order ID', style: _headerStyle)),
-          Expanded(flex: 2, child: Text('Date', style: _headerStyle)),
+          Expanded(flex: 1, child: Text('User ID', style: _headerStyle)),
+          Expanded(flex: 2, child: Text('Name', style: _headerStyle)),
+          Expanded(flex: 2, child: Text('Subject', style: _headerStyle)),
+          Expanded(flex: 3, child: Text('Date', style: _headerStyle)),
           Expanded(flex: 2, child: Text('Status', style: _headerStyle)),
-          Expanded(flex: 3, child: Text('Email', style: _headerStyle)),
-          Expanded(flex: 2, child: Text('Subscription', style: _headerStyle)),
-          Expanded(flex: 2, child: Text('Amount', style: _headerStyle)),
-          Expanded(flex: 2, child: Text('Note', style: _headerStyle)),
+          Expanded(flex: 2, child: Text('Email Address', style: _headerStyle)),
           SizedBox(width: 80, child: Text('Actions', style: _headerStyle)),
         ]),
       );
@@ -241,7 +240,7 @@ class OrdersListWidget extends StatelessWidget {
   }
 
   Widget _buildTableRow(
-    OrderData data,
+    SupportDataModel data,
   ) {
     final padding = isMobile
         ? 8.0
@@ -261,13 +260,13 @@ class OrdersListWidget extends StatelessWidget {
           children: [
             Expanded(
                 flex: 2,
-                child: Text(data.orderId,
+                child: Text(data.name,
                     style: _rowStyle, overflow: TextOverflow.ellipsis)),
             Expanded(
                 flex: 3,
-                child: Text("${data.amount}",
+                child: Text("${data.subject}",
                     style: _rowStyle, overflow: TextOverflow.ellipsis)),
-            Expanded(flex: 2, child:_buildStatusChip(data.status)),
+            Expanded(flex: 2, child: Text(data.status, style: _rowStyle)),
             SizedBox(
                 width: 60, child: _buildActionButton(Icons.visibility, "")),
           ],
@@ -282,15 +281,15 @@ class OrdersListWidget extends StatelessWidget {
               Border(top: BorderSide(color: Colors.grey.shade200, width: 1)),
         ),
         child: Row(children: [
-          Expanded(flex: 1, child: Text('${data.orderId}', style: _rowStyle)),
+          Expanded(flex: 1, child: Text('${data.userId}', style: _rowStyle)),
           Expanded(
               flex: 2,
-              child: Text(data.userEmail,
+              child: Text(data.name,
                   style: _rowStyle, overflow: TextOverflow.ellipsis)),
           Expanded(
-              flex: 2, child: Text(data.amount.toString(), style: _rowStyle)),
-          Expanded(flex: 2, child:_buildStatusChip(data.status)),
-          Expanded(flex: 2, child: Text(data.subscription, style: _rowStyle)),
+              flex: 2, child: Text(data.subject, style: _rowStyle)),
+          Expanded(flex: 2, child: Text('${data.date}', style: _rowStyle)),
+          Expanded(flex: 2, child: Text(data.status, style: _rowStyle)),
           SizedBox(
               width: 70, child: _buildActionButton(Icons.visibility, "View")),
         ]),
@@ -304,86 +303,25 @@ class OrdersListWidget extends StatelessWidget {
               Border(top: BorderSide(color: Colors.grey.shade200, width: 1)),
         ),
         child: Row(children: [
-          Expanded(flex: 1, child: Text('${data.orderId}', style: _rowStyle)),
-          Expanded(flex: 2, child: Text(data.date, style: _rowStyle)),
-          Expanded(flex: 2, child:_buildStatusChip(data.status)),
+          Expanded(flex: 1, child: Text('${data.userId}', style: _rowStyle)),
+          Expanded(flex: 2, child: Text(data.name, style: _rowStyle)),
+          Expanded(flex: 2, child: Text(data.subject, style: _rowStyle)),
           Expanded(
               flex: 3,
-              child: Text(data.userEmail,
+              child: Text(data.date,
                   style: _rowStyle, overflow: TextOverflow.ellipsis)),
           Expanded(
-              flex: 2, child: Text('${data.subscription}', style: _rowStyle)),
+              flex: 2, child: Text('${data.status}', style: _rowStyle)),
+         
           Expanded(
               flex: 2,
-              child: Text('\$${data.amount.toStringAsFixed(2)}',
-                  style: _rowStyle)),
-          Expanded(
-              flex: 2,
-              child: Text(data.notes,
+              child: Text(data.emailAddress,
                   style: _rowStyle, overflow: TextOverflow.ellipsis)),
           SizedBox(
               width: 80, child: _buildActionButton(Icons.visibility, "View")),
         ]),
       );
     }
-  }
-
-    Widget _buildStatusChip(String? status) {
-    bool isBlocked = (status ?? "").toLowerCase() == "failed";
-    bool isActive = (status ?? "").toLowerCase() == "success" || (status ?? "").toLowerCase() == "completed";
-
-    Color bgColor;
-    Color dotColor;
-    Color textColor;
-
-    if (isBlocked) {
-      bgColor = Colors.red.withOpacity(0.1);
-      dotColor = Colors.red;
-      textColor = Colors.red.shade800;
-    } else if (isActive) {
-      bgColor = Colors.green.withOpacity(0.1);
-      dotColor = Colors.green;
-      textColor = Colors.green.shade800;
-    } else {
-      bgColor = Colors.grey.withOpacity(0.1);
-      dotColor = Colors.grey;
-      textColor = Colors.grey.shade700;
-    }
-
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: bgColor,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  color: dotColor,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 6),
-              Text(
-                status ?? "",
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: textColor,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
   }
 
   Widget _buildActionButton(IconData icon, String label) {

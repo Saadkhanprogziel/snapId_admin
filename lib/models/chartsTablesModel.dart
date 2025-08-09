@@ -1,4 +1,3 @@
-
 class UserActivityModel {
   final String time;
   final String name;
@@ -73,36 +72,24 @@ class UserTableModel {
     this.subscription,
     this.signupMethod,
     this.platform,
-    this.status, // Included in constructor
+    this.status,
   });
+}
 
-  // Factory method to create a User from a map (e.g., from JSON)
-  factory UserTableModel.fromMap(Map<String, dynamic> map) {
-    return UserTableModel(
-      userId: map['userId'],
-      name: map['name'],
-      email: map['email'],
-      signupDate: map['signupDate'] != null
-          ? DateTime.tryParse(map['signupDate'])
-          : null,
-      subscription: map['subscription'],
-      signupMethod: map['signupMethod'],
-      platform: map['platform'],
-      status: map['status'], // Added here
-    );
-  }
+class SupportDataModel {
+  final String userId;
+  final String name;
+  final String subject;
+  final String date;
+  final String status;
+  final String emailAddress;
 
-  // Convert User instance to a map (e.g., for API or database)
-  Map<String, dynamic> toMap() {
-    return {
-      'userId': userId,
-      'name': name,
-      'email': email,
-      'signupDate': signupDate?.toIso8601String(),
-      'subscription': subscription,
-      'signupMethod': signupMethod,
-      'platform': platform,
-      'status': status, // Added here
-    };
-  }
+  SupportDataModel({
+    required this.userId,
+    required this.name,
+    required this.subject,
+    required this.date,
+    required this.status,
+    required this.emailAddress,
+  });
 }

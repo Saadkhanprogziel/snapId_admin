@@ -2,7 +2,7 @@ import 'package:admin/constants/colors.dart';
 import 'package:admin/controller/app_controller.dart';
 import 'package:admin/controller/user_management_controller/user_info_detail_controller/user_info_detail_controller.dart';
 import 'package:admin/controller/user_management_controller/user_management_controller.dart';
-import 'package:admin/models/country_data.dart';
+import 'package:admin/models/chartsTablesModel.dart';
 import 'package:admin/theme/text_theme.dart';
 import 'package:admin/utils/custom_elevated_button.dart';
 import 'package:admin/utils/custom_spaces.dart';
@@ -130,10 +130,7 @@ class UsersListWidget extends StatelessWidget {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Tabs
-
           const SizedBox(height: 12),
-          // Action Buttons
           Row(
             children: [
               Expanded(child: _buildActionButton(Icons.download, "Export")),
@@ -153,7 +150,44 @@ class UsersListWidget extends StatelessWidget {
           ),
           Row(
             children: [
-              // add search bar here with prefix search Icon
+              // 🔍 Search Bar
+              SizedBox(
+                width: 250,
+                child: TextField(
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.search, color: Colors.grey.shade600),
+                    hintText: 'Search users...',
+                    contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25),
+                      borderSide: BorderSide(
+                        color: Colors.grey.shade300,
+                        width: 1, // thin border
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25),
+                      borderSide: BorderSide(
+                        color: Colors.grey.shade300,
+                        width: 1, // thin border
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25),
+                      borderSide: BorderSide(
+                        color: Colors
+                            .grey.shade300, // same thin grey border on focus
+                        width: 1,
+                      ),
+                    ),
+                    isDense: true,
+                  ),
+                  onChanged: (value) {
+                    controller.filterUsers(value);
+                  },
+                ),
+              ),
+              const SizedBox(width: 12),
               _buildActionButton(Icons.download, "Export"),
               const SizedBox(width: 8),
               _buildActionButton(Icons.filter_list, "Filter"),
@@ -202,7 +236,9 @@ class UsersListWidget extends StatelessWidget {
           Expanded(flex: 3, child: Text('Signup Date', style: _headerStyle)),
           Expanded(flex: 2, child: Text('Subscription', style: _headerStyle)),
           Expanded(flex: 2, child: Text('Signup Method', style: _headerStyle)),
-          Expanded(flex: 2, child: Text('Plateform', style: _headerStyle)),
+          Expanded(flex: 2, child: Text('Platform', style: _headerStyle)),
+          Expanded(
+              flex: 2, child: Text('Status', style: _headerStyle)), // ✅ New
           SizedBox(width: 80, child: Text('Actions', style: _headerStyle)),
         ]),
       );
@@ -236,7 +272,7 @@ class UsersListWidget extends StatelessWidget {
                 flex: 3,
                 child: Text("${data.name}",
                     style: _rowStyle, overflow: TextOverflow.ellipsis)),
-            Expanded(flex: 2, child: Text(data.status ?? "", style: _rowStyle)),
+            Expanded(flex: 2, child: _buildStatusChip(data.status)), // ✅
             SizedBox(
                 width: 60,
                 child:
@@ -260,7 +296,7 @@ class UsersListWidget extends StatelessWidget {
                   style: _rowStyle, overflow: TextOverflow.ellipsis)),
           Expanded(
               flex: 2, child: Text(data.email.toString(), style: _rowStyle)),
-          Expanded(flex: 2, child: Text('${data.status}', style: _rowStyle)),
+          Expanded(flex: 2, child: _buildStatusChip(data.status)), // ✅
           Expanded(
               flex: 2, child: Text(data.subscription ?? "", style: _rowStyle)),
           SizedBox(
@@ -270,6 +306,7 @@ class UsersListWidget extends StatelessWidget {
         ]),
       );
     } else {
+      // Desktop: Full row
       // Desktop: Full row
       return Container(
         padding: EdgeInsets.symmetric(horizontal: padding, vertical: 16),
@@ -299,6 +336,8 @@ class UsersListWidget extends StatelessWidget {
               flex: 2,
               child: Text(data.platform ?? "",
                   style: _rowStyle, overflow: TextOverflow.ellipsis)),
+          Expanded(flex: 2, child: _buildStatusChip(data.status)),
+// ✅ New
           SizedBox(
               width: 80,
               child: _buildActionButton(
@@ -306,6 +345,64 @@ class UsersListWidget extends StatelessWidget {
         ]),
       );
     }
+  }
+
+  Widget _buildStatusChip(String? status) {
+    bool isBlocked = (status ?? "").toLowerCase() == "block" ;
+    bool isActive = (status ?? "").toLowerCase() == "active";
+
+    Color bgColor;
+    Color dotColor;
+    Color textColor;
+
+    if (isBlocked) {
+      bgColor = Colors.red.withOpacity(0.1);
+      dotColor = Colors.red;
+      textColor = Colors.red.shade800;
+    } else if (isActive) {
+      bgColor = Colors.green.withOpacity(0.1);
+      dotColor = Colors.green;
+      textColor = Colors.green.shade800;
+    } else {
+      bgColor = Colors.grey.withOpacity(0.1);
+      dotColor = Colors.grey;
+      textColor = Colors.grey.shade700;
+    }
+
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: dotColor,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                status ?? "",
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: textColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildTab(String title, int index, bool isSelected) {
@@ -358,6 +455,7 @@ class UsersListWidget extends StatelessWidget {
         drawerController.toggleDrawer();
       },
       child: Container(
+        
         padding: EdgeInsets.symmetric(
           horizontal: isMobile ? 6 : 8,
           vertical: isMobile ? 6 : 8,

@@ -21,6 +21,10 @@ class TopBar extends StatelessWidget {
       return "Manage Users";
     } else if (location.startsWith('/settings')) {
       return "Settings";
+    } else if (location.startsWith('/support')) {
+      return "Support";
+    } else if (location.startsWith('/user-activity')) {
+      return "User Activity";
     } else {
       return "Welcome";
     }

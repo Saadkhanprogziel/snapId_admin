@@ -25,8 +25,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             Row(
               children: [
                 Container(
-                  width: 32,
-                  height: 32,
+                  width: 40,
+                  height: 40,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(8),
@@ -39,7 +39,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     ],
                   ),
                   child: const Icon(
-                    Icons.arrow_back,
+                    Icons.arrow_forward,
                     size: 18,
                     color: Color(0xFF6B7280),
                   ),
@@ -76,7 +76,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 ),
               ],
             ),
-            SpaceH20(),
+            SpaceH40(),
             Container(
               padding: EdgeInsets.symmetric(vertical: 40),
               decoration: BoxDecoration(
@@ -86,163 +86,77 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Order ID and Date
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 20),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            Text(
-                              "Order ID:",
-                              style: CustomTextTheme.regular18
-                                  .copyWith(color: Colors.grey),
-                            ),
-                            SpaceW30(),
-                            Text(
-                              "ORD1024",
-                              style: CustomTextTheme.regular18,
-                            ),
-                          ],
+                        Expanded(
+                          child: _buildDetailItem('Order ID:', 'ORD1024'),
                         ),
-                        Row(
-                          children: [
-                            Text(
-                              "Date:",
-                              style: CustomTextTheme.regular18
-                                  .copyWith(color: Colors.grey),
-                            ),
-                            SpaceW30(),
-                            Text(
-                              "09/08/2025",
-                              style: CustomTextTheme.regular18,
-                            ),
-                          ],
+                        Expanded(
+                          child: _buildDetailItem('Date:', '09/08/2025'),
                         ),
                       ],
                     ),
                   ),
-                  Divider(
-                    color: Colors.grey.shade300,
-                  ),
+
+                  Divider(color: Colors.grey.shade300),
+
+                  // Name and Amount
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 20),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            Text(
-                              "Email:",
-                              style: CustomTextTheme.regular18
-                                  .copyWith(color: Colors.grey),
-                            ),
-                            SpaceW30(),
-                            Text(
-                              "john@gmail.com",
-                              style: CustomTextTheme.regular18,
-                            ),
-                          ],
+                        Expanded(
+                          child: _buildDetailItem('Name:', 'John Smith'),
                         ),
-                        Row(
-                          children: [
-                            Text(
-                              "Status",
-                              style: CustomTextTheme.regular18
-                                  .copyWith(color: Colors.grey),
-                            ),
-                            SpaceW30(),
-                            Text(
-                              "Success",
-                              style: CustomTextTheme.regular18,
-                            ),
-                          ],
+                        Expanded(
+                          child: _buildDetailItem('Amount (USD):', '\$4.99'),
                         ),
                       ],
                     ),
                   ),
-                  Divider(
-                    color: Colors.grey.shade300,
-                  ),
+
+                  Divider(color: Colors.grey.shade300),
+
+                  // Email and Status
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 20),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            Text(
-                              "Subscription:",
-                              style: CustomTextTheme.regular18
-                                  .copyWith(color: Colors.grey),
-                            ),
-                            SpaceW30(),
-                            Text(
-                              "Photo 1",
-                              style: CustomTextTheme.regular18,
-                            ),
-                          ],
+                        Expanded(
+                          child: _buildDetailItem('Email:', 'john@gmail.com'),
                         ),
-                        Row(
-                          children: [
-                            Text(
-                              "Invoice:",
-                              style: CustomTextTheme.regular18
-                                  .copyWith(color: Colors.grey),
-                            ),
-                            SpaceW30(),
-                            Text(
-                              "View",
-                              style: CustomTextTheme.regular18,
-                            ),
-                          ],
+                        Expanded(
+                          child: _buildDetailItem('Status:', 'Success',
+                              status: true),
                         ),
                       ],
                     ),
                   ),
-                  Divider(
-                    color: Colors.grey.shade300,
-                  ),
+                  Divider(color: Colors.grey.shade300),
+
+                  // Subscription and Invoice
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 20),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            Text(
-                              "Name:",
-                              style: CustomTextTheme.regular18
-                                  .copyWith(color: Colors.grey),
-                            ),
-                            SpaceW30(),
-                            Text(
-                              "John Smith",
-                              style: CustomTextTheme.regular18,
-                            ),
-                          ],
+                        Expanded(
+                          child: _buildDetailItem('Subscription:', 'Photo 1'),
                         ),
-                        Row(
-                          children: [
-                            Text(
-                              "Amount (USD):",
-                              style: CustomTextTheme.regular18
-                                  .copyWith(color: Colors.grey),
-                            ),
-                            SpaceW30(),
-                            Text(
-                              "ORD1024",
-                              style: CustomTextTheme.regular18,
-                            ),
-                          ],
+                        Expanded(
+                          child:
+                              _buildDetailItem('Invoice:', 'View', link: true),
                         ),
                       ],
                     ),
                   ),
+
                   SpaceH20(),
                   // Note Section
                   Padding(
@@ -252,10 +166,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       children: [
                         Text(
                           'Note:',
-                          style: CustomTextTheme.regular18
-                              .copyWith(color: Colors.grey,fontWeight: FontWeight.w400),
+                          style: CustomTextTheme.regular18.copyWith(
+                              color: Colors.grey, fontWeight: FontWeight.w400),
                         ),
-
                         const SizedBox(height: 16),
 
                         // Note Input
@@ -326,150 +239,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 ],
               ),
             )
-            // const SizedBox(height: 32),
-
-            // // Order Details Card
-            // Container(
-            //   decoration: BoxDecoration(
-            //       color: Colors.white,
-            //       borderRadius: BorderRadius.circular(12),
-            //       border: Border.all(width: 0.3, color: Colors.grey)),
-            //   child: Padding(
-            //     padding: const EdgeInsets.all(30.0),
-            //     child: Column(
-            //       children: [
-            //         // First Row
-            //         Row(
-            //           children: [
-            //             Expanded(
-            //               child: _buildDetailItem('Order ID:', 'ORD10245'),
-            //             ),
-            //             Expanded(
-            //               child: _buildDetailItem('Date:', '09/08/2025'),
-            //             ),
-            //           ],
-            //         ),
-            //         const SizedBox(height: 24),
-
-            //         // Second Row
-            //         Row(
-            //           children: [
-            //             Expanded(
-            //               child: _buildDetailItem('Name:', 'John Smith'),
-            //             ),
-            //             Expanded(
-            //               child: _buildDetailItem('Amount (USD):', '\$4.99'),
-            //             ),
-            //           ],
-            //         ),
-            //         const SizedBox(height: 24),
-
-            //         // Third Row
-            //         Row(
-            //           children: [
-            //             Expanded(
-            //               child: _buildDetailItem('Email:', 'john@gmail.com'),
-            //             ),
-            //             Expanded(
-            //               child: _buildDetailItem('Status:', 'Success',
-            //                   status: true),
-            //             ),
-            //           ],
-            //         ),
-            //         const SizedBox(height: 24),
-
-            //         // Fourth Row
-            //         Row(
-            //           children: [
-            //             Expanded(
-            //               child: _buildDetailItem('Subscription:', 'Photo 1'),
-            //             ),
-            //             Expanded(
-            //               child: _buildDetailItem('Invoice:', 'View',
-            //                   link: true),
-            //             ),
-            //           ],
-            //         ),
-            //         const SizedBox(height: 32),
-
-            //         // Note Section - Now following the same pattern
-            //         Row(
-            //           crossAxisAlignment: CrossAxisAlignment.start,
-            //           children: [
-            //             Expanded(
-            //               child: Column(
-            //                 crossAxisAlignment: CrossAxisAlignment.start,
-            //                 children: [
-            //                   const Text(
-            //                     'Note:',
-            //                     style: TextStyle(
-            //                       fontSize: 14,
-            //                       color: Color(0xFF6B7280),
-            //                       fontWeight: FontWeight.w500,
-            //                     ),
-            //                   ),
-            //                   const SizedBox(height: 8),
-            //                   Container(
-            //                     height: 120,
-            //                     decoration: BoxDecoration(
-            //                       border: Border.all(
-            //                           color: const Color(0xFFE5E7EB)),
-            //                       borderRadius: BorderRadius.circular(8),
-            //                     ),
-            //                     child: TextField(
-            //                       controller: _noteController,
-            //                       maxLines: null,
-            //                       expands: true,
-            //                       textAlignVertical: TextAlignVertical.top,
-            //                       decoration: const InputDecoration(
-            //                         hintText: 'Write note...',
-            //                         hintStyle: TextStyle(
-            //                           color: Color(0xFFA1A1AA),
-            //                           fontSize: 14,
-            //                         ),
-            //                         border: InputBorder.none,
-            //                         contentPadding: EdgeInsets.all(12),
-            //                       ),
-            //                       style: const TextStyle(
-            //                         fontSize: 14,
-            //                         color: Color(0xFF374151),
-            //                       ),
-            //                     ),
-            //                   ),
-            //                   const SizedBox(height: 16),
-
-            //                   // Save Note Button
-            //                   ElevatedButton(
-            //                     onPressed: () {},
-            //                     style: ElevatedButton.styleFrom(
-            //                       backgroundColor: const Color(0xFF6366F1),
-            //                       foregroundColor: Colors.white,
-            //                       padding: const EdgeInsets.symmetric(
-            //                           horizontal: 24, vertical: 12),
-            //                       shape: RoundedRectangleBorder(
-            //                         borderRadius: BorderRadius.circular(8),
-            //                       ),
-            //                       elevation: 0,
-            //                     ),
-            //                     child: const Text(
-            //                       'Save Note',
-            //                       style: TextStyle(
-            //                         fontSize: 14,
-            //                         fontWeight: FontWeight.w500,
-            //                       ),
-            //                     ),
-            //                   ),
-            //                 ],
-            //               ),
-            //             ),
-            //             // Empty expanded widget to maintain the two-column layout
-            //             const Expanded(child: SizedBox()),
-            //           ],
-            //         ),
-            //       ],
-            //     ),
-            //   ),
-            // ),
           ],
         ),
       ),
@@ -479,69 +248,69 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   Widget _buildDetailItem(String label, String value,
       {bool status = false, bool link = false}) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment:
+          CrossAxisAlignment.center, // Changed to center for better alignment
       children: [
         SizedBox(
-          width: 100, // Fixed width for label to align values
+          width: 140, // Increased width to accommodate longer labels
           child: Text(
             label,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Color(0xFF6B7280),
-              fontWeight: FontWeight.w500,
-            ),
+            style: CustomTextTheme.regular18.copyWith(color: Colors.grey),
           ),
         ),
-        const SizedBox(width: 8),
-        if (status)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: const Color(0xFFDCFCE7),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Text(
-              value,
-              style: const TextStyle(
-                fontSize: 12,
-                color: Color(0xFF16A34A),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          )
-        else if (link)
-          TextButton.icon(
-            onPressed: () {},
-            icon: const Icon(
+        const SizedBox(width: 16), // Consistent spacing
+        _buildValue(value,
+            status: status, link: link), // Removed Expanded wrapper
+      ],
+    );
+  }
+
+  Widget _buildValue(String value, {bool status = false, bool link = false}) {
+    if (status) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: const Color(0xFFDCFCE7),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Text(
+          value,
+          style: const TextStyle(
+            fontSize: 14,
+            color: Color(0xFF16A34A),
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      );
+    } else if (link) {
+      return InkWell(
+        onTap: () {},
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
               Icons.visibility_outlined,
-              size: 14,
+              size: 16,
               color: Color(0xFF6366F1),
             ),
-            label: Text(
+            const SizedBox(width: 4),
+            Text(
               value,
               style: const TextStyle(
                 color: Color(0xFF6366F1),
-                fontSize: 14,
+                fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),
             ),
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.zero,
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-          )
-        else
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Color(0xFF6B7280),
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-      ],
-    );
+          ],
+        ),
+      );
+    } else {
+      return Text(
+        value,
+        style: CustomTextTheme.regular18,
+      );
+    }
   }
 
   @override

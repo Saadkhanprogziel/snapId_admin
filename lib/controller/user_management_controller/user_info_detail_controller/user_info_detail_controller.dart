@@ -1,4 +1,4 @@
-import 'package:admin/models/country_data.dart';
+import 'package:admin/models/chartsTablesModel.dart';
 import 'package:admin/models/user_info_model.dart/user_info_model.dart';
 import 'package:get/get.dart';
 

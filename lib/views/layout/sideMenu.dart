@@ -151,18 +151,6 @@ class SideMenu extends StatelessWidget {
 
 
 
-class Support extends StatelessWidget {
-  const Support({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text("Support"),
-    );
-  }
-}
-
-
 
 class PriceSetting extends StatelessWidget {
   const PriceSetting({super.key});

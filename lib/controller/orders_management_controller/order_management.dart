@@ -1,4 +1,4 @@
-import 'package:admin/models/country_data.dart';
+import 'package:admin/models/chartsTablesModel.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:get/get.dart';
@@ -16,7 +16,7 @@ var currentPage = 0.obs;
         date: '2025-08-01',
         subscription: 'Gold',
         amount: 150.00,
-        status: 'Pending',
+        status: 'success',
       ),
     OrderData(
         orderId: 'ORD-1001',
@@ -25,7 +25,7 @@ var currentPage = 0.obs;
         date: '2025-08-01',
         subscription: 'Gold',
         amount: 150.00,
-        status: 'Pending',
+        status: 'failed',
       ),
     OrderData(
         orderId: 'ORD-1001',
@@ -34,7 +34,7 @@ var currentPage = 0.obs;
         date: '2025-08-01',
         subscription: 'Gold',
         amount: 150.00,
-        status: 'Pending',
+        status: 'success',
       ),
     OrderData(
         orderId: 'ORD-1001',
@@ -43,7 +43,7 @@ var currentPage = 0.obs;
         date: '2025-08-01',
         subscription: 'Gold',
         amount: 150.00,
-        status: 'Pending',
+        status: 'success',
       ),
     OrderData(
         orderId: 'ORD-1001',
@@ -52,7 +52,7 @@ var currentPage = 0.obs;
         date: '2025-08-01',
         subscription: 'Gold',
         amount: 150.00,
-        status: 'Pending',
+        status: 'failed',
       ),
     OrderData(
         orderId: 'ORD-1001',
@@ -61,7 +61,7 @@ var currentPage = 0.obs;
         date: '2025-08-01',
         subscription: 'Gold',
         amount: 150.00,
-        status: 'Pending',
+        status: 'success',
       ),
     OrderData(
         orderId: 'ORD-1001',
@@ -70,7 +70,7 @@ var currentPage = 0.obs;
         date: '2025-08-01',
         subscription: 'Gold',
         amount: 150.00,
-        status: 'Pending',
+        status: 'success',
       ),
     OrderData(
         orderId: 'ORD-1001',
@@ -79,7 +79,7 @@ var currentPage = 0.obs;
         date: '2025-08-01',
         subscription: 'Gold',
         amount: 150.00,
-        status: 'Pending',
+        status: 'success',
       ),
     OrderData(
         orderId: 'ORD-1001',
@@ -88,7 +88,7 @@ var currentPage = 0.obs;
         date: '2025-08-01',
         subscription: 'Gold',
         amount: 150.00,
-        status: 'Pending',
+        status: 'success',
       ),
       OrderData(
         orderId: 'ORD-1002',
@@ -97,7 +97,7 @@ var currentPage = 0.obs;
         date: '2025-08-02',
         subscription: 'Silver',
         amount: 89.99,
-        status: 'Completed',
+        status: 'success',
       ),
       OrderData(
         orderId: 'ORD-1003',

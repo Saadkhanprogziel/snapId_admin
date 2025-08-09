@@ -1,6 +1,6 @@
 import 'package:admin/constants/colors.dart';
 import 'package:admin/controller/user_management_controller/user_info_detail_controller/user_info_detail_controller.dart';
-import 'package:admin/models/country_data.dart';
+import 'package:admin/models/chartsTablesModel.dart';
 import 'package:admin/theme/text_theme.dart';
 
 import 'package:admin/utils/custom_spaces.dart';
@@ -28,16 +28,23 @@ class UserInfoContent extends StatelessWidget {
                 Row(
                   children: [
                     Container(
-                      height: 45,
-                      width: 45,
+                      width: 40,
+                      height: 40,
                       decoration: BoxDecoration(
-                        color: const Color.fromARGB(144, 224, 224, 224),
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
-                      child: Icon(
+                      child: const Icon(
                         Icons.arrow_forward,
-                        size: 26,
-                        color: AppColors.blackColor,
+                        size: 18,
+                        color: Color(0xFF6B7280),
                       ),
                     ),
                     SpaceW20(),
@@ -403,194 +410,198 @@ class UserInfoContent extends StatelessWidget {
     );
   }
 
- 
- Widget _buildOrdersContent(UserInfoDetailController controller) {
-  return Column(
-    children: [
-      // Orders Table
-      Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          children: [
-            // Table Header
-            Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade50,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  topRight: Radius.circular(12),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Expanded(flex: 2, child: _buildTableHeader('Order ID')),
-                  Expanded(flex: 2, child: _buildTableHeader('Notes')), // Updated to match OrderData
-                  Expanded(flex: 2, child: _buildTableHeader('Subscription')),
-                  Expanded(flex: 1, child: _buildTableHeader('Amount')), // Updated to match OrderData
-                  Expanded(flex: 1, child: _buildTableHeader('Action')),
-                ],
-              ),
-            ),
-            Container(
-              height: 400,
-              child: Obx(() {
-                const itemsPerPage = 10;
-                final totalPages =
-                    (controller.orderList.length / itemsPerPage).ceil(); // Use orderList.length
-                final currentPage = controller.currentPage.value;
-                final startIndex = currentPage * itemsPerPage;
-                final endIndex = (startIndex + itemsPerPage) >
-                        controller.orderList.length
-                    ? controller.orderList.length
-                    : (startIndex + itemsPerPage);
-                final paginatedList =
-                    controller.orderList.sublist(startIndex, endIndex);
-
-                return ListView.builder(
-                  itemCount: paginatedList.length,
-                  itemBuilder: (context, index) =>
-                      _buildOrderRow(paginatedList[index]),
-                );
-              }),
-            ),
-            Obx(() {
-              const itemsPerPage = 10;
-              final totalPages =
-                  (controller.orderList.length / itemsPerPage).ceil(); // Use orderList.length
-              final currentPage = controller.currentPage.value;
-
-              return Container(
-                padding: EdgeInsets.only(top: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      onPressed: currentPage > 0
-                          ? () => controller.currentPage.value--
-                          : null,
-                      icon: Icon(
-                        Icons.chevron_left,
-                        color: currentPage > 0
-                            ? Colors.grey.shade700
-                            : Colors.grey.shade400,
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        'Page ${currentPage + 1} of $totalPages',
-                        style: TextStyle(
-                          color: Colors.grey.shade700,
-                          fontSize: 12,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: currentPage < totalPages - 1
-                          ? () => controller.currentPage.value++
-                          : null,
-                      icon: Icon(
-                        Icons.chevron_right,
-                        color: currentPage < totalPages - 1
-                            ? Colors.grey.shade700
-                            : Colors.grey.shade400,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }),
-          ],
-        ),
-      ),
-    ],
-  );
-}
-
-
-
-Widget _buildOrderRow(OrderData data) {
-  return Container(
-    padding: EdgeInsets.all(16),
-    decoration: BoxDecoration(
-      border: Border(
-        top: BorderSide(color: Colors.grey.shade200),
-      ),
-    ),
-    child: Row(
+  Widget _buildOrdersContent(UserInfoDetailController controller) {
+    return Column(
       children: [
-        Expanded(
-          flex: 2,
-          child: Text(
-            data.orderId,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade600,
-            ),
+        // Orders Table
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey.shade300),
+            borderRadius: BorderRadius.circular(12),
           ),
-        ),
-        Expanded(
-          flex: 2,
-          child: Text(
-            data.notes, // Changed from document to notes as per OrderData class
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade600,
-            ),
-          ),
-        ),
-        Expanded(
-          flex: 2,
-          child: Text(
-            data.subscription,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade600,
-            ),
-          ),
-        ),
-        Expanded(
-          flex: 1,
-          child: Text(
-            '\$${data.amount.toStringAsFixed(2)}', // Changed to display amount
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade600,
-            ),
-          ),
-        ),
-        Expanded(
-          flex: 1,
-          child: InkWell(
-            onTap: () {},
-            child: Row(
-              children: [
-                Text(
-                  'View',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF6366F1),
-                    fontWeight: FontWeight.w500,
+          child: Column(
+            children: [
+              // Table Header
+              Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade50,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(12),
+                    topRight: Radius.circular(12),
                   ),
                 ),
-                SizedBox(width: 4),
-                Icon(
-                  Icons.arrow_outward,
-                  size: 14,
-                  color: Color(0xFF6366F1),
+                child: Row(
+                  children: [
+                    Expanded(flex: 2, child: _buildTableHeader('Order ID')),
+                    Expanded(
+                        flex: 2,
+                        child: _buildTableHeader(
+                            'Notes')), // Updated to match OrderData
+                    Expanded(flex: 2, child: _buildTableHeader('Subscription')),
+                    Expanded(
+                        flex: 1,
+                        child: _buildTableHeader(
+                            'Amount')), // Updated to match OrderData
+                    Expanded(flex: 1, child: _buildTableHeader('Action')),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              Container(
+                height: 400,
+                child: Obx(() {
+                  const itemsPerPage = 10;
+                  final totalPages =
+                      (controller.orderList.length / itemsPerPage)
+                          .ceil(); // Use orderList.length
+                  final currentPage = controller.currentPage.value;
+                  final startIndex = currentPage * itemsPerPage;
+                  final endIndex =
+                      (startIndex + itemsPerPage) > controller.orderList.length
+                          ? controller.orderList.length
+                          : (startIndex + itemsPerPage);
+                  final paginatedList =
+                      controller.orderList.sublist(startIndex, endIndex);
+
+                  return ListView.builder(
+                    itemCount: paginatedList.length,
+                    itemBuilder: (context, index) =>
+                        _buildOrderRow(paginatedList[index]),
+                  );
+                }),
+              ),
+              Obx(() {
+                const itemsPerPage = 10;
+                final totalPages = (controller.orderList.length / itemsPerPage)
+                    .ceil(); // Use orderList.length
+                final currentPage = controller.currentPage.value;
+
+                return Container(
+                  padding: EdgeInsets.only(top: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        onPressed: currentPage > 0
+                            ? () => controller.currentPage.value--
+                            : null,
+                        icon: Icon(
+                          Icons.chevron_left,
+                          color: currentPage > 0
+                              ? Colors.grey.shade700
+                              : Colors.grey.shade400,
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          'Page ${currentPage + 1} of $totalPages',
+                          style: TextStyle(
+                            color: Colors.grey.shade700,
+                            fontSize: 12,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: currentPage < totalPages - 1
+                            ? () => controller.currentPage.value++
+                            : null,
+                        icon: Icon(
+                          Icons.chevron_right,
+                          color: currentPage < totalPages - 1
+                              ? Colors.grey.shade700
+                              : Colors.grey.shade400,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ],
           ),
         ),
       ],
-    ),
-  );
-}
+    );
+  }
+
+  Widget _buildOrderRow(OrderData data) {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(color: Colors.grey.shade200),
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: Text(
+              data.orderId,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey.shade600,
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(
+              data.notes, // Changed from document to notes as per OrderData class
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey.shade600,
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(
+              data.subscription,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey.shade600,
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Text(
+              '\$${data.amount.toStringAsFixed(2)}', // Changed to display amount
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey.shade600,
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: InkWell(
+              onTap: () {},
+              child: Row(
+                children: [
+                  Text(
+                    'View',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF6366F1),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  SizedBox(width: 4),
+                  Icon(
+                    Icons.arrow_outward,
+                    size: 14,
+                    color: Color(0xFF6366F1),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildActivityContent(UserInfoDetailController controller) {
     return Column(
@@ -625,7 +636,6 @@ Widget _buildOrderRow(OrderData data) {
               Container(
                 height: 400,
                 child: Obx(() {
-               
                   const itemsPerPage = 10;
                   final totalPages =
                       (controller.getActivities.length / itemsPerPage).ceil();
