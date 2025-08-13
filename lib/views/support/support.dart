@@ -17,8 +17,9 @@ class Support extends StatelessWidget {
     final isMobile = screenWidth < 600;
     final isTablet = screenWidth >= 600 && screenWidth < 1024;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? Theme.of(context).scaffoldBackgroundColor : Colors.white,
       body: SingleChildScrollView(
         physics: AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(16.0),

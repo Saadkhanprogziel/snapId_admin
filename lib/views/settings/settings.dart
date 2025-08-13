@@ -1,7 +1,37 @@
+
 import 'package:admin/controller/settings_controller/settings_controller.dart';
+import 'package:admin/controller/app_controller.dart';
 import 'package:admin/theme/text_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+  Widget _buildElevatedButton(String text, VoidCallback onPressed) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+        backgroundColor: const Color(0xFF6366F1),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        elevation: 0,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.save_outlined, size: 18, color: Colors.white),
+          const SizedBox(width: 8),
+          Text(
+            text,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
 class Settings extends StatelessWidget {
   const Settings({Key? key}) : super(key: key);
@@ -11,8 +41,9 @@ class Settings extends StatelessWidget {
     // Initialize the controller
     final SettingsController controller = Get.put(SettingsController());
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      backgroundColor: isDark ? Theme.of(context).scaffoldBackgroundColor : Colors.white,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.only(top: 70),
@@ -23,10 +54,11 @@ class Settings extends StatelessWidget {
               Expanded(
                 flex: 1,
                 child: Container(
-                  color: Colors.white,
+                  // No border or background for sidebar container
                   child: Column(
                     children: [
                       Obx(() => _buildSidebarItem(
+                            context: context,
                             title: 'Profile Info',
                             isActive: controller.selectedScreen.value ==
                                 'Profile Info',
@@ -34,6 +66,7 @@ class Settings extends StatelessWidget {
                           )),
                       const SizedBox(height: 8),
                       Obx(() => _buildSidebarItem(
+                            context: context,
                             title: 'Security',
                             isActive:
                                 controller.selectedScreen.value == 'Security',
@@ -41,6 +74,7 @@ class Settings extends StatelessWidget {
                           )),
                       const SizedBox(height: 8),
                       Obx(() => _buildSidebarItem(
+                            context: context,
                             title: 'Notifications',
                             isActive:
                                 controller.selectedScreen.value == 'Notifications',
@@ -136,7 +170,7 @@ class Settings extends StatelessWidget {
                                       'Profile Info') {
                                     return Column(
                                       children:
-                                          _buildProfileInfoContent(controller),
+                                          _buildProfileInfoContent(controller, context),
                                     );
                                   } else if (controller.selectedScreen.value ==
                                       'Security') {
@@ -147,7 +181,7 @@ class Settings extends StatelessWidget {
                                       'Notifications') {
                                     return Column(
                                       children:
-                                          _buildNotificationsContent(controller),
+                                          _buildNotificationsContent(controller, context),
                                     );
                                   }
                                   return const SizedBox();
@@ -169,7 +203,7 @@ class Settings extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildProfileInfoContent(SettingsController controller) {
+  List<Widget> _buildProfileInfoContent(SettingsController controller, BuildContext context) {
     return [
       Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -229,12 +263,12 @@ class Settings extends StatelessWidget {
         children: [
           Expanded(
             child: _buildTextField(
-                'Name', 'Enter your name', controller.nameController),
+                'Name', 'Enter your name', controller.nameController, context),
           ),
           const SizedBox(width: 24),
           Expanded(
             child: _buildTextField(
-                'Email', 'Enter your email', controller.emailController),
+                'Email', 'Enter your email', controller.emailController, context),
           ),
         ],
       ),
@@ -243,7 +277,7 @@ class Settings extends StatelessWidget {
         children: [
           Expanded(
             child: _buildTextField('Phone Number', 'Enter phone number',
-                controller.phoneController),
+                controller.phoneController, context),
           ),
           const SizedBox(width: 24),
           const Expanded(child: SizedBox()),
@@ -261,7 +295,8 @@ class Settings extends StatelessWidget {
   }
 
   Widget _buildTextField(
-      String label, String hint, TextEditingController controller) {
+      String label, String hint, TextEditingController controller, BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -278,19 +313,17 @@ class Settings extends StatelessWidget {
           controller: controller,
           decoration: InputDecoration(
             hintText: hint,
-            filled: true,
-            fillColor: Colors.white,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+              borderSide: const BorderSide(color: Color(0xFFE5E7EB), width: 0.4),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+              borderSide: const BorderSide(color: Color(0xFFE5E7EB), width: 0.4),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFF6366F1)),
+              borderSide: const BorderSide(color: Color(0xFF6366F1), width: 0.4),
             ),
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
@@ -312,18 +345,20 @@ class Settings extends StatelessWidget {
     ];
   }
 
-  List<Widget> _buildNotificationsContent(SettingsController controller) {
+  List<Widget> _buildNotificationsContent(SettingsController controller, BuildContext context) {
     return [
       Obx(() => _buildNotificationToggle(
             label: 'Ticket Notifications',
             value: controller.ticketNotifications.value,
             onChanged: controller.toggleTicketNotifications,
+            context: context,
           )),
       const SizedBox(height: 16),
       Obx(() => _buildNotificationToggle(
             label: 'New Order Notifications',
             value: controller.newOrderNotifications.value,
             onChanged: controller.toggleNewOrderNotifications,
+            context: context,
           )),
       const SizedBox(height: 40),
       Row(
@@ -340,7 +375,9 @@ class Settings extends StatelessWidget {
     required String label,
     required bool value,
     required ValueChanged<bool> onChanged,
+    required BuildContext context,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Align(
       alignment: Alignment.centerLeft,
       child: ConstrainedBox(
@@ -348,7 +385,7 @@ class Settings extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(15),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDark ? const Color(0xFF23272F) : Colors.white,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(width: 0.4, color: Colors.grey),
           ),
@@ -392,27 +429,6 @@ class Settings extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
         ),
       ),
-      child: Text(
-        text,
-        style: const TextStyle(
-          color: Color(0xFF374151),
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildElevatedButton(String text, VoidCallback onPressed) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF6366F1),
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        elevation: 0,
-      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -431,16 +447,21 @@ class Settings extends StatelessWidget {
   }
 
   Widget _buildSidebarItem({
+    required BuildContext context,
     required String title,
     required bool isActive,
     VoidCallback? onTap,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final Color activeColor = isDark ? const Color(0xFF23272F) : const Color(0xFF6366F1);
+    final Color inactiveTextColor = isDark ? Colors.white : Colors.black;
+    final Color activeTextColor = isDark ? Colors.white : Colors.white;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 40),
       padding: const EdgeInsets.symmetric(vertical: 5),
       decoration: BoxDecoration(
         border: !isActive ? Border.all(width: 0.4, color: Colors.grey) : null,
-        color: isActive ? const Color(0xFF6366F1) : Colors.transparent,
+        color: isActive ? activeColor : Colors.transparent,
         borderRadius: BorderRadius.circular(12),
       ),
       child: ListTile(
@@ -448,7 +469,7 @@ class Settings extends StatelessWidget {
         title: Text(
           title,
           style: CustomTextTheme.regular14.copyWith(
-            color: isActive ? Colors.white : Colors.black,
+            color: isActive ? activeTextColor : inactiveTextColor,
             fontWeight: FontWeight.w500,
             fontSize: 16,
           ),
@@ -459,6 +480,7 @@ class Settings extends StatelessWidget {
   }
 
   Widget _buildThemeSwitcher(SettingsController controller) {
+    final appController = Get.find<AppController>();
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 40),
       padding: const EdgeInsets.all(16),
@@ -489,7 +511,7 @@ class Settings extends StatelessWidget {
                 children: [
                   Text('Switch Theme', style: CustomTextTheme.regular14),
                   Obx(() => Text(
-                        controller.isLightTheme.value ? 'Light Mode' : 'Dark Mode',
+                        appController.themeMode.value == ThemeMode.light ? 'Light Mode' : 'Dark Mode',
                         style: const TextStyle(
                           color: Color(0xFF9CA3AF),
                           fontSize: 12,
@@ -500,8 +522,8 @@ class Settings extends StatelessWidget {
             ],
           ),
           Obx(() => Switch(
-                value: controller.isLightTheme.value,
-                onChanged: controller.toggleTheme,
+                value: appController.themeMode.value == ThemeMode.light,
+                onChanged: (val) => appController.toggleTheme(val),
               )),
         ],
       ),

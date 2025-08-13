@@ -12,8 +12,9 @@ class UserManagement extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(UserManagementController());
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? Theme.of(context).scaffoldBackgroundColor : Colors.white,
       body: LayoutBuilder(
         builder: (context, constraints) {
           final screenWidth = constraints.maxWidth;

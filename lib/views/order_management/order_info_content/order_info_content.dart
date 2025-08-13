@@ -14,8 +14,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? Theme.of(context).scaffoldBackgroundColor : Colors.white,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 40),
         child: Column(

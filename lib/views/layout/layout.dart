@@ -11,17 +11,35 @@ class SnapIDDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Initialize DrawerControllerX
-    Get.put(AppController());
+    final appController = Get.put(AppController());
 
     return ScreenUtilInit(
       designSize: const Size(1440, 1024),
       minTextAdapt: true,
       splitScreenMode: true,
-      builder: (_, __) => MaterialApp.router(
+      builder: (_, __) => Obx(() => MaterialApp.router(
         title: 'Admin Dashboard',
         debugShowCheckedModeBanner: false,
+        theme: ThemeData.light(),
+        darkTheme: ThemeData(
+          brightness: Brightness.dark,
+          scaffoldBackgroundColor: const Color(0xFF181A20),
+          cardColor: const Color(0xFF23272F),
+          canvasColor: const Color(0xFF181A20),
+          dialogBackgroundColor: const Color(0xFF23272F),
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Color(0xFF23272F),
+            foregroundColor: Colors.white,
+            elevation: 0,
+          ),
+          textTheme: ThemeData.dark().textTheme.apply(
+            bodyColor: Colors.white,
+            displayColor: Colors.white,
+          ),
+        ),
+        themeMode: appController.themeMode.value,
         routerConfig: router,
-      ),
+      )),
     );
   }
 }
@@ -38,12 +56,13 @@ class AdminLayout extends StatelessWidget {
     final isSmallScreen = screenWidth < 1000;
     final rightDrawerWidth = screenWidth * 0.70;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? Theme.of(context).scaffoldBackgroundColor : Colors.white,
       drawer: isSmallScreen ? Drawer(child: SideMenu()) : null,
       appBar: isSmallScreen
           ? AppBar(
-              backgroundColor: Colors.white,
+              backgroundColor: isDark ? Theme.of(context).scaffoldBackgroundColor : Colors.white,
               elevation: 0,
               leading: Builder(
                 builder: (context) => IconButton(

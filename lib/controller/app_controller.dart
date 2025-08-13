@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class AppController extends GetxController {
+  // Theme mode state
+  final Rx<ThemeMode> themeMode = ThemeMode.light.obs;
+
+  void setThemeMode(ThemeMode mode) => themeMode.value = mode;
+  void toggleTheme(bool isLight) => themeMode.value = isLight ? ThemeMode.light : ThemeMode.dark;
   var sidebarCollapsed = false.obs;
 
 

@@ -13,8 +13,9 @@ class Activity extends StatelessWidget {
   Widget build(BuildContext context) {
     final RecentActivitesContoller controller =
         Get.put(RecentActivitesContoller());
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? Theme.of(context).scaffoldBackgroundColor : Colors.white,
       body: Container(
         margin: EdgeInsets.all(20),
         decoration: BoxDecoration(

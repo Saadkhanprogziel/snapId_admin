@@ -11,9 +11,10 @@ class SideMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     final String currentRoute = GoRouterState.of(context).uri.toString();
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: 400,
-      color: Colors.white,
+      color: isDark ? const Color(0xFF181A20) : Colors.white,
       child: Stack(
         children: [
           Positioned.fill(
@@ -110,6 +111,13 @@ class SideMenu extends StatelessWidget {
     required String route,
     required bool selected,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final Color activeColor = selected
+        ? (isDark ? const Color(0xFF6366F1).withOpacity(0.85) : Color.fromARGB(217, 96, 66, 255))
+        : (isDark ? const Color(0xFF23272F).withOpacity(0.5) : Colors.white.withOpacity(0.7));
+    final Color textColor = selected
+        ? Colors.white
+        : (isDark ? Colors.white : AppColors.themeText);
     return InkWell(
       onTap: () => context.go(route),
       child: Container(
@@ -117,27 +125,20 @@ class SideMenu extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20),
         margin: const EdgeInsets.symmetric(vertical: 3),
         decoration: BoxDecoration(
-          color: selected
-              ? Color.fromARGB(
-                  255,
-                  96,
-                  66,
-                  255,
-                )
-              : Colors.white,
+          color: activeColor,
           borderRadius: BorderRadius.circular(15),
         ),
         child: Row(
           children: [
             SvgPicture.asset(
               icon,
-              color: selected ? Colors.white : AppColors.themeText,
+              color: textColor,
             ),
             const SizedBox(width: 20),
             Text(
               label,
               style: CustomTextTheme.regular16.copyWith(
-                  color: selected ? Colors.white : AppColors.themeText,
+                  color: textColor,
                   fontWeight: FontWeight.w500),
             ),
           ],
