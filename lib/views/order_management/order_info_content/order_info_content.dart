@@ -21,7 +21,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final order = widget.orderData;
     return Scaffold(
-      backgroundColor: isDark ? Theme.of(context).scaffoldBackgroundColor : Colors.white,
+      backgroundColor:
+          isDark ? Theme.of(context).scaffoldBackgroundColor : Colors.white,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 40),
         child: Column(
@@ -82,7 +83,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     ),
                   ),
                   style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   ),
                 ),
               ],
@@ -93,67 +95,94 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               decoration: BoxDecoration(
                   color: isDark ? Color(0xFF23272F) : Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(width: 0.3, color: isDark ? Colors.grey.shade700 : Colors.grey)),
+                  border: Border.all(
+                      width: 0.3,
+                      color: isDark ? Colors.grey.shade700 : Colors.grey)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Order ID and Date
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 20),
                     child: Row(
                       children: [
                         Expanded(
-                          child: _buildDetailItem('Order ID:', order?.orderId ?? '-', isDark: isDark),
+                          child: _buildDetailItem(
+                              'Order ID:', order?.orderId ?? '-',
+                              isDark: isDark),
                         ),
                         Expanded(
-                          child: _buildDetailItem('Date:', order?.date ?? '-', isDark: isDark),
+                          child: _buildDetailItem('Date:', order?.date ?? '-',
+                              isDark: isDark),
                         ),
                       ],
                     ),
                   ),
 
-                  Divider(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+                  Divider(
+                      color:
+                          isDark ? Colors.grey.shade700 : Colors.grey.shade300),
 
                   // Email and Amount
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 20),
                     child: Row(
                       children: [
                         Expanded(
-                          child: _buildDetailItem('Email:', order?.userEmail ?? '-', isDark: isDark),
+                          child: _buildDetailItem(
+                              'Email:', order?.userEmail ?? '-',
+                              isDark: isDark),
                         ),
                         Expanded(
-                          child: _buildDetailItem('Amount (USD):', order != null ? '\$${order.amount.toStringAsFixed(2)}' : '-', isDark: isDark),
+                          child: _buildDetailItem(
+                              'Amount (USD):',
+                              order != null
+                                  ? '\$${order.amount.toStringAsFixed(2)}'
+                                  : '-',
+                              isDark: isDark),
                         ),
                       ],
                     ),
                   ),
 
-                  Divider(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+                  Divider(
+                      color:
+                          isDark ? Colors.grey.shade700 : Colors.grey.shade300),
 
                   // Status and Subscription
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 20),
                     child: Row(
                       children: [
                         Expanded(
-                          child: _buildDetailItem('Status:', order?.status ?? '-', status: true, isDark: isDark),
+                          child: _buildDetailItem(
+                              'Status:', order?.status ?? '-',
+                              status: true, isDark: isDark),
                         ),
                         Expanded(
-                          child: _buildDetailItem('Subscription:', order?.subscription ?? '-', isDark: isDark),
+                          child: _buildDetailItem(
+                              'Subscription:', order?.subscription ?? '-',
+                              isDark: isDark),
                         ),
                       ],
                     ),
                   ),
-                  Divider(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+                  Divider(
+                      color:
+                          isDark ? Colors.grey.shade700 : Colors.grey.shade300),
 
                   // Invoice (dummy link)
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 20),
                     child: Row(
                       children: [
                         Expanded(
-                          child: _buildDetailItem('Invoice:', 'View', link: true, isDark: isDark),
+                          child: _buildDetailItem('Invoice:', 'View',
+                              link: true, isDark: isDark),
                         ),
                         Expanded(child: Container()),
                       ],
@@ -170,7 +199,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         Text(
                           'Note:',
                           style: CustomTextTheme.regular18.copyWith(
-                              color: isDark ? Colors.white : Colors.grey, fontWeight: FontWeight.w400),
+                              color: isDark ? Colors.white : Colors.grey,
+                              fontWeight: FontWeight.w400),
                         ),
                         const SizedBox(height: 16),
 
@@ -180,7 +210,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                           height: 120,
                           decoration: BoxDecoration(
                             color: isDark ? Color(0xFF23272F) : null,
-                            border: Border.all(color: isDark ? Colors.grey.shade700 : const Color(0xFFE5E7EB)),
+                            border: Border.all(
+                                color: isDark
+                                    ? Colors.grey.shade700
+                                    : const Color(0xFFE5E7EB)),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: TextField(
@@ -191,7 +224,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                             decoration: InputDecoration(
                               hintText: order?.notes ?? 'Write note...',
                               hintStyle: TextStyle(
-                                color: isDark ? Colors.grey.shade400 : Color(0xFFA1A1AA),
+                                color: isDark
+                                    ? Colors.grey.shade400
+                                    : Color(0xFFA1A1AA),
                                 fontSize: 16,
                                 fontWeight: FontWeight.w400,
                               ),
@@ -221,7 +256,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.transparent,
                               shadowColor: Colors.transparent,
-                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 24, vertical: 16),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
@@ -248,7 +284,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     );
   }
 
-  Widget _buildDetailItem(String label, String value, {bool status = false, bool link = false, bool isDark = false}) {
+  Widget _buildDetailItem(String label, String value,
+      {bool status = false, bool link = false, bool isDark = false}) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -256,7 +293,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           width: 140,
           child: Text(
             label,
-            style: CustomTextTheme.regular18.copyWith(color: isDark ? Colors.white : Colors.grey),
+            style: CustomTextTheme.regular18
+                .copyWith(color: isDark ? Colors.white : Colors.grey),
           ),
         ),
         const SizedBox(width: 16),
@@ -265,15 +303,20 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     );
   }
 
-  Widget _buildValue(String value, {bool status = false, bool link = false, bool isDark = false}) {
+  Widget _buildValue(String value,
+      {bool status = false, bool link = false, bool isDark = false}) {
     if (status) {
       final isFailed = value.trim().toLowerCase() == 'failed';
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
           color: isFailed
-              ? (isDark ? const Color(0xFFDC2626).withOpacity(0.2) : const Color(0xFFFECACA))
-              : (isDark ? Color(0xFF16A34A).withOpacity(0.2) : Color(0xFFDCFCE7)),
+              ? (isDark
+                  ? const Color(0xFFDC2626).withOpacity(0.2)
+                  : const Color(0xFFFECACA))
+              : (isDark
+                  ? Color(0xFF16A34A).withOpacity(0.2)
+                  : Color(0xFFDCFCE7)),
           borderRadius: BorderRadius.circular(6),
         ),
         child: Text(
@@ -311,7 +354,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     } else {
       return Text(
         value,
-        style: CustomTextTheme.regular18.copyWith(color: isDark ? Colors.white : null),
+        style: CustomTextTheme.regular18
+            .copyWith(color: isDark ? Colors.white : null),
       );
     }
   }

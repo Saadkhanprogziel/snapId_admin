@@ -135,6 +135,7 @@ class SideMenu extends StatelessWidget {
                       alignment: Alignment.centerLeft,
                       ),
                       onPressed: () {
+                        context.go('/login'); // Navigate to login page
                       // TODO: Add sign out logic here
                       },
                       child: Row(

@@ -35,7 +35,7 @@ class AnalyticsListWidget extends StatelessWidget {
                   : controller.dummyCountries; // Changed from dummyActivities to dummyCountries
               
               const itemsPerPage = 10;
-              final totalPages = (dataList.length / itemsPerPage).ceil();
+              // final totalPages = (dataList.length / itemsPerPage).ceil();
               final currentPage = controller.currentPage.value;
               final startIndex = currentPage * itemsPerPage;
               final endIndex = (startIndex + itemsPerPage) > dataList.length 

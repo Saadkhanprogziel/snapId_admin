@@ -1,3 +1,4 @@
+import 'package:admin/controller/app_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:admin/models/price_item.dart';
@@ -71,26 +72,53 @@ class EditPriceScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+           Row(
               children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back_ios_new),
-                  onPressed: () => Navigator.of(context).pop(),
+                GestureDetector(
+                  onTap: () {
+                    final appController = Get.find<AppController>();
+                    appController.closeDrawer();
+                  },
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: isDark ? Color(0xFF23272F) : Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      Icons.arrow_forward,
+                      size: 18,
+                      color: isDark ? Colors.white : Color(0xFF6B7280),
+                    ),
+                  ),
                 ),
-                const SizedBox(width: 8),
-                const Text(
-                  'Pricing Setting',
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                const SizedBox(width: 16),
+                Text(
+                  'Edit Price',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? Colors.white : Color(0xFF111827),
+                  ),
                 ),
+               
               ],
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 102),
             Container(
               padding: const EdgeInsets.all(32),
               decoration: BoxDecoration(
                 color: isDark ? const Color(0xFF23272F) : Colors.white,
                 border: Border.all(
-                  color: isDark ? Colors.grey.shade600 : Colors.grey.shade300,
+                  color: isDark ? Colors.grey.shade600 : const Color.fromARGB(255, 201, 199, 199),
                   width: 0.5,
                 ),
                 borderRadius: BorderRadius.circular(24),
