@@ -1,3 +1,4 @@
+import 'package:admin/controller/app_controller.dart';
 import 'package:admin/controller/user_management_controller/user_info_detail_controller/user_info_detail_controller.dart';
 import 'package:admin/models/chartsTablesModel.dart';
 import 'package:admin/theme/text_theme.dart';
@@ -14,6 +15,7 @@ class UserInfoContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final UserInfoDetailController userInfoController =
         Get.put(UserInfoDetailController());
+        final AppController drawerController = Get.find<AppController>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       backgroundColor: isDark ? Theme.of(context).scaffoldBackgroundColor : Colors.white,
@@ -25,37 +27,42 @@ class UserInfoContent extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: isDark ? Color(0xFF23272F) : const Color.fromARGB(255, 237, 236, 236),
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+                GestureDetector(
+                  onTap: () => {
+                    drawerController.closeDrawer(),
+                  },
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: isDark ? Color(0xFF23272F) : const Color.fromARGB(255, 255, 255, 255),
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child:  Icon(
+                          Icons.arrow_forward,
+                          size: 18,
+                          color: isDark ? Colors.white : Color(0xFF6B7280),
+                        ),
                       ),
-                      child:  Icon(
-                        Icons.arrow_forward,
-                        size: 18,
-                        color: isDark ? Colors.white : Color(0xFF6B7280),
-                      ),
-                    ),
-                    SpaceW20(),
-                    Text(
-                      "User information",
-                      style: CustomTextTheme.regular20.copyWith(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    )
-                  ],
+                      SpaceW20(),
+                      Text(
+                        "User information",
+                        style: CustomTextTheme.regular20.copyWith(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      )
+                    ],
+                  ),
                 ),
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -458,9 +465,9 @@ class UserInfoContent extends StatelessWidget {
                 height: 400,
                 child: Obx(() {
                   const itemsPerPage = 10;
-                  final totalPages =
-                      (controller.orderList.length / itemsPerPage)
-                          .ceil(); // Use orderList.length
+                  // final totalPages =
+                  //     (controller.orderList.length / itemsPerPage)
+                  //         .ceil(); // Use orderList.length
                   final currentPage = controller.currentPage.value;
                   final startIndex = currentPage * itemsPerPage;
                   final endIndex =
@@ -644,8 +651,8 @@ class UserInfoContent extends StatelessWidget {
                 height: 400,
                 child: Obx(() {
                   const itemsPerPage = 10;
-                  final totalPages =
-                      (controller.getActivities.length / itemsPerPage).ceil();
+                  // final totalPages =
+                  //     (controller.getActivities.length / itemsPerPage).ceil();
                   final currentPage = controller.currentPage.value;
                   final startIndex = currentPage * itemsPerPage;
                   final endIndex = (startIndex + itemsPerPage) >

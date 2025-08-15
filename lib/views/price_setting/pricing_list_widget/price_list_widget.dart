@@ -206,30 +206,6 @@ class PriceListWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(IconData icon, String label, BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return GestureDetector(
-      onTap: () {},
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: isMobile ? 6 : 8, vertical: isMobile ? 6 : 8),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300),
-          borderRadius: BorderRadius.circular(6),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (label.isNotEmpty && !isMobile) ...[
-              Text(label, style: TextStyle(color: isDark ? Colors.white : Colors.grey.shade700)),
-              const SizedBox(width: 6),
-            ],
-            Icon(icon, color: isDark ? Colors.white : Colors.grey.shade600, size: isMobile ? 14 : 16),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _buildViewActionButton(IconData icon, String label, BuildContext context, {required PriceItem data}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;

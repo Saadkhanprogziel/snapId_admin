@@ -2,7 +2,6 @@ import 'package:admin/controller/app_controller.dart';
 import 'package:admin/controller/support_controller/support_controller.dart';
 import 'package:admin/models/chartsTablesModel.dart';
 import 'package:admin/theme/text_theme.dart';
-import 'package:admin/views/order_management/order_info_content/order_info_content.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -50,8 +49,8 @@ class SupportListWidget extends StatelessWidget {
               child: Obx(() {
                 // Calculate pagination
                 const itemsPerPage = 10;
-                final totalPages =
-                    (controller.ticketList.length / itemsPerPage).ceil();
+                // final totalPages =
+                //     (controller.ticketList.length / itemsPerPage).ceil();
                 final currentPage = controller.currentPage.value;
                 final startIndex = currentPage * itemsPerPage;
                 final endIndex =

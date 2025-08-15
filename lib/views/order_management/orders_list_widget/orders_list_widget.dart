@@ -412,7 +412,7 @@ Widget _buildActionButton(
 }) {    final drawerController = Get.find<AppController>();
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return GestureDetector(
+    return InkWell(
       onTap: () {
         drawerController.setDrawerContent(OrderDetailScreen(orderData: orderData,));
         drawerController.toggleDrawer();

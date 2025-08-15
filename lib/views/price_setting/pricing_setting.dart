@@ -14,7 +14,7 @@ class PricingSetting extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final screenWidth = constraints.maxWidth;
-        final isDesktop = screenWidth > 1200;
+        // final isDesktop = screenWidth > 1200;
         final isTablet = screenWidth > 600 && screenWidth <= 1200;
         final isMobile = screenWidth <= 600;
 

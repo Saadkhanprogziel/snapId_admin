@@ -2,8 +2,7 @@ import 'package:admin/views/activity/activity.dart';
 import 'package:admin/views/analytics/analytics.dart';
 import 'package:admin/views/dashboard/dashboard.dart';
 import 'package:admin/views/layout/layout.dart';
-import 'package:admin/views/layout/sideMenu.dart';
-import 'package:admin/views/order_management/order_info_content/order_info_content.dart';
+
 import 'package:admin/views/order_management/order_management.dart';
 import 'package:admin/views/price_setting/pricing_setting.dart';
 import 'package:admin/views/settings/settings.dart';
