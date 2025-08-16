@@ -4,7 +4,7 @@ class UserActivityModel {
   final String email;
   final String activity;
   final String plateform;
-
+ 
   UserActivityModel({
     required this.time,
     required this.name,
@@ -54,7 +54,7 @@ class OrderData {
   });
 }
 
-class UserTableModel {
+class UserModel {
   final String? userId;
   final String? name;
   final String? email;
@@ -62,9 +62,10 @@ class UserTableModel {
   final String? subscription;
   final String? signupMethod;
   final String? platform;
+  final String? country;
   final String? status; // Added status field
 
-  UserTableModel({
+  UserModel({
     this.userId,
     this.name,
     this.email,
@@ -72,6 +73,7 @@ class UserTableModel {
     this.subscription,
     this.signupMethod,
     this.platform,
+    this.country,
     this.status,
   });
 }
@@ -83,6 +85,7 @@ class SupportDataModel {
   final String date;
   final String status;
   final String emailAddress;
+  final String subscription;
 
   SupportDataModel({
     required this.userId,
@@ -90,6 +93,7 @@ class SupportDataModel {
     required this.subject,
     required this.date,
     required this.status,
+    required this.subscription,
     required this.emailAddress,
   });
 }

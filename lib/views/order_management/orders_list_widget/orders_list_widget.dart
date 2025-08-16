@@ -3,9 +3,10 @@ import 'package:admin/controller/orders_management_controller/order_management.d
 import 'package:admin/models/chartsTablesModel.dart';
 import 'package:admin/theme/text_theme.dart';
 import 'package:admin/views/order_management/order_info_content/order_info_content.dart';
+import 'package:admin/views/support/filter_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
+  
 class OrdersListWidget extends StatelessWidget {
   final OrderManagementController controller;
   final bool isMobile;
@@ -20,180 +21,323 @@ class OrdersListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final drawerController = Get.find<AppController>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final appController = Get.find<AppController>();
 
-    return Container(
-      padding: EdgeInsets.all(isMobile
-          ? 16
-          : isTablet
-              ? 20
-              : 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Tabs and Actions Row
-          _buildHeaderSection(),
-
-          SizedBox(
-              height: isMobile
+    return Stack(
+      children: [
+        Container(
+          padding: EdgeInsets.all(isMobile
+              ? 16
+              : isTablet
                   ? 20
-                  : isTablet
-                      ? 24
-                      : 32),
-
-          // Table Header
-          _buildTableHeader(),
-
-          SizedBox(height: isMobile ? 8 : 12),
-
-          // Table Content
-          Expanded(
-            child: Obx(() {
-              // Calculate pagination
-              const itemsPerPage = 10;
-              final totalPages =
-                  (controller.orderList.length / itemsPerPage).ceil();
-              final currentPage = controller.currentPage.value;
-              final startIndex = currentPage * itemsPerPage;
-              final endIndex =
-                  (startIndex + itemsPerPage) > controller.orderList.length
-                      ? controller.orderList.length
-                      : (startIndex + itemsPerPage);
-              final paginatedList =
-                  controller.orderList.sublist(startIndex, endIndex);
-
-              return ListView.builder(
-                itemCount: paginatedList.length,
-                itemBuilder: (context, index) =>
-                    _buildTableRow(paginatedList[index]),
-              );
-            }),
-          ),
-
-          // Pagination Controls
-          Obx(() {
-            const itemsPerPage = 10;
-            final totalPages =
-                (controller.orderList.length / itemsPerPage).ceil();
-            final currentPage = controller.currentPage.value;
-
-            return Container(
-              padding: EdgeInsets.symmetric(vertical: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    onPressed: currentPage > 0
-                        ? () => controller.currentPage.value--
-                        : null,
-                    icon: Icon(
-                      Icons.chevron_left,
-                      color: currentPage > 0
-                          ? Colors.grey.shade700
-                          : Colors.grey.shade400,
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      'Page ${currentPage + 1} of $totalPages',
-                      style: TextStyle(
-                        color: Colors.grey.shade700,
-                        fontSize: isMobile ? 12 : 14,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: currentPage < totalPages - 1
-                        ? () => controller.currentPage.value++
-                        : null,
-                    icon: Icon(
-                      Icons.chevron_right,
-                      color: currentPage < totalPages - 1
-                          ? Colors.grey.shade700
-                          : Colors.grey.shade400,
-                    ),
-                  ),
-                ],
+                  : 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Tabs and Actions Row
+              _buildHeaderSection(context),
+        
+              SizedBox(
+                  height: isMobile
+                      ? 20
+                      : isTablet
+                          ? 24
+                          : 32),
+        
+              // Table Header
+              _buildTableHeader(),
+        
+              SizedBox(height: isMobile ? 8 : 12),
+        
+              // Table Content
+              Expanded(
+                child: Obx(() {
+                  // Calculate pagination
+                  const itemsPerPage = 10;
+                  // final totalPages =
+                  //     (controller.orderList.length / itemsPerPage).ceil();
+                  final currentPage = controller.currentPage.value;
+                  final startIndex = currentPage * itemsPerPage;
+                  final endIndex =
+                      (startIndex + itemsPerPage) > controller.orderList.length
+                          ? controller.orderList.length
+                          : (startIndex + itemsPerPage);
+                  final paginatedList =
+                      controller.orderList.sublist(startIndex, endIndex);
+        
+                  return ListView.builder(
+                    itemCount: paginatedList.length,
+                    itemBuilder: (context, index) =>
+                        _buildTableRow(paginatedList[index], isDark, context),
+                  );
+                }),
               ),
-            );
-          }),
-        ],
-      ),
+        
+              // Pagination Controls
+              Obx(() {
+                const itemsPerPage = 10;
+                final totalPages =
+                    (controller.orderList.length / itemsPerPage).ceil();
+                final currentPage = controller.currentPage.value;
+        
+                return Container(
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        onPressed: currentPage > 0
+                            ? () => controller.currentPage.value--
+                            : null,
+                        icon: Icon(
+                          Icons.chevron_left,
+                          color: currentPage > 0
+                              ? Colors.grey.shade700
+                              : Colors.grey.shade400,
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          'Page ${currentPage + 1} of $totalPages',
+                          style: TextStyle(
+                            color: Colors.grey.shade700,
+                            fontSize: isMobile ? 12 : 14,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: currentPage < totalPages - 1
+                            ? () => controller.currentPage.value++
+                            : null,
+                        icon: Icon(
+                          Icons.chevron_right,
+                          color: currentPage < totalPages - 1
+                              ? Colors.grey.shade700
+                              : Colors.grey.shade400,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ],
+          ),
+        ),
+
+
+        Obx(() => appController.showFilter.value
+            ? GestureDetector(
+                onTap: () => appController.showFilter.value = false,
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 300),
+                  opacity: appController.showFilter.value ? 0.5 : 0.0,
+                  child: Container(
+                    color: Colors.transparent,
+                    width: double.infinity,
+                    height: double.infinity,
+                  ),
+                ),
+              )
+            : const SizedBox.shrink()),
+
+        // Filter Panel should always be topmost
+        CommonFilterPanel(
+          isDark: isDark,
+          filterContent: _buildFilterPanel(isDark, appController),
+        )
+      ],
     );
   }
 
-   Widget _buildHeaderSection() {
-  if (isMobile) {
+
+
+  Widget _buildFilterPanel(bool isDark, AppController appController) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Text('Status:',
+            style: TextStyle(color: isDark ? Colors.white : Colors.black)),
         const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(child: _buildActionButton(Icons.download, "Export")),
-            const SizedBox(width: 8),
-            Expanded(child: _buildActionButton(Icons.filter_list, "Filter")),
-          ],
+        DropdownButtonFormField<String>(
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: isDark ? const Color(0xFF23272F) : Colors.white,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          value: controller.selectedStatus.value,
+          items:controller.status_filter
+              .map((status) => DropdownMenuItem(
+                    value: status,
+                    child: Text(status),
+                  ))
+              .toList(),
+          onChanged: (value) {
+            controller.selectedStatus.value = value ?? '';
+          },
         ),
-      ],
-    );
-  } else {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          "Orders",
-          style: CustomTextTheme.regular20,
+        const SizedBox(height: 16),
+        Text('Sort by:',
+            style: TextStyle(color: isDark ? Colors.white : Colors.black)),
+        const SizedBox(height: 12),
+        DropdownButtonFormField<String>(
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: isDark ? const Color(0xFF23272F) : Colors.white,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          value: controller.selectedSort.value,
+          items: controller.sort_filter
+              .map((sort) => DropdownMenuItem(
+                    value: sort,
+                    child: Text(sort),
+                  ))
+              .toList(),
+          onChanged: (value) {
+            controller.selectedSort.value = value ?? '';
+          },
         ),
+        const SizedBox(height: 16),
+        Text('Subscription:',
+            style: TextStyle(color: isDark ? Colors.white : Colors.black)),
+        const SizedBox(height: 12),
+        DropdownButtonFormField<String>(
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: isDark ? const Color(0xFF23272F) : Colors.white,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          value: controller.selectedSubscription.value,
+          items: controller.subscription_filter
+              .map((sub) => DropdownMenuItem(
+                    value: sub,
+                    child: Text(sub),
+                  ))
+              .toList(),
+          onChanged: (value) {
+            controller.selectedSubscription.value = value ?? '';
+          
+          },
+        ),
+        const SizedBox(height: 24),
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // 🔍 Search Bar
-            SizedBox(
-              width: 250,
-              child: TextField(
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.search, color: Colors.grey.shade600),
-                  hintText: 'Search users...',
-                  contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25),
-                    borderSide: BorderSide(
-                      color: Colors.grey.shade300,
-                      width: 1, // thin border
-                    ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25),
-                    borderSide: BorderSide(
-                      color: Colors.grey.shade300,
-                      width: 1, // thin border
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25),
-                    borderSide: BorderSide(
-                      color: Colors.grey.shade300, // same thin grey border on focus
-                      width: 1,
-                    ),
-                  ),
-                  isDense: true,
-                ),
-                onChanged: (value) {
-                  // controller.filterUsers(value);
-                },
+            TextButton(
+              onPressed: () {
+                // Reset filters logic here
+                appController.showFilter.value = false;
+              },
+              child: Row(
+                children: const [
+                  Icon(Icons.refresh, color: Colors.red),
+                  SizedBox(width: 4),
+                  Text('Reset', style: TextStyle(color: Colors.red)),
+                ],
               ),
             ),
-            const SizedBox(width: 12),
-            _buildActionButton(Icons.download, "Export"),
-            const SizedBox(width: 8),
-            _buildActionButton(Icons.filter_list, "Filter"),
+            ElevatedButton(
+              onPressed: () {
+                // Apply filter logic here
+                appController.showFilter.value = false;
+
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF4F46E5),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text(
+                'Apply Filter',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
           ],
         ),
       ],
     );
   }
-}
+
+  Widget _buildHeaderSection(BuildContext context) {
+    if (isMobile) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                  child: _buildActionButton(Icons.download, "Export", context)),
+              const SizedBox(width: 8),
+              Expanded(
+                  child:
+                      _buildActionButton(Icons.filter_list, "Filter", context)),
+            ],
+          ),
+        ],
+      );
+    } else {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            "Orders",
+            style: CustomTextTheme.regular20,
+          ),
+          Row(
+            children: [
+              // 🔍 Search Bar
+              SizedBox(
+                width: 250,
+                child: TextField(
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.search, color: Colors.grey.shade600),
+                    hintText: 'Search users...',
+                    hintStyle:
+                        TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25),
+                      borderSide: BorderSide(
+                        color: Colors.grey.shade300,
+                        width: 1, // thin border
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25),
+                      borderSide: BorderSide(
+                        color: Colors.grey.shade300,
+                        width: 1, // thin border
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25),
+                      borderSide: BorderSide(
+                        color: Colors
+                            .grey.shade300, // same thin grey border on focus
+                        width: 1,
+                      ),
+                    ),
+                    isDense: true,
+                  ),
+                  onChanged: (value) {
+                    // controller.filterUsers(value);
+                  },
+                ),
+              ),
+              const SizedBox(width: 12),
+              _buildActionButton(Icons.download, "Export", context),
+              const SizedBox(width: 8),
+              _buildActionButton(Icons.filter_list, "Filter", context),
+            ],
+          ),
+        ],
+      );
+    }
+  }
 
   Widget _buildTableHeader() {
     if (isMobile) {
@@ -242,6 +386,8 @@ class OrdersListWidget extends StatelessWidget {
 
   Widget _buildTableRow(
     OrderData data,
+    bool isDark,
+    BuildContext context,
   ) {
     final padding = isMobile
         ? 8.0
@@ -254,8 +400,10 @@ class OrdersListWidget extends StatelessWidget {
       return Container(
         padding: EdgeInsets.symmetric(horizontal: padding, vertical: 12),
         decoration: BoxDecoration(
-          border:
-              Border(top: BorderSide(color: Colors.grey.shade200, width: 1)),
+          border: Border(
+              top: BorderSide(
+                  color: isDark ? Colors.grey.shade600 : Colors.grey,
+                  width: 0.5)),
         ),
         child: Row(
           children: [
@@ -267,9 +415,10 @@ class OrdersListWidget extends StatelessWidget {
                 flex: 3,
                 child: Text("${data.amount}",
                     style: _rowStyle, overflow: TextOverflow.ellipsis)),
-            Expanded(flex: 2, child:_buildStatusChip(data.status)),
+            Expanded(flex: 2, child: _buildStatusChip(data.status)),
             SizedBox(
-                width: 60, child: _buildActionButton(Icons.visibility, "")),
+                width: 60,
+              child: _buildActionButton(Icons.visibility, "View", context,orderData: data)),
           ],
         ),
       );
@@ -278,8 +427,10 @@ class OrdersListWidget extends StatelessWidget {
       return Container(
         padding: EdgeInsets.symmetric(horizontal: padding, vertical: 14),
         decoration: BoxDecoration(
-          border:
-              Border(top: BorderSide(color: Colors.grey.shade200, width: 1)),
+          border: Border(
+              top: BorderSide(
+                  color: isDark ? Colors.grey.shade600 : Colors.grey,
+                  width: 0.5)),
         ),
         child: Row(children: [
           Expanded(flex: 1, child: Text('${data.orderId}', style: _rowStyle)),
@@ -289,10 +440,11 @@ class OrdersListWidget extends StatelessWidget {
                   style: _rowStyle, overflow: TextOverflow.ellipsis)),
           Expanded(
               flex: 2, child: Text(data.amount.toString(), style: _rowStyle)),
-          Expanded(flex: 2, child:_buildStatusChip(data.status)),
+          Expanded(flex: 2, child: _buildStatusChip(data.status)),
           Expanded(flex: 2, child: Text(data.subscription, style: _rowStyle)),
           SizedBox(
-              width: 70, child: _buildActionButton(Icons.visibility, "View")),
+              width: 70,
+              child: _buildActionButton(Icons.visibility, "View", context,orderData: data)),
         ]),
       );
     } else {
@@ -300,13 +452,15 @@ class OrdersListWidget extends StatelessWidget {
       return Container(
         padding: EdgeInsets.symmetric(horizontal: padding, vertical: 16),
         decoration: BoxDecoration(
-          border:
-              Border(top: BorderSide(color: Colors.grey.shade200, width: 1)),
+          border: Border(
+              top: BorderSide(
+                  color: isDark ? Colors.grey.shade600 : Colors.grey,
+                  width: 0.5)),
         ),
         child: Row(children: [
           Expanded(flex: 1, child: Text('${data.orderId}', style: _rowStyle)),
           Expanded(flex: 2, child: Text(data.date, style: _rowStyle)),
-          Expanded(flex: 2, child:_buildStatusChip(data.status)),
+          Expanded(flex: 2, child: _buildStatusChip(data.status)),
           Expanded(
               flex: 3,
               child: Text(data.userEmail,
@@ -322,15 +476,17 @@ class OrdersListWidget extends StatelessWidget {
               child: Text(data.notes,
                   style: _rowStyle, overflow: TextOverflow.ellipsis)),
           SizedBox(
-              width: 80, child: _buildActionButton(Icons.visibility, "View")),
+              width: 80,
+              child: _buildActionButton(Icons.visibility, "View", context,orderData: data)),
         ]),
       );
     }
   }
 
-    Widget _buildStatusChip(String? status) {
+  Widget _buildStatusChip(String? status) {
     bool isBlocked = (status ?? "").toLowerCase() == "failed";
-    bool isActive = (status ?? "").toLowerCase() == "success" || (status ?? "").toLowerCase() == "completed";
+    bool isActive = (status ?? "").toLowerCase() == "success" ||
+        (status ?? "").toLowerCase() == "completed";
 
     Color bgColor;
     Color dotColor;
@@ -339,7 +495,7 @@ class OrdersListWidget extends StatelessWidget {
     if (isBlocked) {
       bgColor = Colors.red.withOpacity(0.1);
       dotColor = Colors.red;
-      textColor = Colors.red.shade800;
+      textColor = Colors.red;
     } else if (isActive) {
       bgColor = Colors.green.withOpacity(0.1);
       dotColor = Colors.green;
@@ -386,13 +542,25 @@ class OrdersListWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(IconData icon, String label) {
-     final drawerController = Get.find<AppController>();
+Widget _buildActionButton(
+  IconData icon,
+  String label,
+  BuildContext context, {
+  OrderData? orderData,
+}) {    final drawerController = Get.find<AppController>();
 
-    return GestureDetector(
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return InkWell(
       onTap: () {
-        drawerController.setDrawerContent(OrderDetailScreen());
+        if (label.trim().toLowerCase() == 'export'){
+        print(label.trim().toLowerCase());
+          drawerController.showFilter.value = true;
+        }
+        else{
+
+        drawerController.setDrawerContent(OrderDetailScreen(orderData: orderData,));
         drawerController.toggleDrawer();
+        }
       },
       child: Container(
         padding: EdgeInsets.symmetric(
@@ -411,7 +579,7 @@ class OrdersListWidget extends StatelessWidget {
               Text(
                 label,
                 style: TextStyle(
-                  color: Colors.grey.shade700,
+                
                   fontSize: isTablet ? 12 : 14,
                 ),
               ),
@@ -419,7 +587,7 @@ class OrdersListWidget extends StatelessWidget {
             ],
             Icon(
               icon,
-              color: Colors.grey.shade600,
+             
               size: isMobile ? 14 : 16,
             ),
           ],

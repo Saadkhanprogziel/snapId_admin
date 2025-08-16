@@ -1,15 +1,11 @@
-import 'package:admin/constants/colors.dart';
 import 'package:admin/controller/app_controller.dart';
-import 'package:admin/controller/user_management_controller/user_info_detail_controller/user_info_detail_controller.dart';
 import 'package:admin/controller/user_management_controller/user_management_controller.dart';
 import 'package:admin/models/chartsTablesModel.dart';
 import 'package:admin/theme/text_theme.dart';
-import 'package:admin/utils/custom_elevated_button.dart';
-import 'package:admin/utils/custom_spaces.dart';
 import 'package:admin/views/user_management/user_detail_info_content/user_detail_info_content.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
+ 
 class UsersListWidget extends StatelessWidget {
   final UserManagementController controller;
   final bool isMobile;
@@ -24,6 +20,8 @@ class UsersListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: EdgeInsets.all(isMobile
           ? 16
@@ -34,7 +32,7 @@ class UsersListWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Tabs and Actions Row
-          _buildHeaderSection(),
+          _buildHeaderSection(context),
 
           SizedBox(
               height: isMobile
@@ -53,8 +51,8 @@ class UsersListWidget extends StatelessWidget {
             child: Obx(() {
               // Calculate pagination
               const itemsPerPage = 10;
-              final totalPages =
-                  (controller.orderList.length / itemsPerPage).ceil();
+              // final totalPages =
+              //     (controller.orderList.length / itemsPerPage).ceil();
               final currentPage = controller.currentPage.value;
               final startIndex = currentPage * itemsPerPage;
               final endIndex =
@@ -67,7 +65,7 @@ class UsersListWidget extends StatelessWidget {
               return ListView.builder(
                 itemCount: paginatedList.length,
                 itemBuilder: (context, index) =>
-                    _buildTableRow(paginatedList[index]),
+                    _buildTableRow(paginatedList[index], isDark, context),
               );
             }),
           ),
@@ -125,7 +123,7 @@ class UsersListWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildHeaderSection() {
+  Widget _buildHeaderSection(BuildContext context) {
     if (isMobile) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -133,9 +131,12 @@ class UsersListWidget extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             children: [
-              Expanded(child: _buildActionButton(Icons.download, "Export")),
+              Expanded(
+                  child: _buildActionButton(Icons.download, "Export", context)),
               const SizedBox(width: 8),
-              Expanded(child: _buildActionButton(Icons.filter_list, "Filter")),
+              Expanded(
+                  child:
+                      _buildActionButton(Icons.filter_list, "Filter", context)),
             ],
           ),
         ],
@@ -157,6 +158,8 @@ class UsersListWidget extends StatelessWidget {
                   decoration: InputDecoration(
                     prefixIcon: Icon(Icons.search, color: Colors.grey.shade600),
                     hintText: 'Search users...',
+                    hintStyle:
+                        TextStyle(fontSize: 12, color: Colors.grey.shade500),
                     contentPadding: const EdgeInsets.symmetric(vertical: 0),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(25),
@@ -188,9 +191,9 @@ class UsersListWidget extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              _buildActionButton(Icons.download, "Export"),
+              _buildActionButton(Icons.download, "Export", context),
               const SizedBox(width: 8),
-              _buildActionButton(Icons.filter_list, "Filter"),
+              _buildActionButton(Icons.filter_list, "Filter", context),
             ],
           ),
         ],
@@ -246,7 +249,9 @@ class UsersListWidget extends StatelessWidget {
   }
 
   Widget _buildTableRow(
-    UserTableModel data,
+    UserModel data,
+    bool isDark,
+    BuildContext context,
   ) {
     final padding = isMobile
         ? 8.0
@@ -259,8 +264,10 @@ class UsersListWidget extends StatelessWidget {
       return Container(
         padding: EdgeInsets.symmetric(horizontal: padding, vertical: 12),
         decoration: BoxDecoration(
-          border:
-              Border(top: BorderSide(color: Colors.grey.shade200, width: 1)),
+          border: Border(
+              top: BorderSide(
+                  color: isDark ? Colors.grey.shade600 : Colors.grey,
+                  width: 0.5)),
         ),
         child: Row(
           children: [
@@ -275,8 +282,8 @@ class UsersListWidget extends StatelessWidget {
             Expanded(flex: 2, child: _buildStatusChip(data.status)), // ✅
             SizedBox(
                 width: 60,
-                child:
-                    _buildActionButton(viewBtn: true, Icons.arrow_outward, "")),
+                child: _buildActionButton(Icons.visibility, "View", context,
+                    userModel: data)),
           ],
         ),
       );
@@ -285,8 +292,10 @@ class UsersListWidget extends StatelessWidget {
       return Container(
         padding: EdgeInsets.symmetric(horizontal: padding, vertical: 14),
         decoration: BoxDecoration(
-          border:
-              Border(top: BorderSide(color: Colors.grey.shade200, width: 1)),
+          border: Border(
+              top: BorderSide(
+                  color: isDark ? Colors.grey.shade600 : Colors.grey,
+                  width: 0.5)),
         ),
         child: Row(children: [
           Expanded(flex: 1, child: Text('${data.userId}', style: _rowStyle)),
@@ -301,8 +310,8 @@ class UsersListWidget extends StatelessWidget {
               flex: 2, child: Text(data.subscription ?? "", style: _rowStyle)),
           SizedBox(
               width: 70,
-              child: _buildActionButton(
-                  viewBtn: true, Icons.arrow_outward, "View")),
+              child: _buildActionButton(Icons.visibility, "View", context,
+                  userModel: data)),
         ]),
       );
     } else {
@@ -311,8 +320,10 @@ class UsersListWidget extends StatelessWidget {
       return Container(
         padding: EdgeInsets.symmetric(horizontal: padding, vertical: 16),
         decoration: BoxDecoration(
-          border:
-              Border(top: BorderSide(color: Colors.grey.shade200, width: 1)),
+          border: Border(
+              top: BorderSide(
+                  color: isDark ? Colors.grey.shade600 : Colors.grey,
+                  width: 0.5)),
         ),
         child: Row(children: [
           Expanded(flex: 1, child: Text('${data.userId}', style: _rowStyle)),
@@ -340,15 +351,15 @@ class UsersListWidget extends StatelessWidget {
 // ✅ New
           SizedBox(
               width: 80,
-              child: _buildActionButton(
-                  viewBtn: true, Icons.arrow_outward, "View")),
+              child: _buildActionButton(Icons.visibility, "View", context,
+                  userModel: data)),
         ]),
       );
     }
   }
 
   Widget _buildStatusChip(String? status) {
-    bool isBlocked = (status ?? "").toLowerCase() == "block" ;
+    bool isBlocked = (status ?? "").toLowerCase() == "block";
     bool isActive = (status ?? "").toLowerCase() == "active";
 
     Color bgColor;
@@ -405,85 +416,48 @@ class UsersListWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildTab(String title, int index, bool isSelected) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: isMobile ? 12 : 20,
-        vertical: isMobile ? 8 : 12,
-      ),
-      decoration: BoxDecoration(
-        color: isSelected ? const Color(0xFF6366F1) : Colors.transparent,
-        borderRadius: BorderRadius.circular(8),
-        border: isSelected ? null : Border.all(color: Colors.grey.shade300),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            isSelected ? Icons.flag_outlined : Icons.person_outline,
-            color: isSelected ? Colors.white : Colors.grey,
-            size: isMobile ? 14 : 16,
-          ),
-          if (!isMobile || title.length < 12) ...[
-            const SizedBox(width: 8),
-            Text(
-              title,
-              style: TextStyle(
-                color: isSelected ? Colors.white : Colors.grey.shade700,
-                fontSize: isMobile ? 12 : 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
+ 
 
-  Widget _buildActionButton(
-    IconData icon,
-    String label, {
-    bool viewBtn = false,
-    OrderData? data,
-  }) {
+  Widget _buildActionButton(IconData icon, String label, BuildContext context,
+      {UserModel? userModel}) {
     final drawerController = Get.find<AppController>();
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: () {
-        drawerController.setDrawerContent(UserInfoContent());
+        drawerController.setDrawerContent(UserInfoContent(userModel: userModel,));
         drawerController.toggleDrawer();
       },
       child: Container(
-        
         padding: EdgeInsets.symmetric(
           horizontal: isMobile ? 6 : 8,
           vertical: isMobile ? 6 : 8,
         ),
         decoration: BoxDecoration(
-          color: viewBtn ? Color.fromARGB(40, 96, 66, 255) : Colors.transparent,
           border: Border.all(color: Colors.grey.shade300),
           borderRadius: BorderRadius.circular(6),
         ),
-        // fontSize: isTablet ? 12 : 14,
         child: Row(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (label.isNotEmpty && !isMobile) ...[
-              Text(label,
-                  style: CustomTextTheme.regular12.copyWith(
-                      fontSize: isTablet ? 12 : 14,
-                      color: viewBtn
-                          ? Color.fromARGB(255, 96, 66, 255)
-                          : Colors.grey.shade700)),
+              Text(
+                label,
+                style: TextStyle(
+                  color: isDark 
+                      ? Colors.white
+                      : Colors.grey.shade700,
+                  fontSize: isTablet ? 12 : 14,
+                ),
+              ),
               const SizedBox(width: 6),
             ],
             Icon(
               icon,
-              color: viewBtn
-                  ? Color.fromARGB(255, 96, 66, 255)
-                  : Colors.grey.shade700,
+              color: isDark
+                  ? Colors.white
+                  : Colors.grey.shade600,
               size: isMobile ? 14 : 16,
             ),
           ],

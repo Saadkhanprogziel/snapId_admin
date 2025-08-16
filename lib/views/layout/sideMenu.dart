@@ -6,14 +6,15 @@ import 'package:go_router/go_router.dart';
 
 class SideMenu extends StatelessWidget {
   const SideMenu({super.key});
-
+ 
   @override
   Widget build(BuildContext context) {
     final String currentRoute = GoRouterState.of(context).uri.toString();
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: 400,
-      color: Colors.white,
+      color: isDark ? const Color(0xFF181A20) : Colors.white,
       child: Stack(
         children: [
           Positioned.fill(
@@ -25,75 +26,137 @@ class SideMenu extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 20),
-            child: Column(
-              children: [
-                const SizedBox(height: 100),
-                const Text(
-                  "SnapID",
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blueAccent,
+            child: CustomScrollView(
+                slivers: [
+                // Fixed header section
+                SliverToBoxAdapter(
+                  child: Column(
+                  children: [
+                    const SizedBox(height: 100),
+                    SizedBox(
+                    width: 171,
+                    height: 60,
+                    child: Image.asset(
+                      'assets/images/text_logo.png',
+                      fit: BoxFit.contain,
+                    ),
+                    ),
+                    const SizedBox(height: 32),
+                  ],
                   ),
                 ),
-                const SizedBox(height: 32),
-                _sideMenuItem(
-                  context,
-                  icon: "assets/icons/dash.svg",
-                  label: "Dashboard",
-                  route: "/dashboard",
-                  selected: currentRoute == '/dashboard',
+                // Scrollable menu items
+                SliverList(
+                  delegate: SliverChildListDelegate([
+                  _sideMenuItem(
+                    context,
+                    icon: "assets/icons/dash.svg",
+                    label: "Dashboard",
+                    route: "/dashboard",
+                    selected: currentRoute == '/dashboard',
+                  ),
+                  _sideMenuItem(
+                    context,
+                    icon: "assets/icons/analytics.svg",
+                    label: "Analytics",
+                    route: "/analytics",
+                    selected: currentRoute == '/analytics',
+                  ),
+                  _sideMenuItem(
+                    context,
+                    icon: "assets/icons/manage_user.svg",
+                    label: "Manage Users",
+                    route: "/users",
+                    selected: currentRoute == '/users',
+                  ),
+                  _sideMenuItem(
+                    context,
+                    icon: "assets/icons/manage_orders.svg",
+                    label: "Manage Orders",
+                    route: "/orders",
+                    selected: currentRoute == '/orders',
+                  ),
+                  _sideMenuItem(
+                    context,
+                    icon: "assets/icons/support.svg",
+                    label: "Support",
+                    route: "/support",
+                    selected: currentRoute == '/support',
+                  ),
+                  _sideMenuItem(
+                    context,
+                    icon: "assets/icons/price_setting.svg",
+                    label: "Price Setting",
+                    route: "/price-settings",
+                    selected: currentRoute == '/price-settings',
+                  ),
+                  _sideMenuItem(
+                    context,
+                    icon: "assets/icons/activity.svg",
+                    label: "User Activity",
+                    route: "/user-activity",
+                    selected: currentRoute == '/user-activity',
+                  ),
+                  _sideMenuItem(
+                    context,
+                    icon: "assets/icons/analytics.svg",
+                    label: "Setting",
+                    route: "/settings",
+                    selected: currentRoute == '/settings',
+                  ),
+                  // Add some space before the sign out button
+                  const SizedBox(height: 40),
+                  ]),
                 ),
-                _sideMenuItem(
-                  context,
-                  icon: "assets/icons/analytics.svg",
-                  label: "Analytics",
-                  route: "/analytics",
-                  selected: currentRoute == '/analytics',
-                ),
-                _sideMenuItem(
-                  context,
-                  icon: "assets/icons/manage_user.svg",
-                  label: "Manage Users",
-                  route: "/users",
-                  selected: currentRoute == '/users',
-                  // route: "/users/42",
-                  // selected: currentRoute.startsWith('/orders'),
-                ),
-                _sideMenuItem(
-                  context,
-                  icon: "assets/icons/manage_orders.svg",
-                  label: "Manage Orders",
-                  route: "/orders",
-                  selected: currentRoute == '/orders',
-                ),
-                _sideMenuItem(
-                  context,
-                  icon: "assets/icons/support.svg",
-                  label: "Support",
-                  route: "/support",
-                  selected: currentRoute == '/support',
-                ),
-                _sideMenuItem(
-                  context,
-                  icon: "assets/icons/price_setting.svg",
-                  label: "Price Setting",
-                  route: "/price-settings",
-                  selected: currentRoute == '/price-settings',
-                ),
-                _sideMenuItem(
-                  context,
-                  icon: "assets/icons/activity.svg",
-                  label: "User Activity",
-                  route: "/user-activity",
-                  selected: currentRoute == '/user-activity',
-                ),
-                _sideMenuItem(
-                  context,
-                  icon: "assets/icons/analytics.svg",
-                  label: "Setting",
-                  route: "/settings",
-                  selected: currentRoute == '/settings',
+                // Fixed Sign Out button at the bottom
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 24.0),
+                    child: SizedBox(
+                    height: 65,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                      backgroundColor: isDark
+                        ? const Color(0xFF23272F).withOpacity(0.5)
+                        : Colors.white.withOpacity(0.7),
+                      foregroundColor: isDark ? Colors.white : AppColors.themeText,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: BorderSide(
+                        color: isDark ? Colors.white24 : AppColors.themeText.withOpacity(0.2),
+                        width: 0.5,
+                        ),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      alignment: Alignment.centerLeft,
+                      ),
+                      onPressed: () {
+                        context.go('/login'); // Navigate to login page
+                      // TODO: Add sign out logic here
+                      },
+                      child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Icon(Icons.logout, color: isDark ? Colors.white : AppColors.themeText),
+                        const SizedBox(width: 12),
+                        Text(
+                        "Sign Out",
+                        style: TextStyle(
+                          color: isDark ? Colors.white : AppColors.themeText,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+                        ),
+                      ],
+                      ),
+                    ),
+                    ),
+                  ),
+                  ),
                 ),
               ],
             ),
@@ -110,6 +173,13 @@ class SideMenu extends StatelessWidget {
     required String route,
     required bool selected,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final Color activeColor = selected
+        ? (isDark ? const Color(0xFF6366F1).withOpacity(0.85) : const Color.fromARGB(217, 96, 66, 255))
+        : (isDark ? const Color(0xFF23272F).withOpacity(0.5) : Colors.white.withOpacity(0.7));
+    final Color textColor = selected
+        ? Colors.white
+        : (isDark ? Colors.white : AppColors.themeText);
     return InkWell(
       onTap: () => context.go(route),
       child: Container(
@@ -117,27 +187,20 @@ class SideMenu extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20),
         margin: const EdgeInsets.symmetric(vertical: 3),
         decoration: BoxDecoration(
-          color: selected
-              ? Color.fromARGB(
-                  255,
-                  96,
-                  66,
-                  255,
-                )
-              : Colors.white,
+          color: activeColor,
           borderRadius: BorderRadius.circular(15),
         ),
         child: Row(
           children: [
             SvgPicture.asset(
               icon,
-              color: selected ? Colors.white : AppColors.themeText,
+              color: textColor,
             ),
             const SizedBox(width: 20),
             Text(
               label,
               style: CustomTextTheme.regular16.copyWith(
-                  color: selected ? Colors.white : AppColors.themeText,
+                  color: textColor,
                   fontWeight: FontWeight.w500),
             ),
           ],
@@ -147,20 +210,13 @@ class SideMenu extends StatelessWidget {
   }
 }
 
-
-
-
-
-
 class PriceSetting extends StatelessWidget {
   const PriceSetting({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text("Price Setting"),
     );
   }
 }
-
-

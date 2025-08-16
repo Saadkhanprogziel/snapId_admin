@@ -2,25 +2,30 @@ import 'package:admin/views/activity/activity.dart';
 import 'package:admin/views/analytics/analytics.dart';
 import 'package:admin/views/dashboard/dashboard.dart';
 import 'package:admin/views/layout/layout.dart';
-import 'package:admin/views/layout/sideMenu.dart';
-import 'package:admin/views/order_management/order_info_content/order_info_content.dart';
+ 
 import 'package:admin/views/order_management/order_management.dart';
+import 'package:admin/views/price_setting/pricing_setting.dart';
 import 'package:admin/views/settings/settings.dart';
 import 'package:admin/views/support/support.dart';
 import 'package:admin/views/user_management/user_management.dart';
 import 'package:go_router/go_router.dart';
+import 'package:admin/views/login/login.dart';
 
 
 
 final router = GoRouter(
-  initialLocation: '/dashboard',
+  initialLocation: '/login',
   routes: [
+    GoRoute(
+      path: '/login',
+      builder: (context, state) => const SnapIdLoginScreen(),
+    ),
     ShellRoute(
       builder: (context, state, child) => AdminLayout(child: child),
       routes: [
         GoRoute(
           path: '/dashboard',
-          builder: (context, state) =>  DashboardContent(),
+          builder: (context, state) => DashboardContent(),
         ),
         GoRoute(
           path: '/analytics',
@@ -44,19 +49,13 @@ final router = GoRouter(
         ),
         GoRoute(
           path: '/price-settings',
-          builder: (context, state) => PriceSetting(),
+          builder: (context, state) => PricingSetting(),
         ),
         GoRoute(
           path: '/settings',
           builder: (context, state) => Settings(),
         ),
-        // GoRoute(
-        //   path: '/users/:id',
-        //   builder: (context, state) {
-        //     final userId = state.pathParameters['id']!;
-        //     return UsersPage(userId: userId);
-        //   },
-        // ),
+        // ...existing code...
       ],
     ),
   ],

@@ -2,9 +2,10 @@ import 'package:admin/controller/app_controller.dart';
 import 'package:admin/controller/recent_activities_controller/recent_activites_contoller.dart';
 import 'package:admin/models/chartsTablesModel.dart';
 import 'package:admin/utils/custom_spaces.dart';
+import 'package:admin/views/user_management/user_detail_info_content/user_detail_info_content.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
+ 
 // Main Activity page
 class Activity extends StatelessWidget {
   const Activity({super.key});
@@ -13,13 +14,17 @@ class Activity extends StatelessWidget {
   Widget build(BuildContext context) {
     final RecentActivitesContoller controller =
         Get.put(RecentActivitesContoller());
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor:
+          isDark ? Theme.of(context).scaffoldBackgroundColor : Colors.white,
       body: Container(
         margin: EdgeInsets.all(20),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(25),
-            border: Border.all(width: 1, color: Colors.grey.shade300)),
+          color: isDark ? Color(0xFF23272F) : Colors.transparent,
+            borderRadius: BorderRadius.circular(25),
+                  border: Border.all(width: 0.4, color: isDark ? Colors.grey.shade600 : Colors.grey),
+),
         child: RecentActivities(
           controller: controller,
           isMobile: MediaQuery.of(context).size.width < 600,
@@ -46,7 +51,9 @@ class RecentActivities extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
+      
       padding: EdgeInsets.all(isMobile
           ? 16
           : isTablet
@@ -57,7 +64,7 @@ class RecentActivities extends StatelessWidget {
         children: [
           _buildHeaderSection(),
           SpaceH15(),
-         // here we will add search bar and filter
+          // here we will add search bar and filter
           _buildTableHeader(),
           SizedBox(height: isMobile ? 8 : 12),
           Expanded(
@@ -65,7 +72,7 @@ class RecentActivities extends StatelessWidget {
               itemCount: controller.dummyActivities.length,
               itemBuilder: (context, index) {
                 final activity = controller.dummyActivities[index];
-                return _buildTableRow(activity);
+                return _buildTableRow(activity,isDark);
               },
             ),
           ),
@@ -74,76 +81,72 @@ class RecentActivities extends StatelessWidget {
     );
   }
 
-
- Widget _buildHeaderSection() {
-  if (isMobile) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(child: _buildActionButton(Icons.download, "Export")),
-            const SizedBox(width: 8),
-            Expanded(child: _buildActionButton(Icons.filter_list, "Filter")),
-          ],
-        ),
-      ],
-    );
-  } else {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-    
-        Row(
-          children: [
-            // 🔍 Search Bar
-            SizedBox(
-              width: 250,
-              child: TextField(
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.search, color: Colors.grey.shade600),
-                  hintText: 'Search users...',
-                  contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25),
-                    borderSide: BorderSide(
-                      color: Colors.grey.shade300,
-                      width: 1, // thin border
-                    ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25),
-                    borderSide: BorderSide(
-                      color: Colors.grey.shade300,
-                      width: 1, // thin border
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25),
-                    borderSide: BorderSide(
-                      color: Colors.grey.shade300, // same thin grey border on focus
-                      width: 1,
-                    ),
-                  ),
-                  isDense: true,
-                ),
-                onChanged: (value) {
-                  // controller.filterUsers(value);
-                },
-              ),
-            ),
+  Widget _buildHeaderSection() {
+    if (isMobile) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 12),
+          Row(
+            children: [
           
-            const SizedBox(width: 8),
-            _buildActionButton(Icons.filter_list, "Filter"),
-          ],
-        ),
-      ],
-    );
-  }
-}
+              Expanded(child: _buildActionButton(Icons.filter_list, "Filter")),
+            ],
+          ),
+        ],
+      );
+    } else {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Row(
+            children: [
+              // 🔍 Search Bar
+              SizedBox(
+                width: 250,
+                child: TextField(
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.search, color: Colors.grey.shade600),
+                    hintText: 'Search users...',
+                    contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25),
+                      borderSide: BorderSide(
+                        color: Colors.grey.shade300,
+                        width: 1, // thin border
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25),
+                      borderSide: BorderSide(
+                        color: Colors.grey.shade300,
+                        width: 1, // thin border
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25),
+                      borderSide: BorderSide(
+                        color: Colors
+                            .grey.shade300, // same thin grey border on focus
+                        width: 1,
+                      ),
+                    ),
+                    isDense: true,
+                  ),
+                  onChanged: (value) {
+                    // controller.filterUsers(value);
+                  },
+                ),
+              ),
 
-  
+              const SizedBox(width: 8),
+              _buildActionButton(Icons.filter_list, "Filter"),
+            ],
+          ),
+        ],
+      );
+    }
+  }
 
   Widget _buildTableHeader() {
     if (isMobile) {
@@ -188,9 +191,8 @@ class RecentActivities extends StatelessWidget {
       );
     }
   }
-  
 
-  Widget _buildTableRow(UserActivityModel activity) {
+  Widget _buildTableRow(UserActivityModel activity, bool isDark) {
     final padding = isMobile
         ? 8.0
         : isTablet
@@ -201,8 +203,10 @@ class RecentActivities extends StatelessWidget {
       return Container(
         padding: EdgeInsets.symmetric(horizontal: padding, vertical: 12),
         decoration: BoxDecoration(
-          border:
-              Border(top: BorderSide(color: Colors.grey.shade200, width: 1)),
+          border: Border(
+              top: BorderSide(
+                  color: isDark ? Colors.grey.shade600 : Colors.grey,
+                  width: 0.5)),
         ),
         child: Row(
           children: [
@@ -233,7 +237,8 @@ class RecentActivities extends StatelessWidget {
                   style: const TextStyle(fontSize: 14),
                   overflow: TextOverflow.ellipsis),
             ),
-            SizedBox(width: 60, child: _buildActionButton(Icons.visibility, "View")),
+            SizedBox(
+                width: 60, child: _buildActionButton(Icons.visibility, "View", isDark: isDark)),
           ],
         ),
       );
@@ -241,8 +246,10 @@ class RecentActivities extends StatelessWidget {
       return Container(
         padding: EdgeInsets.symmetric(horizontal: padding, vertical: 14),
         decoration: BoxDecoration(
-          border:
-              Border(top: BorderSide(color: Colors.grey.shade200, width: 1)),
+          border: Border(
+              top: BorderSide(
+                  color: isDark ? Colors.grey.shade600 : Colors.grey,
+                  width: 0.5)),
         ),
         child: Row(
           children: [
@@ -250,7 +257,8 @@ class RecentActivities extends StatelessWidget {
             Expanded(flex: 2, child: Text(activity.name)),
             Expanded(flex: 3, child: Text(activity.email)),
             Expanded(flex: 2, child: Text(activity.activity)),
-            SizedBox(width: 80, child: _buildActionButton(Icons.visibility, "View")),
+            SizedBox(
+                width: 80, child: _buildActionButton(Icons.visibility, "View",  isDark: isDark)),
           ],
         ),
       );
@@ -258,8 +266,10 @@ class RecentActivities extends StatelessWidget {
       return Container(
         padding: EdgeInsets.symmetric(horizontal: padding, vertical: 16),
         decoration: BoxDecoration(
-          border:
-              Border(top: BorderSide(color: Colors.grey.shade200, width: 1)),
+          border: Border(
+              top: BorderSide(
+                  color: isDark ? Colors.grey.shade600 : Colors.grey,
+                  width: 0.5)),
         ),
         child: Row(
           children: [
@@ -268,19 +278,20 @@ class RecentActivities extends StatelessWidget {
             Expanded(flex: 3, child: Text(activity.email)),
             Expanded(flex: 2, child: Text(activity.activity)),
             Expanded(flex: 1, child: Text(activity.plateform)),
-            SizedBox(width: 80, child: _buildActionButton(Icons.visibility, "View")),
+            SizedBox(
+                width: 80, child: _buildActionButton(Icons.visibility, "View", isDark: isDark)),
           ],
         ),
       );
     }
   }
 
- Widget _buildActionButton(IconData icon, String label) {
-     final drawerController = Get.find<AppController>();
+  Widget _buildActionButton(IconData icon, String label,{bool isDark= false}) {
+    final drawerController = Get.find<AppController>();
 
-    return GestureDetector(
+    return InkWell(
       onTap: () {
-        // drawerController.setDrawerContent(OrderDetailScreen());
+        drawerController.setDrawerContent(UserInfoContent());
         drawerController.toggleDrawer();
       },
       child: Container(
@@ -300,7 +311,7 @@ class RecentActivities extends StatelessWidget {
               Text(
                 label,
                 style: TextStyle(
-                  color: Colors.grey.shade700,
+                  // color: Colors.grey.shade700,
                   fontSize: isTablet ? 12 : 14,
                 ),
               ),
@@ -308,7 +319,7 @@ class RecentActivities extends StatelessWidget {
             ],
             Icon(
               icon,
-              color: Colors.grey.shade600,
+              color: isDark ? Colors.white: Colors.grey.shade600,
               size: isMobile ? 14 : 16,
             ),
           ],
@@ -323,4 +334,3 @@ class RecentActivities extends StatelessWidget {
     fontWeight: FontWeight.w600,
   );
 }
-
