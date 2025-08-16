@@ -3,6 +3,7 @@ import 'package:admin/controller/orders_management_controller/order_management.d
 import 'package:admin/models/chartsTablesModel.dart';
 import 'package:admin/theme/text_theme.dart';
 import 'package:admin/views/order_management/order_info_content/order_info_content.dart';
+import 'package:admin/views/support/filter_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -21,105 +22,242 @@ class OrdersListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final appController = Get.find<AppController>();
 
-    return Container(
-      padding: EdgeInsets.all(isMobile
-          ? 16
-          : isTablet
-              ? 20
-              : 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Tabs and Actions Row
-          _buildHeaderSection(context),
-
-          SizedBox(
-              height: isMobile
+    return Stack(
+      children: [
+        Container(
+          padding: EdgeInsets.all(isMobile
+              ? 16
+              : isTablet
                   ? 20
-                  : isTablet
-                      ? 24
-                      : 32),
-
-          // Table Header
-          _buildTableHeader(),
-
-          SizedBox(height: isMobile ? 8 : 12),
-
-          // Table Content
-          Expanded(
-            child: Obx(() {
-              // Calculate pagination
-              const itemsPerPage = 10;
-              // final totalPages =
-              //     (controller.orderList.length / itemsPerPage).ceil();
-              final currentPage = controller.currentPage.value;
-              final startIndex = currentPage * itemsPerPage;
-              final endIndex =
-                  (startIndex + itemsPerPage) > controller.orderList.length
-                      ? controller.orderList.length
-                      : (startIndex + itemsPerPage);
-              final paginatedList =
-                  controller.orderList.sublist(startIndex, endIndex);
-
-              return ListView.builder(
-                itemCount: paginatedList.length,
-                itemBuilder: (context, index) =>
-                    _buildTableRow(paginatedList[index], isDark, context),
-              );
-            }),
-          ),
-
-          // Pagination Controls
-          Obx(() {
-            const itemsPerPage = 10;
-            final totalPages =
-                (controller.orderList.length / itemsPerPage).ceil();
-            final currentPage = controller.currentPage.value;
-
-            return Container(
-              padding: EdgeInsets.symmetric(vertical: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    onPressed: currentPage > 0
-                        ? () => controller.currentPage.value--
-                        : null,
-                    icon: Icon(
-                      Icons.chevron_left,
-                      color: currentPage > 0
-                          ? Colors.grey.shade700
-                          : Colors.grey.shade400,
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      'Page ${currentPage + 1} of $totalPages',
-                      style: TextStyle(
-                        color: Colors.grey.shade700,
-                        fontSize: isMobile ? 12 : 14,
+                  : 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Tabs and Actions Row
+              _buildHeaderSection(context),
+        
+              SizedBox(
+                  height: isMobile
+                      ? 20
+                      : isTablet
+                          ? 24
+                          : 32),
+        
+              // Table Header
+              _buildTableHeader(),
+        
+              SizedBox(height: isMobile ? 8 : 12),
+        
+              // Table Content
+              Expanded(
+                child: Obx(() {
+                  // Calculate pagination
+                  const itemsPerPage = 10;
+                  // final totalPages =
+                  //     (controller.orderList.length / itemsPerPage).ceil();
+                  final currentPage = controller.currentPage.value;
+                  final startIndex = currentPage * itemsPerPage;
+                  final endIndex =
+                      (startIndex + itemsPerPage) > controller.orderList.length
+                          ? controller.orderList.length
+                          : (startIndex + itemsPerPage);
+                  final paginatedList =
+                      controller.orderList.sublist(startIndex, endIndex);
+        
+                  return ListView.builder(
+                    itemCount: paginatedList.length,
+                    itemBuilder: (context, index) =>
+                        _buildTableRow(paginatedList[index], isDark, context),
+                  );
+                }),
+              ),
+        
+              // Pagination Controls
+              Obx(() {
+                const itemsPerPage = 10;
+                final totalPages =
+                    (controller.orderList.length / itemsPerPage).ceil();
+                final currentPage = controller.currentPage.value;
+        
+                return Container(
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        onPressed: currentPage > 0
+                            ? () => controller.currentPage.value--
+                            : null,
+                        icon: Icon(
+                          Icons.chevron_left,
+                          color: currentPage > 0
+                              ? Colors.grey.shade700
+                              : Colors.grey.shade400,
+                        ),
                       ),
-                      textAlign: TextAlign.center,
-                    ),
+                      Expanded(
+                        child: Text(
+                          'Page ${currentPage + 1} of $totalPages',
+                          style: TextStyle(
+                            color: Colors.grey.shade700,
+                            fontSize: isMobile ? 12 : 14,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: currentPage < totalPages - 1
+                            ? () => controller.currentPage.value++
+                            : null,
+                        icon: Icon(
+                          Icons.chevron_right,
+                          color: currentPage < totalPages - 1
+                              ? Colors.grey.shade700
+                              : Colors.grey.shade400,
+                        ),
+                      ),
+                    ],
                   ),
-                  IconButton(
-                    onPressed: currentPage < totalPages - 1
-                        ? () => controller.currentPage.value++
-                        : null,
-                    icon: Icon(
-                      Icons.chevron_right,
-                      color: currentPage < totalPages - 1
-                          ? Colors.grey.shade700
-                          : Colors.grey.shade400,
-                    ),
+                );
+              }),
+            ],
+          ),
+        ),
+
+
+        Obx(() => appController.showFilter.value
+            ? GestureDetector(
+                onTap: () => appController.showFilter.value = false,
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 300),
+                  opacity: appController.showFilter.value ? 0.5 : 0.0,
+                  child: Container(
+                    color: Colors.transparent,
+                    width: double.infinity,
+                    height: double.infinity,
                   ),
+                ),
+              )
+            : const SizedBox.shrink()),
+
+        // Filter Panel should always be topmost
+        CommonFilterPanel(
+          isDark: isDark,
+          filterContent: _buildFilterPanel(isDark, appController),
+        )
+      ],
+    );
+  }
+
+
+
+  Widget _buildFilterPanel(bool isDark, AppController appController) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Status:',
+            style: TextStyle(color: isDark ? Colors.white : Colors.black)),
+        const SizedBox(height: 12),
+        DropdownButtonFormField<String>(
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: isDark ? const Color(0xFF23272F) : Colors.white,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          value: controller.selectedStatus.value,
+          items:controller.status_filter
+              .map((status) => DropdownMenuItem(
+                    value: status,
+                    child: Text(status),
+                  ))
+              .toList(),
+          onChanged: (value) {
+            controller.selectedStatus.value = value ?? '';
+          },
+        ),
+        const SizedBox(height: 16),
+        Text('Sort by:',
+            style: TextStyle(color: isDark ? Colors.white : Colors.black)),
+        const SizedBox(height: 12),
+        DropdownButtonFormField<String>(
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: isDark ? const Color(0xFF23272F) : Colors.white,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          value: controller.selectedSort.value,
+          items: controller.sort_filter
+              .map((sort) => DropdownMenuItem(
+                    value: sort,
+                    child: Text(sort),
+                  ))
+              .toList(),
+          onChanged: (value) {
+            controller.selectedSort.value = value ?? '';
+          },
+        ),
+        const SizedBox(height: 16),
+        Text('Subscription:',
+            style: TextStyle(color: isDark ? Colors.white : Colors.black)),
+        const SizedBox(height: 12),
+        DropdownButtonFormField<String>(
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: isDark ? const Color(0xFF23272F) : Colors.white,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          value: controller.selectedSubscription.value,
+          items: controller.subscription_filter
+              .map((sub) => DropdownMenuItem(
+                    value: sub,
+                    child: Text(sub),
+                  ))
+              .toList(),
+          onChanged: (value) {
+            controller.selectedSubscription.value = value ?? '';
+          
+          },
+        ),
+        const SizedBox(height: 24),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            TextButton(
+              onPressed: () {
+                // Reset filters logic here
+                appController.showFilter.value = false;
+              },
+              child: Row(
+                children: const [
+                  Icon(Icons.refresh, color: Colors.red),
+                  SizedBox(width: 4),
+                  Text('Reset', style: TextStyle(color: Colors.red)),
                 ],
               ),
-            );
-          }),
-        ],
-      ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Apply filter logic here
+                appController.showFilter.value = false;
+
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF4F46E5),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text(
+                'Apply Filter',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -414,8 +552,15 @@ Widget _buildActionButton(
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return InkWell(
       onTap: () {
+        if (label.trim().toLowerCase() == 'export'){
+        print(label.trim().toLowerCase());
+          drawerController.showFilter.value = true;
+        }
+        else{
+
         drawerController.setDrawerContent(OrderDetailScreen(orderData: orderData,));
         drawerController.toggleDrawer();
+        }
       },
       child: Container(
         padding: EdgeInsets.symmetric(
@@ -434,9 +579,7 @@ Widget _buildActionButton(
               Text(
                 label,
                 style: TextStyle(
-                  color: isDark && label == "View"
-                      ? Colors.white
-                      : Colors.grey.shade700,
+                
                   fontSize: isTablet ? 12 : 14,
                 ),
               ),
@@ -444,9 +587,7 @@ Widget _buildActionButton(
             ],
             Icon(
               icon,
-              color: isDark && label == "View"
-                  ? Colors.white
-                  : Colors.grey.shade600,
+             
               size: isMobile ? 14 : 16,
             ),
           ],

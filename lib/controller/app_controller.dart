@@ -5,7 +5,12 @@ import 'package:get_storage/get_storage.dart';
 class AppController extends GetxController {
   final GetStorage _storage = GetStorage();
 
+
   // Start with Light theme
+      final RxBool showFilter = false.obs;
+      final Rx<Widget?> _filterContent = Rx<Widget?>(null);
+
+
     final RxBool isNotification = false.obs;
   final Rx<ThemeMode> themeMode = ThemeMode.light.obs;
 
@@ -23,6 +28,7 @@ class AppController extends GetxController {
 
   bool get isRightDrawerOpen => _isRightDrawerOpen.value;
   Widget? get drawerContent => _drawerContent.value;
+  Widget? get filterContent => _filterContent.value;
 
   void toggleDrawer({Widget? content}) {
     _isRightDrawerOpen.value = !_isRightDrawerOpen.value;
@@ -37,6 +43,11 @@ class AppController extends GetxController {
   void setDrawerContent(Widget content) {
     _drawerContent.value = content;
   }
+
+  void setFilterContent(Widget content) {
+    _filterContent.value = content;
+    }
+
 
   void closeDrawer() {
     _isRightDrawerOpen.value = false;

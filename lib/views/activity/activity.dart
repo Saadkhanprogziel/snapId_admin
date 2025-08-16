@@ -89,8 +89,7 @@ class RecentActivities extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             children: [
-              Expanded(child: _buildActionButton(Icons.download, "Export")),
-              const SizedBox(width: 8),
+          
               Expanded(child: _buildActionButton(Icons.filter_list, "Filter")),
             ],
           ),

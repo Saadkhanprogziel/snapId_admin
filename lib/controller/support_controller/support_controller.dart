@@ -1,42 +1,132 @@
-
-// Controller
 import 'package:admin/models/chartsTablesModel.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class SupportController extends GetxController {
-  // Separate period selections for each chart
-  
-  
+  // Filter states
+  var selectedStatus = 'All'.obs;
+  var selectedSort = 'All'.obs;
+  var selectedSubscription = 'All'.obs;
+  var showFilter = false.obs; // Moved showFilter to SupportController
+  final List<String> status_filter = ['All','Open', 'Closed'];
+  final List<String> sort_filter = ['All','Newest', 'Oldest'];
+  final List<String> subscription_filter = ['All','photo 1', 'photo 3', 'photo 6'];
+
+  // Existing chart-related states
   var selectedQueriesPeriod = 'This Week'.obs;
   var selectedStatusPeriod = 'This Week'.obs;
   final List<String> periods = ['This Week', 'This Month', 'This Year'];
 
-var currentPage = 0.obs;
+  var currentPage = 0.obs;
 
   final RxList<SupportDataModel> ticketList = <SupportDataModel>[
-    SupportDataModel(userId: "#00102", name: "John Smith", subject: "Can't download it", date: "Aug 9,2025", status: "Panding", emailAddress: "John@gmail.com"),
-    SupportDataModel(userId: "#00102", name: "John Smith", subject: "Can't download it", date: "Aug 9,2025", status: "open", emailAddress: "John@gmail.com"),
-    SupportDataModel(userId: "#00102", name: "John Smith", subject: "Can't download it", date: "Aug 9,2025", status: "closed", emailAddress: "John@gmail.com"),
-    SupportDataModel(userId: "#00102", name: "John Smith", subject: "Can't download it", date: "Aug 9,2025", status: "open", emailAddress: "John@gmail.com"),
-    SupportDataModel(userId: "#00102", name: "John Smith", subject: "Can't download it", date: "Aug 9,2025", status: "Panding", emailAddress: "John@gmail.com"),
-    SupportDataModel(userId: "#00102", name: "John Smith", subject: "Can't download it", date: "Aug 9,2025", status: "Panding", emailAddress: "John@gmail.com"),
-    SupportDataModel(userId: "#00102", name: "John Smith", subject: "Can't download it", date: "Aug 9,2025", status: "close", emailAddress: "John@gmail.com"),
-    SupportDataModel(userId: "#00102", name: "John Smith", subject: "Can't download it", date: "Aug 9,2025", status: "Panding", emailAddress: "John@gmail.com"),
-    SupportDataModel(userId: "#00102", name: "John Smith", subject: "Can't download it", date: "Aug 9,2025", status: "Panding", emailAddress: "John@gmail.com"),
-    SupportDataModel(userId: "#00102", name: "John Smith", subject: "Can't download it", date: "Aug 9,2025", status: "Panding", emailAddress: "John@gmail.com"),
-    SupportDataModel(userId: "#00102", name: "John Smith", subject: "Can't download it", date: "Aug 9,2025", status: "Panding", emailAddress: "John@gmail.com"),
-    SupportDataModel(userId: "#00102", name: "John Smith", subject: "Can't download it", date: "Aug 9,2025", status: "Panding", emailAddress: "John@gmail.com"),
-    SupportDataModel(userId: "#00102", name: "John Smith", subject: "Can't download it", date: "Aug 9,2025", status: "Panding", emailAddress: "John@gmail.com"),
+    SupportDataModel(
+        userId: "#00102",
+        name: "John Smith",
+        subject: "Can't download it",
+        date: "Aug 9,2025",
+        status: "Pending",
+        emailAddress: "John@gmail.com",
+        subscription: "Free"),
+    SupportDataModel(
+        userId: "#00103",
+        name: "Jane Doe",
+        subject: "Login issue",
+        date: "Aug 8,2025",
+        status: "Open",
+        emailAddress: "Jane@gmail.com",
+        subscription: "Premium"),
+    SupportDataModel(
+        userId: "#00104",
+        name: "Bob Johnson",
+        subject: "Payment failed",
+        date: "Aug 7,2025",
+        status: "Closed",
+        emailAddress: "Bob@gmail.com",
+        subscription: "Enterprise"),
+    SupportDataModel(
+        userId: "#00105",
+        name: "Alice Brown",
+        subject: "App crash",
+        date: "Aug 6,2025",
+        status: "Open",
+        emailAddress: "Alice@gmail.com",
+        subscription: "Free"),
+    SupportDataModel(
+        userId: "#00106",
+        name: "Tom Wilson",
+        subject: "Feature request",
+        date: "Aug 5,2025",
+        status: "Pending",
+        emailAddress: "Tom@gmail.com",
+        subscription: "Premium"),
+    // Add more varied data as needed
   ].obs;
 
+  // Original list to restore on reset
+  final List<SupportDataModel> _originalTicketList = [];
 
-  // Queries Line Chart Data
+  @override
+  void onInit() {
+    super.onInit();
+    // Store original list for resetting filters
+    _originalTicketList.addAll(ticketList);
+  }
+
+  // Filter and sort logic
+  void applyFilters() {
+    var filteredList = _originalTicketList.toList();
+
+    // Filter by status
+    if (selectedStatus.value.isNotEmpty) {
+      filteredList = filteredList
+          .where((ticket) =>
+              ticket.status.toLowerCase() == selectedStatus.value.toLowerCase())
+          .toList();
+    }
+
+    // Filter by subscription
+    if (selectedSubscription.value.isNotEmpty) {
+      filteredList = filteredList
+          .where((ticket) => ticket.subscription.toLowerCase() ==
+              selectedSubscription.value.toLowerCase())
+          .toList();
+    }
+
+    // Sort
+    if (selectedSort.value.isNotEmpty) {
+      switch (selectedSort.value) {
+        case 'Newest':
+          filteredList.sort((a, b) => DateTime.parse(b.date).compareTo(DateTime.parse(a.date)));
+          break;
+        case 'Oldest':
+          filteredList.sort((a, b) => DateTime.parse(a.date).compareTo(DateTime.parse(b.date)));
+          break;
+        case 'Status':
+          filteredList.sort((a, b) => a.status.compareTo(b.status));
+          break;
+      }
+    }
+
+    ticketList.value = filteredList;
+    currentPage.value = 0; // Reset to first page
+    showFilter.value = false; // Close filter panel
+  }
+
+  void resetFilters() {
+    selectedStatus.value = '';
+    selectedSort.value = '';
+    selectedSubscription.value = '';
+    ticketList.value = _originalTicketList.toList();
+    currentPage.value = 0; // Reset to first page
+    showFilter.value = false; // Close filter panel
+  }
+
+  // Existing chart-related code (unchanged)
   var totalQueries = 182.obs;
   var queriesChartTitle = 'Total Queries'.obs;
 
-  // Line chart data
   var aiAssistantData = <FlSpot>[
     const FlSpot(0, 80),
     const FlSpot(1, 90),
@@ -55,13 +145,11 @@ var currentPage = 0.obs;
     const FlSpot(5, 20),
   ].obs;
 
-  // Support Status Pie Chart Data
   var statusChartTitle = 'Support by Status'.obs;
   var openCount = 43.obs;
   var pendingCount = 45.obs;
   var closedCount = 112.obs;
 
-  // Chart configuration
   var chartColors = {
     'aiAssistant': const Color(0xFF8B7CF6),
     'manualSupport': const Color(0xFFD8B4FE),
@@ -86,10 +174,8 @@ var currentPage = 0.obs;
 
   var monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
 
-  // Computed properties
   int get computedTotal => openCount.value + pendingCount.value + closedCount.value;
 
-  // Separate methods for changing periods
   void changeQueriesPeriod(String period) {
     selectedQueriesPeriod.value = period;
     _updateQueriesDataForPeriod(period);
@@ -100,7 +186,6 @@ var currentPage = 0.obs;
     _updateStatusDataForPeriod(period);
   }
 
-  // Separate data update methods for each chart
   void _updateQueriesDataForPeriod(String period) {
     switch (period) {
       case 'This Week':
@@ -122,7 +207,6 @@ var currentPage = 0.obs;
         ];
         totalQueries.value = 182;
         break;
-
       case 'This Month':
         aiAssistantData.value = [
           const FlSpot(0, 120),
@@ -142,7 +226,6 @@ var currentPage = 0.obs;
         ];
         totalQueries.value = 395;
         break;
-
       case 'This Year':
         aiAssistantData.value = [
           const FlSpot(0, 200),
@@ -172,13 +255,11 @@ var currentPage = 0.obs;
         pendingCount.value = 45;
         closedCount.value = 112;
         break;
-
       case 'This Month':
         openCount.value = 78;
         pendingCount.value = 92;
         closedCount.value = 245;
         break;
-
       case 'This Year':
         openCount.value = 156;
         pendingCount.value = 189;
@@ -228,60 +309,32 @@ var currentPage = 0.obs;
     ];
   }
 
-  // Separate API methods for each chart
   Future<void> fetchQueriesData(String period) async {
     try {
-      // TODO: Implement API call to fetch queries data based on period
-      // Example API call:
-      // final response = await ApiService.getQueriesData(period: period);
-      // 
-      // Update the data based on API response:
-      // aiAssistantData.value = response.aiAssistantData;
-      // manualSupportData.value = response.manualSupportData;
-      // totalQueries.value = response.totalQueries;
-      
       print('Fetching queries data for period: $period');
-      
-      // For now, update with existing logic
       _updateQueriesDataForPeriod(period);
     } catch (e) {
       print('Error fetching queries data: $e');
-      // Handle error - maybe show snackbar or keep existing data
     }
   }
 
   Future<void> fetchStatusData(String period) async {
     try {
-      // TODO: Implement API call to fetch status data based on period
-      // Example API call:
-      // final response = await ApiService.getStatusData(period: period);
-      // 
-      // Update the data based on API response:
-      // openCount.value = response.openCount;
-      // pendingCount.value = response.pendingCount;
-      // closedCount.value = response.closedCount;
-      
       print('Fetching status data for period: $period');
-      
-      // For now, update with existing logic
       _updateStatusDataForPeriod(period);
     } catch (e) {
       print('Error fetching status data: $e');
-      // Handle error - maybe show snackbar or keep existing data
     }
   }
 
-  // Method to refresh queries chart data
   Future<void> refreshQueriesData() async {
     await fetchQueriesData(selectedQueriesPeriod.value);
   }
 
-  // Method to refresh status chart data
   Future<void> refreshStatusData() async {
     await fetchStatusData(selectedStatusPeriod.value);
   }
 
-  // Method to refresh both charts
   void refreshAllData() {
     refreshQueriesData();
     refreshStatusData();

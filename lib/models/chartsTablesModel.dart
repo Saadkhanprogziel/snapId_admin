@@ -85,6 +85,7 @@ class SupportDataModel {
   final String date;
   final String status;
   final String emailAddress;
+  final String subscription;
 
   SupportDataModel({
     required this.userId,
@@ -92,6 +93,7 @@ class SupportDataModel {
     required this.subject,
     required this.date,
     required this.status,
+    required this.subscription,
     required this.emailAddress,
   });
 }

@@ -6,6 +6,13 @@ import 'package:get/get.dart';
 enum DataRange { weekly, monthly, }
 
 class OrderManagementController extends GetxController {
+  var selectedStatus = 'All'.obs;
+  var selectedSort = 'All'.obs;
+  var selectedSubscription = 'All'.obs;
+  var showFilter = false.obs; // Moved showFilter to SupportController
+  final List<String> status_filter = ['All','Open', 'Closed'];
+  final List<String> sort_filter = ['All','Newest', 'Oldest'];
+  final List<String> subscription_filter = ['All','photo 1', 'photo 3', 'photo 6'];
 var currentPage = 0.obs;
   var isRightDrawerOpen = true.obs;
   final RxList<OrderData> orderList = <OrderData>[

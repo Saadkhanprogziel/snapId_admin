@@ -191,90 +191,90 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
                   SpaceH20(),
                   // Note Section
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Note:',
-                          style: CustomTextTheme.regular18.copyWith(
-                              color: isDark ? Colors.white : Colors.grey,
-                              fontWeight: FontWeight.w400),
-                        ),
-                        const SizedBox(height: 16),
+                  // Padding(
+                  //   padding: const EdgeInsets.symmetric(horizontal: 20),
+                  //   child: Column(
+                  //     crossAxisAlignment: CrossAxisAlignment.start,
+                  //     children: [
+                  //       Text(
+                  //         'Note:',
+                  //         style: CustomTextTheme.regular18.copyWith(
+                  //             color: isDark ? Colors.white : Colors.grey,
+                  //             fontWeight: FontWeight.w400),
+                  //       ),
+                  //       const SizedBox(height: 16),
 
-                        // Note Input
-                        Container(
-                          width: double.infinity,
-                          height: 120,
-                          decoration: BoxDecoration(
-                            color: isDark ? Color(0xFF23272F) : null,
-                            border: Border.all(
-                                color: isDark
-                                    ? Colors.grey.shade700
-                                    : const Color(0xFFE5E7EB)),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: TextField(
-                            controller: _noteController,
-                            maxLines: null,
-                            expands: true,
-                            textAlignVertical: TextAlignVertical.top,
-                            decoration: InputDecoration(
-                              hintText: order?.notes ?? 'Write note...',
-                              hintStyle: TextStyle(
-                                color: isDark
-                                    ? Colors.grey.shade400
-                                    : Color(0xFFA1A1AA),
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400,
-                              ),
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.all(16),
-                            ),
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: isDark ? Colors.white : Color(0xFF374151),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
+                  //       // Note Input
+                  //       Container(
+                  //         width: double.infinity,
+                  //         height: 120,
+                  //         decoration: BoxDecoration(
+                  //           color: isDark ? Color(0xFF23272F) : null,
+                  //           border: Border.all(
+                  //               color: isDark
+                  //                   ? Colors.grey.shade700
+                  //                   : const Color(0xFFE5E7EB)),
+                  //           borderRadius: BorderRadius.circular(8),
+                  //         ),
+                  //         child: TextField(
+                  //           controller: _noteController,
+                  //           maxLines: null,
+                  //           expands: true,
+                  //           textAlignVertical: TextAlignVertical.top,
+                  //           decoration: InputDecoration(
+                  //             hintText: order?.notes ?? 'Write note...',
+                  //             hintStyle: TextStyle(
+                  //               color: isDark
+                  //                   ? Colors.grey.shade400
+                  //                   : Color(0xFFA1A1AA),
+                  //               fontSize: 16,
+                  //               fontWeight: FontWeight.w400,
+                  //             ),
+                  //             border: InputBorder.none,
+                  //             contentPadding: EdgeInsets.all(16),
+                  //           ),
+                  //           style: TextStyle(
+                  //             fontSize: 16,
+                  //             color: isDark ? Colors.white : Color(0xFF374151),
+                  //           ),
+                  //         ),
+                  //       ),
+                  //       const SizedBox(height: 24),
 
-                        // Save Note Button
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF8B5CF6), Color(0xFF6366F1)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                          ),
-                          child: ElevatedButton(
-                            onPressed: () {},
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.transparent,
-                              shadowColor: Colors.transparent,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 24, vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: const Text(
-                              'Save Note',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  //       // Save Note Button
+                  //       Container(
+                  //         decoration: BoxDecoration(
+                  //           borderRadius: BorderRadius.circular(8),
+                  //           gradient: const LinearGradient(
+                  //             colors: [Color(0xFF8B5CF6), Color(0xFF6366F1)],
+                  //             begin: Alignment.topLeft,
+                  //             end: Alignment.bottomRight,
+                  //           ),
+                  //         ),
+                  //         child: ElevatedButton(
+                  //           onPressed: () {},
+                  //           style: ElevatedButton.styleFrom(
+                  //             backgroundColor: Colors.transparent,
+                  //             shadowColor: Colors.transparent,
+                  //             padding: const EdgeInsets.symmetric(
+                  //                 horizontal: 24, vertical: 16),
+                  //             shape: RoundedRectangleBorder(
+                  //               borderRadius: BorderRadius.circular(8),
+                  //             ),
+                  //           ),
+                  //           child: const Text(
+                  //             'Save Note',
+                  //             style: TextStyle(
+                  //               fontSize: 16,
+                  //               fontWeight: FontWeight.w600,
+                  //               color: Colors.white,
+                  //             ),
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
                 ],
               ),
             )
