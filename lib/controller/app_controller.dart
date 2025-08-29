@@ -5,19 +5,20 @@ import 'package:get_storage/get_storage.dart';
 class AppController extends GetxController {
   final GetStorage _storage = GetStorage();
 
+  
 
   // Start with Light theme
-      final RxBool showFilter = false.obs;
-      final Rx<Widget?> _filterContent = Rx<Widget?>(null);
+  final RxBool showFilter = false.obs;
+  final Rx<Widget?> _filterContent = Rx<Widget?>(null);
 
-
-    final RxBool isNotification = false.obs;
+  final RxBool isNotification = false.obs;
   final Rx<ThemeMode> themeMode = ThemeMode.light.obs;
 
   // Toggle based on switch value
   void toggleTheme(bool darkModeEnabled) {
     themeMode.value = darkModeEnabled ? ThemeMode.dark : ThemeMode.light;
-    _storage.write('themeMode', themeMode.value == ThemeMode.dark ? 'dark' : 'light');
+    _storage.write(
+        'themeMode', themeMode.value == ThemeMode.dark ? 'dark' : 'light');
   }
 
   var sidebarCollapsed = false.obs;
@@ -46,28 +47,29 @@ class AppController extends GetxController {
 
   void setFilterContent(Widget content) {
     _filterContent.value = content;
-    }
-
+  }
 
   void closeDrawer() {
     _isRightDrawerOpen.value = false;
     _drawerContent.value = null;
-    isNotification.value = false; // Reset notification state when drawer is closed
+    isNotification.value =
+        false; // Reset notification state when drawer is closed
   }
 
   void toggleSidebar() {
     sidebarCollapsed.value = !sidebarCollapsed.value;
   }
-@override
-void onInit() {
-  super.onInit();
-  String? storedTheme = _storage.read('themeMode');
-  if (storedTheme == 'dark') {
-    themeMode.value = ThemeMode.dark;
-  } else {
-    themeMode.value = ThemeMode.light;
+
+  @override
+  void onInit() {
+    super.onInit();
+    String? storedTheme = _storage.read('themeMode');
+    if (storedTheme == 'dark') {
+      themeMode.value = ThemeMode.dark;
+    } else {
+      themeMode.value = ThemeMode.light;
+    }
   }
-}
 
   void setThemeMode(ThemeMode mode) {
     themeMode.value = mode;

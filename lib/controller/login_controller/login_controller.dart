@@ -1,9 +1,12 @@
+import 'package:admin/repositories/auth_repository/auth_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class LoginController extends GetxController {
+  AuthRepository authRepository = AuthRepository();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  bool isLoading = false;
 
   bool isPasswordVisible = false;
   bool rememberMe = false;
@@ -15,17 +18,29 @@ class LoginController extends GetxController {
   }
 
   void login() {
-    // Implement login logic here
-    String email = emailController.text;
-    String password = passwordController.text;
-
-    if (email.isNotEmpty && password.isNotEmpty) {
-      // Perform login operation
-      print("Logging in with Email: $email and Password: $password");
-    } else {
-      print("Email and Password cannot be empty");
+    isLoading = true;
+    update();
+    try {
+      authRepository
+          .login(email: emailController.text, password: passwordController.text)
+          .then((response) => response.fold(
+                (error) {
+                  isLoading = false;
+                  update();
+                  Get.snackbar("Error", "$error",
+                      backgroundColor: Colors.red, colorText: Colors.white);
+                },
+                (success) {
+                  isLoading = false;
+                  update();
+                  print("you are logged");
+                },
+              ));
+    } on Exception catch (e) {
+      isLoading = false;
+      Get.snackbar("Error", "Biometric login failed: ${e.toString()}",
+          backgroundColor: Colors.red, colorText: Colors.white);
+      update();
     }
   }
-
-  
 }

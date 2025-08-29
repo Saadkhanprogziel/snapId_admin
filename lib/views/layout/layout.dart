@@ -1,5 +1,5 @@
 import 'package:admin/controller/app_controller.dart';
-import 'package:admin/views/app_routes.dart';
+import 'package:admin/views/navigations/route_management.dart';
 import 'package:admin/views/layout/sideMenu.dart';
 import 'package:admin/views/layout/topbar.dart';
 import 'package:flutter/material.dart';
@@ -36,11 +36,15 @@ class SnapIDDashboard extends StatelessWidget {
                   ),
             ),
             themeMode: appController.themeMode.value,
-            routerConfig: router,
+            routerConfig: AppRouter.router,
           )),
     );
   }
 }
+
+
+
+
 
 class AdminLayout extends StatelessWidget {
   final Widget child;
