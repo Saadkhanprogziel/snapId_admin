@@ -4,22 +4,32 @@ import 'package:universal_html/html.dart' as html;
 
 class AppNavigation {
   static final navigatorKey = GlobalKey<NavigatorState>();
-  static final _appContext = navigatorKey.currentState!.context;
+
+  static BuildContext get _appContext {
+    final ctx = navigatorKey.currentContext;
+    if (ctx == null) {
+      throw Exception("Navigator context not ready yet!");
+    }
+    return ctx;
+  }
 
   static void pushNamed(
     String routeName, {
     dynamic extra,
     Map<String, String>? pathParameters,
   }) {
-    _appContext.pushNamed(routeName,
-        extra: extra, pathParameters: pathParameters ?? {});
+    _appContext.pushNamed(
+      routeName,
+      extra: extra,
+      pathParameters: pathParameters ?? {},
+    );
   }
 
   static Future<T?> pushNamedWithResult<T>(
     String routeName, {
     dynamic extra,
     Map<String, String>? pathParameters,
-  }) async {
+  }) {
     return _appContext.pushNamed<T>(
       routeName,
       extra: extra,
@@ -32,8 +42,11 @@ class AppNavigation {
     dynamic extra,
     Map<String, String>? pathParameters,
   }) {
-    _appContext.goNamed(routeName,
-        extra: extra, pathParameters: pathParameters ?? {});
+    _appContext.goNamed(
+      routeName,
+      extra: extra,
+      pathParameters: pathParameters ?? {},
+    );
   }
 
   static void pushReplacementNamed(
@@ -41,8 +54,11 @@ class AppNavigation {
     dynamic extra,
     Map<String, String>? pathParameters,
   }) {
-    _appContext.replaceNamed(routeName,
-        extra: extra, pathParameters: pathParameters ?? {});
+    _appContext.replaceNamed(
+      routeName,
+      extra: extra,
+      pathParameters: pathParameters ?? {},
+    );
   }
 
   static void pop<T>([T? result]) {
@@ -55,6 +71,4 @@ class AppNavigation {
     final path = hashedPath.length > 1 ? hashedPath[1] : location;
     return path;
   }
-
-  
 }

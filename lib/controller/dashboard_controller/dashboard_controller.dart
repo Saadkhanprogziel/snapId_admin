@@ -1,14 +1,45 @@
-
+import 'package:admin/models/dashboard/dashboard_stats_model.dart';
 import 'package:admin/models/plateform_request_data.dart';
 import 'package:admin/models/revanue_data.dart';
 import 'package:admin/models/subscriber_data.dart';
+import 'package:admin/repositories/dashboard_repository/dashboard_repository.dart';
 
 import 'package:get/get.dart';
 
 class DashboardController extends GetxController {
   var isWeeklyView = true.obs;
+  var isLoading = true.obs;
+  DashboardRepository dashboardRepository = DashboardRepository();
 
-  
+  var dashboardStatsData = Rxn<DashboardStatsModel>();
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchDashboardData();
+    loadRevanueDataFor(selectedRevanueFilter.value); // initial load
+    loadSubscriberDataFor(selectedSubscriberFilter.value); // initial load
+    // fetchDashboardData();
+  }
+
+  void fetchDashboardData() {
+    isLoading.value = true;
+    try {
+      dashboardRepository.getDashboardStats().then((response) {
+        response.fold((error) {
+          isLoading.value = false;
+        }, (success) {
+          print("ye len janab apki data ${success.orders.totalOrders}");
+          dashboardStatsData.value = success;
+          isLoading.value = false;
+        });
+      });
+    } on Exception catch (e) {
+      // TODO
+      isLoading.value = false;
+    }
+  }
+
   final Map<String, List<PlatformRequestData>> sampleData = {
     'weekly': [
       PlatformRequestData('Mon', 45000, 32000),
@@ -221,11 +252,4 @@ class DashboardController extends GetxController {
 
   List<PlatformRequestData> get currentData =>
       isWeeklyView.value ? sampleData['weekly']! : sampleData['monthly']!;
-
-  @override
-  void onInit() {
-    super.onInit();
-    loadRevanueDataFor(selectedRevanueFilter.value); // initial load
-    loadSubscriberDataFor(selectedSubscriberFilter.value); // initial load
-  }
 }

@@ -24,7 +24,7 @@ class NetworkRepository {
       throw NetworkResponse(
         message: "No internet connection",
         data: null,
-        success: "false",
+        success: false,
       );
     }
 
@@ -39,7 +39,7 @@ class NetworkRepository {
             message: "Internet connection lost",
             data: null,
             failed: true,
-            success: "false",
+            success: false,
           );
           completer.completeError(networkResponse);
         }
@@ -77,7 +77,7 @@ class NetworkRepository {
         networkResponse = NetworkResponse(
           message: "An unexpected error occurred",
           data: null,
-          success: "false",
+          success: false,
           failed: true,
         );
         completer.completeError(networkResponse);
@@ -164,17 +164,16 @@ class NetworkRepository {
   }
 }
 
-NetworkResponse _handleResponse(Response response) {
-  final body = response.data;
-
-  if (response.statusCode == 200 || response.statusCode == 201) {
-    return NetworkResponse(
-      data: body,
-      message: body["message"] ?? "",
-    );
+ NetworkResponse _handleResponse(Response response) {
+    final body = response.data;
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return NetworkResponse(
+        data: body,
+        success: body is Map && body["success"] == true,
+        message: body is Map && body.containsKey("message")
+            ? body["message"]
+            : "",
+      );
+    }
+    throw NetworkResponse(success: false, data: body);
   }
-  throw NetworkResponse(
-    failed: true,
-    message: body["message"] ?? "Something went wrong",
-  );
-}

@@ -1,8 +1,11 @@
 import 'package:admin/constants/colors.dart';
+import 'package:admin/controller/auth_controller/auth_controller.dart';
 import 'package:admin/theme/text_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:get/get.dart';
+// Import your AuthController
 
 class SideMenu extends StatelessWidget {
   const SideMenu({super.key});
@@ -10,6 +13,7 @@ class SideMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String currentRoute = GoRouterState.of(context).uri.toString();
+    final AuthController authController = Get.put(AuthController());
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
@@ -52,8 +56,8 @@ class SideMenu extends StatelessWidget {
                     context,
                     icon: "assets/icons/dash.svg",
                     label: "Dashboard",
-                    route: "/dashboard",
-                    selected: currentRoute == '/dashboard',
+                    route: "/",
+                    selected: currentRoute == '/',
                   ),
                   _sideMenuItem(
                     context,
@@ -131,12 +135,20 @@ class SideMenu extends StatelessWidget {
                         width: 0.5,
                         ),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      padding: const EdgeInsets.symmetric(horizontal: 20 ),
                       alignment: Alignment.centerLeft,
                       ),
-                      onPressed: () {
-                        context.go('/login'); // Navigate to login page
-                      // TODO: Add sign out logic here
+                      onPressed: () async {
+                        // Show confirmation dialog before logout
+                        final bool shouldLogout = await _showLogoutDialog(context);
+                        if (shouldLogout) {
+                          // Call the logout method from AuthController
+                          authController.logout(context);
+                          // Navigate to login page after logout
+                          if (context.mounted) {
+                            context.go('/login');
+                          }
+                        }
                       },
                       child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -164,6 +176,51 @@ class SideMenu extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  // Add confirmation dialog for logout
+  Future<bool> _showLogoutDialog(BuildContext context) async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        return AlertDialog(
+          backgroundColor: isDark ? const Color(0xFF181A20) : Colors.white,
+          title: Text(
+            'Confirm Logout',
+            style: TextStyle(
+              color: isDark ? Colors.white : AppColors.themeText,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          content: Text(
+            'Are you sure you want to sign out?',
+            style: TextStyle(
+              color: isDark ? Colors.white70 : AppColors.themeText.withOpacity(0.8),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: isDark ? Colors.white70 : AppColors.themeText.withOpacity(0.7),
+                ),
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF6366F1),
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Sign Out'),
+            ),
+          ],
+        );
+      },
+    ) ?? false;
   }
 
   Widget _sideMenuItem(

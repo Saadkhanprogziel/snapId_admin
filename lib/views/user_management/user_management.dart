@@ -4,6 +4,7 @@ import 'package:admin/views/user_management/users_list_widget/users_list_widget.
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 class UserManagement extends StatelessWidget {
   const UserManagement({Key? key}) : super(key: key);
@@ -19,17 +20,16 @@ class UserManagement extends StatelessWidget {
       body: LayoutBuilder(
         builder: (context, constraints) {
           final screenWidth = constraints.maxWidth;
-          // final isDesktop = screenWidth > 1200;
           final isTablet = screenWidth > 600 && screenWidth <= 1200;
           final isMobile = screenWidth <= 600;
 
           final cardWidth = isTablet
               ? (screenWidth - 48) /
-                  2 // 2 cards per row: 16px padding on both sides + 16px gap
+                  2 
               : isMobile
-                  ? screenWidth - 32 // 1 card per row: full width minus padding
+                  ? screenWidth - 32
                   : (screenWidth - 80) /
-                      4; // 4 cards per row: 16px padding + 16px gaps
+                      4; 
 
           return SingleChildScrollView(
             child: Padding(
@@ -37,8 +37,8 @@ class UserManagement extends StatelessWidget {
               child: Column(
                 children: [
                   Wrap(
-                    spacing: 16, // Horizontal spacing between cards
-                    runSpacing: 16, // Vertical spacing between rows
+                    spacing: 16,
+                    runSpacing: 16,
                     children: [
                       SizedBox(
                         width: cardWidth,
@@ -147,7 +147,7 @@ class UserManagement extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      '${controller.totalUsers.value.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}',
+                      '${controller.userStatsData.value?.totalUsers.totalCount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}',
                       style: const TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,

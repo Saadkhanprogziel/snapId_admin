@@ -1,9 +1,11 @@
 import 'package:admin/controller/dashboard_controller/dashboard_controller.dart';
+import 'package:admin/models/dashboard/dashboard_stats_model.dart';
 import 'package:admin/views/dashboard/revanue_chart/revanue_chart.dart';
 import 'package:admin/views/dashboard/subscriber_chart/subscriber_chart.dart';
 import 'package:admin/utils/custom_spaces.dart';
 import 'package:admin/utils/stat_card_widget.dart';
 import 'package:admin/views/dashboard/request_analytics_chart/request_analytics_cart.dart';
+import 'package:admin/widgets/jumping_dots.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -23,44 +25,57 @@ class DashboardContent extends StatelessWidget {
         final isTablet = screenWidth > 600 && screenWidth <= 1200;
         final isMobile = screenWidth <= 600;
 
-        return SingleChildScrollView(
-          padding: EdgeInsets.all(isMobile
-              ? 16
-              : isTablet
-                  ? 20
-                  : 24),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: IntrinsicHeight(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Top Section: Stat Cards + Request Analytics Chart
-                  _buildTopSection(
-                      _dashboardController, isDesktop, isTablet, isMobile, isDark),
+        // Wrap the loading check in Obx to observe state changes
+        return Obx(() {
+          if (_dashboardController.isLoading.value) {
+            return Row(
+              children: [
+                Spacer(),
+                JumpingDots(numberOfDots: 3),
+                Spacer(),
+              ],
+            );
+          }
 
-                  SizedBox(
-                      height: isMobile
-                          ? 20
-                          : isTablet
-                              ? 25
-                              : 30),
+          return SingleChildScrollView(
+            padding: EdgeInsets.all(isMobile
+                ? 16
+                : isTablet
+                    ? 20
+                    : 24),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Top Section: Stat Cards + Request Analytics Chart
+                    _buildTopSection(_dashboardController, isDesktop,
+                        isTablet, isMobile, isDark),
 
-                  // Charts Section: Revenue & Subscriber Charts
-                  _buildChartsSection(
-                      _dashboardController, isDesktop, isTablet, isMobile,isDark),
+                    SizedBox(
+                        height: isMobile
+                            ? 20
+                            : isTablet
+                                ? 25
+                                : 30),
 
-                  SizedBox(
-                      height: isMobile
-                          ? 16
-                          : isTablet
-                              ? 18
-                              : 20),
-                ],
+                    // Charts Section: Revenue & Subscriber Charts
+                    _buildChartsSection(_dashboardController, isDesktop,
+                        isTablet, isMobile, isDark),
+
+                    SizedBox(
+                        height: isMobile
+                            ? 16
+                            : isTablet
+                                ? 18
+                                : 20),
+                  ],
+                ),
               ),
             ),
-          ),
-        );
+          );
+        });
       },
     );
   }
@@ -73,7 +88,8 @@ class DashboardContent extends StatelessWidget {
         children: [
           Expanded(
             flex: 2,
-            child: _buildStatCardsGrid(isDesktop, isTablet, isMobile, isDark),
+            child: _buildStatCardsGrid(isDesktop, isTablet, isMobile, isDark,
+                stats: controller.dashboardStatsData.value),
           ),
           const SizedBox(width: 20),
           Expanded(
@@ -87,7 +103,8 @@ class DashboardContent extends StatelessWidget {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildStatCardsGrid(isDesktop, isTablet, isMobile, isDark),
+          _buildStatCardsGrid(isDesktop, isTablet, isMobile, isDark,
+              stats: controller.dashboardStatsData.value),
           SizedBox(height: isMobile ? 16 : 20),
           _buildRequestAnalyticsChart(
               controller, isDesktop, isTablet, isMobile, isDark),
@@ -96,7 +113,9 @@ class DashboardContent extends StatelessWidget {
     }
   }
 
-  Widget _buildStatCardsGrid(bool isDesktop, bool isTablet, bool isMobile, bool isDark) {
+  Widget _buildStatCardsGrid(
+      bool isDesktop, bool isTablet, bool isMobile, bool isDark,
+      {DashboardStatsModel? stats}) {
     if (isDesktop) {
       return Column(
         children: [
@@ -105,7 +124,7 @@ class DashboardContent extends StatelessWidget {
               Expanded(
                 child: statCard(
                   "Total Users",
-                  "12,480",
+                  "${stats?.users.totalUsers ?? ""}",
                   'assets/icons/users.svg',
                   Colors.deepPurple,
                   isDark: isDark,
@@ -115,7 +134,7 @@ class DashboardContent extends StatelessWidget {
               Expanded(
                 child: statCard(
                   "Total Revenue",
-                  "\$84,310",
+                  "${stats?.totalRevenue ?? ""}",
                   'assets/icons/revanue.svg',
                   Colors.deepPurple,
                   isDark: isDark,
@@ -129,7 +148,7 @@ class DashboardContent extends StatelessWidget {
               Expanded(
                 child: statCard(
                   "Total Orders",
-                  "318",
+                  "${stats?.orders.totalOrders ?? ""}",
                   'assets/icons/Group.svg',
                   Colors.deepPurple,
                   isDark: isDark,
@@ -139,7 +158,7 @@ class DashboardContent extends StatelessWidget {
               Expanded(
                 child: statCard(
                   "Support Requests",
-                  "100",
+                  "${stats?.support.totalSupport ?? ""}",
                   "assets/icons/support.svg",
                   Colors.deepPurple,
                   isDark: isDark,
@@ -157,7 +176,7 @@ class DashboardContent extends StatelessWidget {
               Expanded(
                 child: statCard(
                   "Total Users",
-                  "12,480",
+                  "${stats?.users.totalUsers ?? ""}",
                   'assets/icons/users.svg',
                   Colors.deepPurple,
                   isDark: isDark,
@@ -167,7 +186,7 @@ class DashboardContent extends StatelessWidget {
               Expanded(
                 child: statCard(
                   "Total Revenue",
-                  "\$84,310",
+                  "${stats?.totalRevenue ?? ""}",
                   'assets/icons/revanue.svg',
                   Colors.deepPurple,
                   isDark: isDark,
@@ -181,7 +200,7 @@ class DashboardContent extends StatelessWidget {
               Expanded(
                 child: statCard(
                   "Total Orders",
-                  "318",
+                  "${stats?.orders.totalOrders ?? ""}",
                   'assets/icons/Group.svg',
                   Colors.deepPurple,
                   isDark: isDark,
@@ -191,7 +210,7 @@ class DashboardContent extends StatelessWidget {
               Expanded(
                 child: statCard(
                   "Support Requests",
-                  "100",
+                  "${stats?.support.totalSupport ?? ""}",
                   "assets/icons/support.svg",
                   Colors.deepPurple,
                   isDark: isDark,
@@ -206,7 +225,7 @@ class DashboardContent extends StatelessWidget {
         children: [
           statCard(
             "Total Users",
-            "12,480",
+            "${stats?.users.totalUsers ?? ""}",
             'assets/icons/users.svg',
             Colors.deepPurple,
             isDark: isDark,
@@ -214,7 +233,7 @@ class DashboardContent extends StatelessWidget {
           const SizedBox(height: 10),
           statCard(
             "Total Revenue",
-            "\$84,310",
+            "${stats?.totalRevenue ?? ""}",
             'assets/icons/revanue.svg',
             Colors.deepPurple,
             isDark: isDark,
@@ -222,7 +241,7 @@ class DashboardContent extends StatelessWidget {
           const SizedBox(height: 10),
           statCard(
             "Total Orders",
-            "318",
+            "${stats?.orders.totalOrders ?? ""}",
             'assets/icons/Group.svg',
             Colors.deepPurple,
             isDark: isDark,
@@ -230,7 +249,7 @@ class DashboardContent extends StatelessWidget {
           const SizedBox(height: 10),
           statCard(
             "Support Requests",
-            "100",
+            "${stats?.support.totalSupport ?? ""}",
             "assets/icons/support.svg",
             Colors.deepPurple,
             isDark: isDark,
@@ -249,8 +268,7 @@ class DashboardContent extends StatelessWidget {
               ? 340
               : 370,
       decoration: BoxDecoration(
-                        color: isDark ? Color(0xFF23272F) : Colors.transparent ,
-
+        color: isDark ? Color(0xFF23272F) : Colors.transparent,
         border: Border.all(width: 0.4, color: Colors.grey),
         borderRadius: BorderRadius.circular(isMobile ? 16 : 25),
       ),
@@ -262,16 +280,15 @@ class DashboardContent extends StatelessWidget {
   }
 
   Widget _buildChartsSection(DashboardController controller, bool isDesktop,
-      bool isTablet, bool isMobile,bool isDark) {
+      bool isTablet, bool isMobile, bool isDark) {
     if (isDesktop) {
       return Row(
         children: [
           Expanded(
             child: Container(
               height: 420,
-              
               decoration: BoxDecoration(
-                color: isDark ? Color(0xFF23272F) : Colors.transparent ,
+                color: isDark ? Color(0xFF23272F) : Colors.transparent,
                 border: Border.all(width: 0.4, color: Colors.grey),
                 borderRadius: BorderRadius.circular(25),
               ),
@@ -286,7 +303,7 @@ class DashboardContent extends StatelessWidget {
             child: Container(
               height: 420,
               decoration: BoxDecoration(
-                color: isDark ? Color(0xFF23272F) : Colors.transparent, 
+                color: isDark ? Color(0xFF23272F) : Colors.transparent,
                 border: Border.all(width: 0.4, color: Colors.grey),
                 borderRadius: BorderRadius.circular(25),
               ),
@@ -306,6 +323,7 @@ class DashboardContent extends StatelessWidget {
             height: isMobile ? 320 : 360,
             width: double.infinity,
             decoration: BoxDecoration(
+              color: isDark ? Color(0xFF23272F) : Colors.transparent,
               border: Border.all(width: 0.4, color: Colors.grey),
               borderRadius: BorderRadius.circular(isMobile ? 16 : 20),
             ),
@@ -322,6 +340,7 @@ class DashboardContent extends StatelessWidget {
             height: isMobile ? 320 : 360,
             width: double.infinity,
             decoration: BoxDecoration(
+              color: isDark ? Color(0xFF23272F) : Colors.transparent,
               border: Border.all(width: 0.4, color: Colors.grey),
               borderRadius: BorderRadius.circular(isMobile ? 16 : 20),
             ),

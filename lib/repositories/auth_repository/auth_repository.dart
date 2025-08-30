@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:admin/main.dart';
-import 'package:admin/models/user_model/user_model.dart';
+import 'package:admin/models/admin_model/admin_model.dart';
 import 'package:dartz/dartz.dart';
 
 class AuthRepository {
@@ -13,7 +13,7 @@ class AuthRepository {
         data: {"emailORphone": email, "password": password});
     if (!response.failed) {
       final data = UserModel.fromJson(response.data["data"]);
-      print("ye lo ${response.data['data']['accessToken']}");
+    
 
       localStorage.setString("user", jsonEncode(data.toJson()));
 
@@ -22,11 +22,14 @@ class AuthRepository {
     return left(response.message);
   }
 
-  Future<Either<String, bool>> forgotPassowrd({required String email}) async {
+  Future<Either<String, bool>> logout() async {
     final response = await networkRepository
-        .put(url: "/auth/forget-password", data: {"email": email});
+        .post(url: "/admin/auth/logout");
     if (!response.failed) {
+      localStorage.remove('token');
+      localStorage.remove('user');
       return right(true);
+
     }
     return left(response.message);
   }

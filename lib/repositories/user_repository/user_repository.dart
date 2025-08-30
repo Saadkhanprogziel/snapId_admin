@@ -1,8 +1,22 @@
 import 'dart:convert';
 
+import 'package:admin/main.dart';
+import 'package:admin/models/users/user_stats_model.dart';
 import 'package:dartz/dartz.dart';
 
-// class UserRepository {
+class UserRepository {
+
+Future<Either<String, UserStatsModel>> getUserStats() async{
+  final response = await networkRepository.get(url: "admin/users/get-user-counts");
+  if(!response.failed){
+    final data = UserStatsModel.fromJson(response.data['data']);
+    return right(data);
+  }
+  return left(response.message);
+}
+
+
+
 //   Future<Either<String, Paginate<UserModel>>> getAllUsers({
 //     required Paginate<UserModel> previousData,
 //     required Status status,
@@ -141,4 +155,4 @@ import 'package:dartz/dartz.dart';
 //     }
 //     return left(response.message);
 //   }
-// }
+}

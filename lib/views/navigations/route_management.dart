@@ -1,5 +1,6 @@
 import 'package:admin/constants/app_routes.dart';
 import 'package:admin/main.dart';
+import 'package:admin/views/navigations/app_navigation.dart';
 import 'package:go_router/go_router.dart';
 
 // Import views
@@ -17,27 +18,30 @@ import 'package:admin/views/settings/settings.dart';
 
 class AppRouter {
   static final router = GoRouter(
-    initialLocation: AppRoutes.login,
+    navigatorKey: AppNavigation.navigatorKey,
+    initialLocation: '/',
     routes: [
       GoRoute(
         path: AppRoutes.login,
-        builder: (context, state) =>  SnapIdLoginScreen(),
+        name: 'login', // 👈 add this
+        builder: (context, state) => SnapIdLoginScreen(),
         redirect: (context, state) {
-              final token = localStorage.getString("token");
-              if (token != null && token.isNotEmpty) return '/dashboard';
-              return '/login';
-            },
+          final token = localStorage.getString("token");
+          if (token != null && token.isNotEmpty) return '/';
+          return null; // stay on login
+        },
       ),
       ShellRoute(
         builder: (context, state, child) => AdminLayout(child: child),
         routes: [
           GoRoute(
-            path: AppRoutes.dashboard,
+            path: '/',
+            name: 'dashboard', // 👈 add this
             builder: (context, state) => DashboardContent(),
             redirect: (context, state) {
               final token = localStorage.getString("token");
-              if (token != null && token.isNotEmpty) return '/dashboard';
-              return '/login';
+              if (token == null || token.isEmpty) return AppRoutes.login;
+              return null;
             },
           ),
           GoRoute(

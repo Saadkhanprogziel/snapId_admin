@@ -1,9 +1,29 @@
 import 'package:admin/models/chartsTablesModel.dart';
+import 'package:admin/models/users/user_stats_model.dart';
+import 'package:admin/repositories/user_repository/user_repository.dart';
 import 'package:get/get.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class UserManagementController extends GetxController {
   var currentPage = 0.obs;
+  var userStatsData = Rxn<UserStatsModel>();
+  UserRepository userRepository = UserRepository();
+
+  @override
+  void onInit() {
+    super.onInit();
+    orderList.assignAll(allUsers); // Initially show all users
+    fetchUserData();
+    fetchUserStatsData();
+  }
+
+  fetchUserStatsData() {
+    userRepository.getUserStats().then((response) {
+      response.fold((error) {}, (success) {
+        userStatsData.value = success;
+      });
+    });
+  }
 
   // Master list (all users, unfiltered)
   final RxList<UserModel> allUsers = <UserModel>[
@@ -190,8 +210,8 @@ class UserManagementController extends GetxController {
       final lowerQuery = query.toLowerCase();
       orderList.assignAll(allUsers.where((user) {
         return (user.name ?? '').toLowerCase().contains(lowerQuery) ||
-               (user.email ?? '').toLowerCase().contains(lowerQuery) ||
-               (user.userId ?? '').toLowerCase().contains(lowerQuery);
+            (user.email ?? '').toLowerCase().contains(lowerQuery) ||
+            (user.userId ?? '').toLowerCase().contains(lowerQuery);
       }));
     }
     currentPage.value = 0; // Reset pagination
@@ -235,12 +255,5 @@ class UserManagementController extends GetxController {
     updatePlatformUsers(4200, 2800);
     updateUserStatus(13500, 980);
     updateSignupMethods(7200, 3500, 3800);
-  }
-
-  @override
-  void onInit() {
-    super.onInit();
-    orderList.assignAll(allUsers); // Initially show all users
-    fetchUserData();
   }
 }

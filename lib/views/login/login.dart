@@ -2,7 +2,7 @@ import 'package:admin/views/login/auth_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
-import '../../../controller/login_controller/login_controller.dart';
+import '../../controller/auth_controller/auth_controller.dart';
 
 class SnapIdLoginScreen extends StatelessWidget {
   SnapIdLoginScreen({Key? key}) : super(key: key);
@@ -27,12 +27,11 @@ class SnapIdLoginScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(24.0),
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 580),
-                  child: GetBuilder<LoginController>(
-                    init: LoginController(),
+                  child: GetBuilder<AuthController>(
+                    init: AuthController(),
                     builder: (controller) {
                       return Form(
                         key: _formKey,
-                        
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -81,7 +80,6 @@ class SnapIdLoginScreen extends StatelessWidget {
                                   // ✅ EMAIL FIELD
                                   AuthTextField(
                                     hintText: 'Email',
-                                    
                                     autovalidateMode:
                                         AutovalidateMode.onUserInteraction,
                                     validator: (value) {
@@ -122,13 +120,14 @@ class SnapIdLoginScreen extends StatelessWidget {
                                     width: double.infinity,
                                     height: 55,
                                     child: ElevatedButton(
-                                      onPressed: () {
-                                        if (_formKey.currentState!.validate()) {
-                                          controller.login();
-                                          // // If all fields are valid
-                                          // context.go('/dashboard');
-                                        }
-                                      },
+                                      onPressed: controller.isLoading
+                                          ? null // disable while loading
+                                          : () {
+                                              if (_formKey.currentState!
+                                                  .validate()) {
+                                                controller.login(context);
+                                              }
+                                            },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor:
                                             const Color(0xFF6366F1),
@@ -140,14 +139,24 @@ class SnapIdLoginScreen extends StatelessWidget {
                                               BorderRadius.circular(14),
                                         ),
                                       ),
-                                      child: const Text(
-                                        'Login',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                          letterSpacing: 0.2,
-                                        ),
-                                      ),
+                                      child: controller.isLoading
+                                          ? const SizedBox(
+                                              height: 24,
+                                              width: 24,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2.5,
+                                                color: Colors
+                                                    .white, // makes it visible on purple bg
+                                              ),
+                                            )
+                                          : const Text(
+                                              'Login',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600,
+                                                letterSpacing: 0.2,
+                                              ),
+                                            ),
                                     ),
                                   ),
                                 ],

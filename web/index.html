@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <base href="$FLUTTER_BASE_HREF">
 
@@ -14,7 +15,7 @@
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="icon" type="image/png" href="favicon.png" />
 
   <title>admin</title>
   <link rel="manifest" href="manifest.json">
@@ -40,11 +41,13 @@
     }
 
     #loader img {
-      max-width: 300px; /* adjust size */
+      max-width: 300px;
+      /* adjust size */
       height: auto;
     }
   </style>
 </head>
+
 <body>
   <!-- Loader with GIF -->
   <div id="loader">
@@ -56,12 +59,11 @@
 
   <script>
     // Change this value to match your GIF duration (ms)
-    const gifDuration = 3000; // e.g., 3 seconds
+    const gifDuration = 4000; // 4 seconds
 
-    window.addEventListener("flutter-first-frame", function () {
+    window.addEventListener("load", function () {
       const loader = document.getElementById("loader");
-      
-      // Wait for GIF to finish before hiding loader
+
       setTimeout(() => {
         loader.classList.add("fade-out");
         setTimeout(() => loader.remove(), 600);
@@ -69,4 +71,5 @@
     });
   </script>
 </body>
+
 </html>
