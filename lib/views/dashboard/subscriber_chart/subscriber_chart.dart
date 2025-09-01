@@ -1,5 +1,5 @@
 import 'package:admin/controller/dashboard_controller/dashboard_controller.dart';
-import 'package:admin/models/subscriber_data.dart';
+import 'package:admin/models/dashboard/dashboard_subscribers_chart_Model.dart';
 import 'package:admin/theme/text_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -17,10 +17,8 @@ class SubscriberChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Obx(() {
-      final data = controller.subscriberData;
-      if (data.length < 2) {
-        return Center(child: Text("Not enough data to render chart.", style: TextStyle(color: isDark ? Colors.white : Colors.black)));
-      }
+      final data = controller.subscriberChartData.value?.plansWithNames ?? [];
+
       return Container(
         decoration: BoxDecoration(
           // color: isDark ? Color(0xFF23272F) : Colors.transparent,
@@ -39,8 +37,9 @@ class SubscriberChart extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "20,000",
-                  style: CustomTextTheme.regular20.copyWith(color: isDark ? Colors.white : Colors.black),
+                  "${controller.subscriberChartData.value?.planCount}",
+                  style: CustomTextTheme.regular20
+                      .copyWith(color: isDark ? Colors.white : Colors.black),
                 ),
                 _buildLegend(isDark)
               ],
@@ -63,69 +62,67 @@ class SubscriberChart extends StatelessWidget {
             color: isDark ? Colors.white : Colors.grey,
           ),
         ),
-      Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-        decoration: BoxDecoration(
-          color: isDark ? Colors.transparent : Colors.white,
-          border: Border.all(color: Colors.grey.shade300),
-          borderRadius: BorderRadius.circular(8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          decoration: BoxDecoration(
+            color: isDark ? Colors.transparent : Colors.white,
+            border: Border.all(color: Colors.grey.shade300),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: Obx(() {
+              return DropdownButton<String>(
+                value: controller.selectedSubscriberFilter.value,
+                isDense: true, // reduces height
+                style: TextStyle(
+                    fontSize: 14,
+                    color: isDark
+                        ? Colors.white
+                        : Colors.grey[800]), // smaller text
+                menuMaxHeight: 250, // optional: limits dropdown menu height
+                items: const [
+                  DropdownMenuItem(
+                      value: 'today',
+                      child: Text('Today', style: TextStyle(fontSize: 14))),
+                  DropdownMenuItem(
+                      value: 'this_week',
+                      child: Text('Week', style: TextStyle(fontSize: 14))),
+                  DropdownMenuItem(
+                      value: 'this_month',
+                      child: Text('Month', style: TextStyle(fontSize: 14))),
+                  DropdownMenuItem(
+                      value: 'last_6_months',
+                      child: Text('6 Month', style: TextStyle(fontSize: 14))),
+                  DropdownMenuItem(
+                      value: 'last_month',
+                      child:
+                          Text('Last Month', style: TextStyle(fontSize: 14))),
+                  DropdownMenuItem(
+                      value: 'this_year',
+                      child: Text('Year', style: TextStyle(fontSize: 14))),
+                ],
+                onChanged: (value) {
+                  if (value != null) {
+                    controller.updateSubscriberFilter(value);
+                  }
+                },
+              );
+            }),
+          ),
         ),
-        child: DropdownButtonHideUnderline(
-          child: Obx(() {
-            return DropdownButton<String>(
-              value: controller.selectedSubscriberFilter.value,
-              isDense: true, // reduces height
-              style:  TextStyle(fontSize: 14, color: isDark ? Colors.white : Colors.grey[800] ), // smaller text
-              menuMaxHeight: 250, // optional: limits dropdown menu height
-              items: const [
-                DropdownMenuItem(
-                  value: 'day',
-                  child: Text('Day', style: TextStyle(fontSize: 14)),
-                ),
-                DropdownMenuItem(
-                  value: 'week',
-                  child: Text('Week', style: TextStyle(fontSize: 14)),
-                ),
-                DropdownMenuItem(
-                  value: 'month',
-                  child: Text('Month', style: TextStyle(fontSize: 14)),
-                ),
-                DropdownMenuItem(
-                  value: '3month',
-                  child: Text('3 Month', style: TextStyle(fontSize: 14)),
-                ),
-                DropdownMenuItem(
-                  value: 'six month',
-                  child: Text('6 Month', style: TextStyle(fontSize: 14)),
-                ),
-                DropdownMenuItem(
-                  value: 'year',
-                  child: Text('Year', style: TextStyle(fontSize: 14)),
-                ),
-              ],
-              onChanged: (value) {
-                if (value != null) {
-                  controller.updateSubscriberFilter(value);
-                }
-              },
-            );
-          }),
-        ),
-      ),
-    ],
-  );
-}
-
+      ],
+    );
+  }
 
   Widget _buildLegend(bool isDark) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _buildLegendItem('Package 1', package1Color, isDark),
+        _buildLegendItem('Single Photo', package1Color, isDark),
         const SizedBox(width: 20),
-        _buildLegendItem('Package 2', package2Color, isDark),
+        _buildLegendItem('Standard Pack', package2Color, isDark),
         const SizedBox(width: 20),
-        _buildLegendItem('Package 3', package3Color, isDark),
+        _buildLegendItem('Family Pack', package3Color, isDark),
       ],
     );
   }
@@ -145,12 +142,15 @@ class SubscriberChart extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           label,
-          style: TextStyle(color: isDark ? Colors.white70 : Colors.grey, fontWeight: FontWeight.w600),
+          style: TextStyle(
+              color: isDark ? Colors.white70 : Colors.grey,
+              fontWeight: FontWeight.w600),
         ),
       ],
     );
   }
-  Widget _buildChart(List<SubscriberData> data, bool isDark) {
+
+  Widget _buildChart(List<SubscriptionItem> data, bool isDark) {
     double maxY = _getMaxValue(data) * 1.2;
     return LineChart(
       LineChartData(
@@ -168,24 +168,28 @@ class SubscriberChart extends StatelessWidget {
               return touchedSpots.map((spot) {
                 String packageLabel;
                 if (spot.barIndex == 0) {
-                  packageLabel = 'Package 1';
+                  packageLabel = 'Single Photo';
                 } else if (spot.barIndex == 1) {
-                  packageLabel = 'Package 2';
+                  packageLabel = 'Standard Pack';
                 } else {
-                  packageLabel = 'Package 3';
+                  packageLabel = 'Family Pack';
                 }
                 return LineTooltipItem(
                   '$packageLabel\n${spot.y.toInt()}',
-                  TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 12),
+                  TextStyle(
+                      color: isDark ? Colors.white : Colors.black,
+                      fontSize: 12),
                 );
               }).toList();
             },
           ),
         ),
         lineBarsData: [
+          // Single Photo line
           LineChartBarData(
             spots: data.asMap().entries.map((entry) {
-              return FlSpot(entry.key.toDouble(), entry.value.package1.toDouble());
+              return FlSpot(entry.key.toDouble(),
+                  (entry.value.singlePhoto ?? 0).toDouble());
             }).toList(),
             isCurved: true,
             color: package1Color,
@@ -193,9 +197,11 @@ class SubscriberChart extends StatelessWidget {
             dotData: FlDotData(show: false),
             belowBarData: BarAreaData(show: false),
           ),
+          // Standard Pack line
           LineChartBarData(
             spots: data.asMap().entries.map((entry) {
-              return FlSpot(entry.key.toDouble(), entry.value.package2.toDouble());
+              return FlSpot(entry.key.toDouble(),
+                  (entry.value.standardPack ?? 0).toDouble());
             }).toList(),
             isCurved: true,
             color: package2Color,
@@ -203,9 +209,11 @@ class SubscriberChart extends StatelessWidget {
             dotData: FlDotData(show: false),
             belowBarData: BarAreaData(show: false),
           ),
+          // Family Pack line
           LineChartBarData(
             spots: data.asMap().entries.map((entry) {
-              return FlSpot(entry.key.toDouble(), entry.value.package3.toDouble());
+              return FlSpot(entry.key.toDouble(),
+                  (entry.value.familyPack ?? 0).toDouble());
             }).toList(),
             isCurved: true,
             color: package3Color,
@@ -255,15 +263,17 @@ class SubscriberChart extends StatelessWidget {
               },
             ),
           ),
-          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          topTitles:
+              const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          rightTitles:
+              const AxisTitles(sideTitles: SideTitles(showTitles: false)),
         ),
         gridData: FlGridData(
           show: true,
           drawHorizontalLine: true,
           drawVerticalLine: true,
           verticalInterval: 1,
-          horizontalInterval: maxY / 5,
+          horizontalInterval: (maxY > 0 ? maxY / 5 : 1), // ✅ safe fallback
           getDrawingHorizontalLine: (value) => FlLine(
             color: isDark ? Colors.white12 : Colors.grey,
             strokeWidth: .5,
@@ -275,16 +285,22 @@ class SubscriberChart extends StatelessWidget {
         ),
         borderData: FlBorderData(
           show: true,
-          border: Border.all(color: isDark ? Colors.white24 : Colors.grey, width: .3),
+          border: Border.all(
+              color: isDark ? Colors.white24 : Colors.grey, width: .3),
         ),
       ),
     );
   }
 
-  double _getMaxValue(List<SubscriberData> data) {
+  double _getMaxValue(List<SubscriptionItem> data) {
     double max = 0;
     for (var d in data) {
-      max = [d.package1, d.package2, d.package3, max].reduce((a, b) => a > b ? a : b).toDouble();
+      final singlePhoto = (d.singlePhoto ?? 0).toDouble();
+      final standardPack = (d.standardPack ?? 0).toDouble();
+      final familyPack = (d.familyPack ?? 0).toDouble();
+
+      max = [singlePhoto, standardPack, familyPack, max]
+          .reduce((a, b) => a > b ? a : b);
     }
     return max;
   }
