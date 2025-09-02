@@ -1,4 +1,5 @@
 import 'package:admin/controller/analytics_controller/analytics_controller.dart';
+import 'package:admin/models/analytics/processed_count.dart';
 import 'package:admin/utils/custom_spaces.dart';
 import 'package:admin/utils/stat_card_widget.dart';
 import 'package:admin/views/analytics/analytics_list_widget/analytics_list_widget.dart';
@@ -40,7 +41,10 @@ class Analytics extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Stat Cards Section
-                    _buildStatCardsSection(isDesktop, isTablet, isMobile),
+
+                    // Chart Section
+                    _buildChartSection(
+                        analyticsController, isDesktop, isTablet, isMobile, isDark),
 
                     SizedBox(
                         height: isMobile
@@ -49,18 +53,7 @@ class Analytics extends StatelessWidget {
                                 ? 20
                                 : 24),
 
-                    // Chart Section - Updated to include both charts
-                    _buildChartSection(analyticsController, isDesktop, isTablet,
-                        isMobile, isDark),
-
-                    SizedBox(
-                        height: isMobile
-                            ? 16
-                            : isTablet
-                                ? 20
-                                : 24),
-
-                    // Top Countries/Buyers Section LIST WIDGET
+                    // List Widget Section
                     Container(
                       height: isMobile
                           ? 500
@@ -90,300 +83,113 @@ class Analytics extends StatelessWidget {
     );
   }
 
-  Widget _buildStatCardsSection(bool isDesktop, bool isTablet, bool isMobile) {
-    return Builder(
-      builder: (context) {
-        final isDark = Theme.of(context).brightness == Brightness.dark;
-        if (isDesktop) {
-          return Row(
-            children: [
-              Expanded(
-                child: statCard(
-                  "Top Country By Revenue",
-                  "\$12,480",
-                  'assets/flags/pk.svg',
-                  name: "Pakistan",
-                  Colors.deepPurple,
-                  analytics: true,
-                  flag: true,
-                  isDark: isDark,
-                ),
-              ),
-              const SpaceW10(),
-              Expanded(
-                child: statCard(
-                  "Top Country by Orders",
-                  "84,310",
-                  'assets/flags/ua.svg',
-                  Colors.deepPurple,
-                  name: "Ukraine",
-                  analytics: true,
-                  flag: true,
-                  isDark: isDark,
-                ),
-              ),
-              const SpaceW10(),
-              Expanded(
-                child: statCard(
-                  name: "Amelia Liam",
-                  "Top Buyer By Revenue",
-                  "318",
-                  'assets/icons/revanue.svg',
-                  Colors.deepPurple,
-                  analytics: true,
-                  isDark: isDark,
-                ),
-              ),
-              const SpaceW10(),
-              Expanded(
-                child: statCard(
-                  "Top Buyer by Orders",
-                  "100",
-                  "assets/icons/Group.svg",
-                  Colors.deepPurple,
-                  name: "Tripti Dimri",
-                  analytics: true,
-                  isDark: isDark,
-                ),
-              ),
-            ],
-          );
-        } else if (isTablet) {
-          return Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: statCard(
-                      "Top Country By Revenue",
-                      "\$12,480",
-                      'assets/flags/pk.svg',
-                      name: "Pakistan",
-                      Colors.deepPurple,
-                      analytics: true,
-                      flag: true,
-                      isDark: isDark,
-                    ),
-                  ),
-                  const SpaceW10(),
-                  Expanded(
-                    child: statCard(
-                      "Top Country by Orders",
-                      "84,310",
-                      'assets/flags/ua.svg',
-                      Colors.deepPurple,
-                      name: "Ukraine",
-                      analytics: true,
-                      flag: true,
-                      isDark: isDark,
-                    ),
-                  ),
-                ],
-              ),
-              const SpaceH10(),
-              Row(
-                children: [
-                  Expanded(
-                    child: statCard(
-                      name: "Amelia Liam",
-                      "Top Buyer By Revenue",
-                      "318",
-                      'assets/icons/revanue.svg',
-                      Colors.deepPurple,
-                      analytics: true,
-                      isDark: isDark,
-                    ),
-                  ),
-                  const SpaceW10(),
-                  Expanded(
-                    child: statCard(
-                      "Top Buyer by Orders",
-                      "100",
-                      "assets/icons/Group.svg",
-                      Colors.deepPurple,
-                      name: "Tripti Dimri",
-                      analytics: true,
-                      isDark: isDark,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          );
-        } else {
-          return Column(
-            children: [
-              statCard(
-                "Top Country By Revenue",
-                "\$12,480",
-                'assets/flags/pk.svg',
-                name: "Pakistan",
-                Colors.deepPurple,
-                analytics: true,
-                flag: true,
-                isDark: isDark,
-              ),
-              const SpaceH10(),
-              statCard(
-                "Top Country by Orders",
-                "84,310",
-                'assets/flags/ua.svg',
-                Colors.deepPurple,
-                name: "Ukraine",
-                analytics: true,
-                flag: true,
-                isDark: isDark,
-              ),
-              const SpaceH10(),
-              statCard(
-                name: "Amelia Liam",
-                "Top Buyer By Revenue",
-                "318",
-                'assets/icons/revanue.svg',
-                Colors.deepPurple,
-                analytics: true,
-                isDark: isDark,
-              ),
-              const SpaceH10(),
-              statCard(
-                "Top Buyer by Orders",
-                "100",
-                "assets/icons/Group.svg",
-                Colors.deepPurple,
-                name: "Tripti Dimri",
-                analytics: true,
-                isDark: isDark,
-              ),
-            ],
-          );
-        }
-      },
-    );
-  }
+  // ---------------- Stat Cards ----------------
+
+  
+  // ---------------- Chart Section ----------------
 
   Widget _buildChartSection(AnalyticsController analyticsController,
-    bool isDesktop, bool isTablet, bool isMobile, bool isDark) {
-  if (isMobile) {
-    // For mobile, stack charts vertically
-    return Column(
+      bool isDesktop, bool isTablet, bool isMobile, bool isDark) {
+    if (isMobile) {
+      return Column(
+        children: [
+          // Document Chart Card
+          Container(
+            height: 400,
+            decoration: BoxDecoration(
+              color: isDark ? Color(0xFF23272F) : Colors.white,
+              border: Border.all(
+                  width: 0.4,
+                  color: isDark ? Colors.grey.shade800 : Colors.grey),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            child: Obx(() => DocumentTypeChart(
+                  chartData: analyticsController
+                      .topDocumentTypesCount.value!.topDocumentTypes,
+                  selectedPeriod:
+                      analyticsController.selectedDocTypePeriod.value,
+                  onPeriodChanged: (value) {
+                    analyticsController.updateDocTypeFilter(value);
+                  },
+                )),
+          ),
+          const SizedBox(height: 16),
+          // Pie Chart Card
+          Container(
+            height: 400,
+            decoration: BoxDecoration(
+              color: isDark ? Color(0xFF23272F) : Colors.white,
+              border: Border.all(
+                  width: 0.4,
+                  color: isDark ? Colors.grey.shade800 : Colors.grey),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            padding: EdgeInsets.all(16),
+            child: _buildPieChart(isDark),
+          ),
+        ],
+      );
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Document Chart Card
-        Container(
-          height: 400, // increased from 350 → 400
-          decoration: BoxDecoration(
-            color: isDark ? Color(0xFF23272F) : Colors.white,
-            border: Border.all(
-                width: 0.4,
-                color: isDark ? Colors.grey.shade800 : Colors.grey),
-            borderRadius: BorderRadius.circular(16),
+        Expanded(
+          flex: 70,
+          child: Container(
+            height: isTablet ? 400 : 380,
+            decoration: BoxDecoration(
+              color: isDark ? Color(0xFF23272F) : Colors.white,
+              border: Border.all(
+                  width: 0.4,
+                  color: isDark ? Colors.grey.shade800 : Colors.grey),
+              borderRadius: BorderRadius.circular(isMobile ? 16 : 25),
+            ),
+            padding: EdgeInsets.symmetric(
+              horizontal: isTablet ? 24 : 40,
+              vertical: 16,
+            ),
+            child: Obx(() => DocumentTypeChart(
+                  chartData: analyticsController
+                      .topDocumentTypesCount.value!.topDocumentTypes,
+                  selectedPeriod:
+                      analyticsController.selectedDocTypePeriod.value,
+                  onPeriodChanged: (value) {
+                    analyticsController.updateDocTypeFilter(value);
+                  },
+                )),
           ),
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          child: Obx(() => DocumentTypeChart(
-                chartData: analyticsController
-                    .topDocumentTypesCount.value!.topDocumentTypes,
-                selectedPeriod: analyticsController.selectedDocTypePeriod.value,
-                onPeriodChanged: (value) {
-                  analyticsController.updateDocTypeFilter(value);
-                },
-              )),
         ),
-        const SizedBox(height: 16),
+        SizedBox(width: isTablet ? 20 : 24),
         // Pie Chart Card
-        Container(
-          height: 400, // increased from 350 → 400
-          decoration: BoxDecoration(
-            color: isDark ? Color(0xFF23272F) : Colors.white,
-            border: Border.all(
-                width: 0.4,
-                color: isDark ? Colors.grey.shade800 : Colors.grey),
-            borderRadius: BorderRadius.circular(16),
+        Expanded(
+          flex: 30,
+          child: Container(
+            height: isTablet ? 360 : 380,
+            decoration: BoxDecoration(
+              color: isDark ? Color(0xFF23272F) : Colors.white,
+              border: Border.all(
+                  width: 0.4,
+                  color: isDark ? Colors.grey.shade800 : Colors.grey),
+              borderRadius: BorderRadius.circular(isMobile ? 16 : 25),
+            ),
+            padding: EdgeInsets.all(isTablet ? 20 : 24),
+            child: _buildPieChart(isDark),
           ),
-          padding: EdgeInsets.all(16),
-          child: _buildPieChart(isDark),
         ),
       ],
     );
   }
 
-  // For tablet and desktop, show charts side by side with separate cards
-  return Row(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      // Document Chart Card - 70% width
-      Expanded(
-        flex: 70,
-        child: Container(
-          height: isMobile
-              ? 350
-              : isTablet
-                  ? 400 // increased from 350 → 400
-                  : 380, // increased from 320 → 380
-          decoration: BoxDecoration(
-            color: isDark ? Color(0xFF23272F) : Colors.white,
-            border: Border.all(
-                width: 0.4,
-                color: isDark ? Colors.grey.shade800 : Colors.grey),
-            borderRadius: BorderRadius.circular(isMobile ? 16 : 25),
-          ),
-          padding: EdgeInsets.symmetric(
-            horizontal: isMobile
-                ? 16
-                : isTablet
-                    ? 24
-                    : 40,
-            vertical: 16,
-          ),
-          child: Obx(() => DocumentTypeChart(
-                chartData: analyticsController
-                    .topDocumentTypesCount.value!.topDocumentTypes,
-                selectedPeriod: analyticsController.selectedDocTypePeriod.value,
-                onPeriodChanged: (value) {
-                  analyticsController.updateDocTypeFilter(value);
-                },
-              )),
-        ),
-      ),
-      // Margin between cards
-      SizedBox(
-          width: isMobile
-              ? 16
-              : isTablet
-                  ? 20
-                  : 24),
-      // Pie Chart Card - 30% width
-      Expanded(
-        flex: 30,
-        child: Container(
-          height: isMobile
-              ? 350
-              : isTablet
-                  ? 360 // increased from 300 → 360
-                  : 380, // increased from 320 → 380
-          decoration: BoxDecoration(
-            color: isDark ? Color(0xFF23272F) : Colors.white,
-            border: Border.all(
-                width: 0.4,
-                color: isDark ? Colors.grey.shade800 : Colors.grey),
-            borderRadius: BorderRadius.circular(isMobile ? 16 : 25),
-          ),
-          padding: EdgeInsets.all(isMobile
-              ? 16
-              : isTablet
-                  ? 20
-                  : 24),
-          child: _buildPieChart(isDark),
-        ),
-      ),
-    ],
-  );
-}
-
+  // ---------------- Pie Chart ----------------
 
   Widget _buildPieChart(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header with title and dropdown (for pie chart only)
+        // Header
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -415,21 +221,24 @@ class Analytics extends StatelessWidget {
                     menuMaxHeight: 250,
                     items: const [
                       DropdownMenuItem(
-                        value: 'Week',
+                        value: 'this_week',
                         child: Text('Week', style: TextStyle(fontSize: 14)),
                       ),
                       DropdownMenuItem(
-                        value: 'Month',
-                        child: Text('Month', style: TextStyle(fontSize: 14)),
+                        value: 'last_month',
+                        child: Text('Last Month', style: TextStyle(fontSize: 14)),
                       ),
                       DropdownMenuItem(
-                        value: 'Year',
-                        child: Text('Year', style: TextStyle(fontSize: 14)),
+                        value: 'this_month',
+                        child: Text('This Month', style: TextStyle(fontSize: 14)),
+                      ),
+                      DropdownMenuItem(
+                        value: 'this_year',
+                        child: Text('This Year', style: TextStyle(fontSize: 14)),
                       ),
                     ],
                     onChanged: (value) {
-                      if (value != null)
-                        controller.pieChartPeriod.value = value;
+                      if (value != null) controller.updatePieChartFilter(value);
                     },
                   ),
                 ),
@@ -438,37 +247,45 @@ class Analytics extends StatelessWidget {
           ],
         ),
 
-        // Total count (dynamic from pieChartPeriod)
+        // Total + Chart
         Obx(() {
           final controller = Get.find<AnalyticsController>();
-          final data = controller
-                  .pieChartDataByPeriod[controller.pieChartPeriod.value] ??
-              [];
+          final status = controller.processedDocumentCount.value?.sessionByStatus;
+
+          if (status == null) return SizedBox();
+
+          final data = [
+            {
+              'label': 'Image Processed',
+              'value': status.imageProcessed,
+              'color': const Color(0xFF81C784), // green
+            },
+            {
+              'label': 'Downloaded',
+              'value': status.downloaded,
+              'color': const Color(0xFFFF8A95), // red
+            },
+          ];
+
           final total =
               data.fold<num>(0, (sum, item) => sum + (item['value'] as num));
-          return Text(
-            total.toStringAsFixed(0),
-            style: TextStyle(
-              color: isDark ? Colors.white : Colors.black,
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-            ),
-          );
-        }),
 
-        // Legend centered below the total count
-        _buildLegend(isDark),
-        const SizedBox(height: 12), // Less space below legend before pie chart
-        // Semi-circular donut chart
-        Expanded(
-          child: Stack(
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Obx(() {
-                final controller = Get.find<AnalyticsController>();
-                final data = controller.pieChartDataByPeriod[
-                        controller.pieChartPeriod.value] ??
-                    [];
-                return ValueListenableBuilder<int?>(
+              Text(
+                total.toStringAsFixed(0),
+                style: TextStyle(
+                  color: isDark ? Colors.white : Colors.black,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              _buildLegend(data, isDark),
+              const SizedBox(height: 12),
+              SizedBox(
+                height: 200,
+                child: ValueListenableBuilder<int?>(
                   valueListenable: hoveredIndex,
                   builder: (context, value, child) {
                     return PieChart(
@@ -477,11 +294,12 @@ class Analytics extends StatelessWidget {
                         centerSpaceRadius: 50,
                         startDegreeOffset: 180,
                         sections: _getPieChartSectionsFromController(
-                            data, isDark,
-                            hovered: value),
+                          data,
+                          isDark,
+                          hovered: value,
+                        ),
                         pieTouchData: PieTouchData(
-                          touchCallback:
-                              (FlTouchEvent event, pieTouchResponse) {
+                          touchCallback: (event, pieTouchResponse) {
                             if (event is FlPointerHoverEvent) {
                               if (pieTouchResponse != null &&
                                   pieTouchResponse.touchedSection != null) {
@@ -499,30 +317,40 @@ class Analytics extends StatelessWidget {
                       ),
                     );
                   },
-                );
-              }),
+                ),
+              ),
             ],
-          ),
-        ),
+          );
+        }),
       ],
     );
   }
 
-  // ...existing code...
-
   List<PieChartSectionData> _getPieChartSectionsFromController(
       List<Map<String, dynamic>> data, bool isDark,
       {int? hovered}) {
+    final total =
+        data.fold<num>(0, (sum, item) => sum + (item['value'] as num));
+
     return List.generate(data.length, (index) {
       final item = data[index];
+      final value = (item['value'] as num).toDouble();
+      final label = item['label'] as String;
+      final color = item['color'] as Color;
+
       return PieChartSectionData(
-        color: item['color'] as Color,
-        value: (item['value'] as num).toDouble(),
+        color: color,
+        value: value,
         title: '',
-        radius: 25,
+        radius: hovered == index ? 35 : 25,
         badgeWidget: hovered == index
-            ? _buildTooltip(item['label'] as String, item['value'].toString(),
-                item['percentage'] as String, item['color'] as Color, isDark)
+            ? _buildTooltip(
+                label,
+                value.toStringAsFixed(0),
+                '${((value / total) * 100).toStringAsFixed(1)}%',
+                color,
+                isDark,
+              )
             : null,
         badgePositionPercentageOffset: 0.8,
       );
@@ -595,24 +423,12 @@ class Analytics extends StatelessWidget {
     );
   }
 
-  Widget _buildLegend(bool isDark) {
-    final legendItems = [
-      {
-        'color': Color(0xFFFF8A95),
-        'label': 'Failed',
-      },
-      {
-        'color': Color(0xFF81C784),
-        'label': 'Successful',
-      },
-    ];
-
+  Widget _buildLegend(List<Map<String, dynamic>> data, bool isDark) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: legendItems.map((item) {
+      children: data.map((item) {
         return Padding(
-          padding: const EdgeInsets.symmetric(
-              horizontal: 24), // Even space between legend items
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [

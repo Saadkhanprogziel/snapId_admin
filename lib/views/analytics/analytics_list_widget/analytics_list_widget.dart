@@ -32,7 +32,7 @@ class AnalyticsListWidget extends StatelessWidget {
               final isTopBuyers = controller.selectedTopTab.value == 1;
               final dataList = isTopBuyers
                   ? controller.dummyBuyers
-                  : controller.dummyCountries; // Changed from dummyActivities to dummyCountries
+                  : controller.topCountries.value; // Changed from dummyActivities to topCountries.value
               
               const itemsPerPage = 10;
               // final totalPages = (dataList.length / itemsPerPage).ceil();
@@ -54,7 +54,7 @@ class AnalyticsListWidget extends StatelessWidget {
             final isTopBuyers = controller.selectedTopTab.value == 1;
             final dataList = isTopBuyers
                 ? controller.dummyBuyers
-                : controller.dummyCountries; // Changed from dummyActivities to dummyCountries
+                : controller.topCountries.value; // Changed from dummyActivities to topCountries.value
             const itemsPerPage = 10;
             final totalPages = (dataList.length / itemsPerPage).ceil();
             final currentPage = controller.currentPage.value;
@@ -133,14 +133,7 @@ class AnalyticsListWidget extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(child: _buildActionButton(Icons.download, "Export", isDark: isDark)),
-              const SizedBox(width: 8),
-              Expanded(child: _buildActionButton(Icons.filter_list, "Filter",isDark: isDark)),
-            ],
-          ),
+         
         ],
       );
     } else {
@@ -164,9 +157,7 @@ class AnalyticsListWidget extends StatelessWidget {
                 "Top Buyers", 1, controller.selectedTopTab.value == 1,  isDark: isDark)),
           ),
           const Spacer(),
-          _buildActionButton(Icons.download, "Export",isDark: isDark),
-          const SizedBox(width: 8),
-          _buildActionButton(Icons.filter_list, "Filter",isDark: isDark),
+         
         ],
       );
     }
@@ -257,14 +248,14 @@ class AnalyticsListWidget extends StatelessWidget {
           children: isTopBuyers
               ? [
                   Expanded(flex: 2, child: Text(data.name, style: _rowStyle, overflow: TextOverflow.ellipsis)),
-                  Expanded(flex: 2, child: Text(data.country, style: _rowStyle)),
-                  Expanded(flex: 2, child: Text('${data.orders}', style: _rowStyle)),
+                  Expanded(flex: 2, child: Text(data.countryName, style: _rowStyle)),
+                  Expanded(flex: 2, child: Text('${data.totalOrders}', style: _rowStyle)),
                   SizedBox(width: 60, child: _buildActionButton(Icons.remove_red_eye_outlined, "" , viewBtn: true, isDark: isDark)),
                 ]
               : [
                   Expanded(flex: 1, child: Text('${data.rank}', style: _rowStyle)),
-                  Expanded(flex: 2, child: Text(data.country, style: _rowStyle, overflow: TextOverflow.ellipsis)),
-                  Expanded(flex: 2, child: Text('${data.orders}', style: _rowStyle)),
+                  Expanded(flex: 2, child: Text(data.countryName, style: _rowStyle, overflow: TextOverflow.ellipsis)),
+                  Expanded(flex: 2, child: Text('${data.totalOrders}', style: _rowStyle)),
                   Expanded(flex: 2, child: Text('\$${data.revenue.toStringAsFixed(2)}', style: _rowStyle)),
                 ],
         ),
@@ -283,15 +274,15 @@ class AnalyticsListWidget extends StatelessWidget {
               ? [
                   Expanded(flex: 1, child: Text('${data.rank}', style: _rowStyle)),
                   Expanded(flex: 2, child: Text(data.name, style: _rowStyle, overflow: TextOverflow.ellipsis)),
-                  Expanded(flex: 2, child: Text(data.country, style: _rowStyle)),
-                  Expanded(flex: 2, child: Text('${data.orders}', style: _rowStyle)),
+                  Expanded(flex: 2, child: Text(data.countryName, style: _rowStyle)),
+                  Expanded(flex: 2, child: Text('${data.totalOrders}', style: _rowStyle)),
                   Expanded(flex: 2, child: Text('\$${data.revenue.toStringAsFixed(2)}', style: _rowStyle)),
                   SizedBox(width: 70, child: _buildActionButton(Icons.remove_red_eye_outlined, "View",  viewBtn: true, isDark: isDark)),
                 ]
               : [
                   Expanded(flex: 1, child: Text('${data.rank}', style: _rowStyle)),
-                  Expanded(flex: 2, child: Text(data.country, style: _rowStyle, overflow: TextOverflow.ellipsis)),
-                  Expanded(flex: 2, child: Text('${data.orders}', style: _rowStyle)),
+                  Expanded(flex: 2, child: Text(data.countryName, style: _rowStyle, overflow: TextOverflow.ellipsis)),
+                  Expanded(flex: 2, child: Text('${data.totalOrders}', style: _rowStyle)),
                   Expanded(flex: 2, child: Text('\$${data.revenue.toStringAsFixed(2)}', style: _rowStyle)),
                   Expanded(flex: 2, child: Text(data.platformBreakdown, style: _rowStyle, overflow: TextOverflow.ellipsis)),
                 ],
@@ -311,17 +302,17 @@ class AnalyticsListWidget extends StatelessWidget {
               ? [
                   Expanded(flex: 1, child: Text('${data.rank}', style: _rowStyle)),
                   Expanded(flex: 2, child: Text(data.name, style: _rowStyle)),
-                  Expanded(flex: 2, child: Text(data.country, style: _rowStyle)),
+                  Expanded(flex: 2, child: Text(data.countryName, style: _rowStyle)),
                   Expanded(flex: 3, child: Text(data.email, style: _rowStyle, overflow: TextOverflow.ellipsis)),
-                  Expanded(flex: 2, child: Text('${data.orders}', style: _rowStyle)),
+                  Expanded(flex: 2, child: Text('${data.totalOrders}', style: _rowStyle)),
                   Expanded(flex: 2, child: Text('\$${data.revenue.toStringAsFixed(2)}', style: _rowStyle)),
                   Expanded(flex: 2, child: Text(data.plateform, style: _rowStyle)),
                   SizedBox(width: 80, child: _buildActionButton(Icons.remove_red_eye_outlined, "View", viewBtn: true, isDark: isDark)),
                 ]
               : [
                   Expanded(flex: 1, child: Text('${data.rank}', style: _rowStyle)),
-                  Expanded(flex: 2, child: Text(data.country, style: _rowStyle, overflow: TextOverflow.ellipsis)),
-                  Expanded(flex: 2, child: Text('${data.orders}', style: _rowStyle)),
+                  Expanded(flex: 2, child: Text(data.countryName, style: _rowStyle, overflow: TextOverflow.ellipsis)),
+                  Expanded(flex: 2, child: Text('${data.totalOrders}', style: _rowStyle)),
                   Expanded(flex: 2, child: Text('\$${data.revenue.toStringAsFixed(2)}', style: _rowStyle)),
                   Expanded(flex: 3, child: Text(data.platformBreakdown, style: _rowStyle, overflow: TextOverflow.ellipsis)),
                 ],

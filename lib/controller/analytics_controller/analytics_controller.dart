@@ -1,196 +1,73 @@
+import 'package:admin/models/analytics/processed_count.dart';
 import 'package:admin/models/chartsTablesModel.dart';
-import 'package:admin/models/country_data_model.dart';
-import 'package:admin/models/top_documents_type/top_documents_type.dart';
+import 'package:admin/models/analytics/country_data_model.dart';
+import 'package:admin/models/analytics/top_documents_type.dart';
 import 'package:admin/repositories/analytics_repository/analytics_repository.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class AnalyticsController extends GetxController {
   AnalyticsRepository analyticsRepository = AnalyticsRepository();
 
   var topDocumentTypesCount = Rxn<TopDocumentTypesResponse>();
-  final pieChartPeriod = 'Week'.obs;
-  final topDcoumentsPeriod = 'this_year'.obs;
+  var processedDocumentCount= Rxn<ProcessedDocCountModel>();
+  var topCountries= <CountryData>[].obs;
+  final pieChartPeriod = 'last_month'.obs;
 
   @override
   void onInit() {
     super.onInit();
     fetchTopDocuments();
+    fetchProcessedDocCount();
+    fetchTopCountries();
   }
 
-  final Map<String, List<Map<String, dynamic>>> pieChartDataByPeriod = {
-    'Week': [
-      {
-        'label': 'Failed Requests',
-        'value': 500,
-        'color': const Color(0xFFFF8A95),
-        'percentage': '10%',
-      },
-      {
-        'label': 'Successful Requests',
-        'value': 4500,
-        'color': const Color(0xFF81C784),
-        'percentage': '90%',
-      },
-    ],
-    'Month': [
-      {
-        'label': 'Failed Requests',
-        'value': 2050,
-        'color': const Color(0xFFFF8A95),
-        'percentage': '17%', // 2050/12050
-      },
-      {
-        'label': 'Successful Requests',
-        'value': 10000,
-        'color': const Color(0xFF81C784),
-        'percentage': '83%', // 10000/12050
-      },
-    ],
-    'Year': [
-      {
-        'label': 'Failed Requests',
-        'value': 12000,
-        'color': const Color(0xFFFF8A95),
-        'percentage': '20%', // 12000/60000
-      },
-      {
-        'label': 'Successful Requests',
-        'value': 48000,
-        'color': const Color(0xFF81C784),
-        'percentage': '80%', // 48000/60000
-      },
-    ],
-  };
+
   
   var selectedDocTypePeriod = 'last_month'.obs;
   var selectedTopTab = 0.obs; // 0 = Top Countries, 1 = Top Buyers
   var currentPage = 0.obs;
 
+  void updatePieChartFilter(String filter) {
+    pieChartPeriod.value = filter;
+    fetchProcessedDocCount();
+  }
   void updateDocTypeFilter(String filter) {
     selectedDocTypePeriod.value = filter;
     fetchTopDocuments();
+    
   }
 
   void fetchTopDocuments() async {
-    // Use selectedDocTypePeriod instead of topDcoumentsPeriod
     analyticsRepository.getTopDocumentTypesCount(selectedDocTypePeriod.value).then((response) {
       response.fold((error) {
-        print("errrrrrrrrrrrrrr $error");
+        print("error $error");
       }, (success) {
         topDocumentTypesCount.value = success;
       });
     });
   }
 
-  final List<CountryData> dummyCountries = [
-    CountryData(
-      rank: 1,
-      country: "United States",
-      orders: 1250,
-      revenue: 125000.50,
-      platformBreakdown: "iOS: 60%, Android: 35%, Web: 5%",
-    ),
-    CountryData(
-      rank: 2,
-      country: "United Kingdom",
-      orders: 890,
-      revenue: 89500.75,
-      platformBreakdown: "iOS: 45%, Android: 40%, Web: 15%",
-    ),
-    CountryData(
-      rank: 3,
-      country: "Germany",
-      orders: 750,
-      revenue: 75200.00,
-      platformBreakdown: "Android: 55%, iOS: 35%, Web: 10%",
-    ),
-    CountryData(
-      rank: 4,
-      country: "Canada",
-      orders: 620,
-      revenue: 62800.25,
-      platformBreakdown: "iOS: 50%, Android: 45%, Web: 5%",
-    ),
-    CountryData(
-      rank: 5,
-      country: "Australia",
-      orders: 580,
-      revenue: 58900.80,
-      platformBreakdown: "iOS: 65%, Android: 30%, Web: 5%",
-    ),
-    CountryData(
-      rank: 6,
-      country: "France",
-      orders: 520,
-      revenue: 52700.40,
-      platformBreakdown: "Android: 48%, iOS: 42%, Web: 10%",
-    ),
-    CountryData(
-      rank: 7,
-      country: "Japan",
-      orders: 480,
-      revenue: 48300.60,
-      platformBreakdown: "iOS: 70%, Android: 25%, Web: 5%",
-    ),
-    CountryData(
-      rank: 8,
-      country: "Netherlands",
-      orders: 420,
-      revenue: 42500.90,
-      platformBreakdown: "Android: 52%, iOS: 38%, Web: 10%",
-    ),
-    CountryData(
-      rank: 9,
-      country: "Sweden",
-      orders: 380,
-      revenue: 38700.20,
-      platformBreakdown: "iOS: 55%, Android: 35%, Web: 10%",
-    ),
-    CountryData(
-      rank: 10,
-      country: "Italy",
-      orders: 350,
-      revenue: 35800.15,
-      platformBreakdown: "Android: 58%, iOS: 32%, Web: 10%",
-    ),
-    CountryData(
-      rank: 11,
-      country: "Spain",
-      orders: 320,
-      revenue: 32900.45,
-      platformBreakdown: "Android: 54%, iOS: 36%, Web: 10%",
-    ),
-    CountryData(
-      rank: 12,
-      country: "Brazil",
-      orders: 290,
-      revenue: 29400.80,
-      platformBreakdown: "Android: 75%, iOS: 20%, Web: 5%",
-    ),
-    CountryData(
-      rank: 13,
-      country: "South Korea",
-      orders: 270,
-      revenue: 27600.30,
-      platformBreakdown: "Android: 65%, iOS: 30%, Web: 5%",
-    ),
-    CountryData(
-      rank: 14,
-      country: "Mexico",
-      orders: 250,
-      revenue: 25300.60,
-      platformBreakdown: "Android: 68%, iOS: 27%, Web: 5%",
-    ),
-    CountryData(
-      rank: 15,
-      country: "India",
-      orders: 220,
-      revenue: 22800.40,
-      platformBreakdown: "Android: 82%, iOS: 15%, Web: 3%",
-    ),
-  ];
+  void fetchProcessedDocCount() async {
+    analyticsRepository.getProcessedDocumentCount(pieChartPeriod.value).then((response) {
+      response.fold((error) {
+        print("error $error");
+      }, (success) {
+        processedDocumentCount.value = success;
+      });
+    });
+  }
+  void fetchTopCountries() async {
+    analyticsRepository.getTopCountries().then((response) {
+      response.fold((error) {
+        print("errrrrrrrrrror $error");
+      }, (success) {
+        print("janab");
+        topCountries.value = success; 
+      });
+    });
+  }
 
+  
   List<BuyerData> dummyBuyers = [
     BuyerData(
       rank: 1,

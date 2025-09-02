@@ -1,5 +1,5 @@
 import 'package:admin/constants/colors.dart';
-import 'package:admin/models/top_documents_type/top_documents_type.dart';
+import 'package:admin/models/analytics/top_documents_type.dart';
 import 'package:admin/theme/text_theme.dart';
 import 'package:flutter/material.dart';
 
