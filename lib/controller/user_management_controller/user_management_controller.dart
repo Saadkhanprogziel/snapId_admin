@@ -1,168 +1,80 @@
 import 'package:admin/models/chartsTablesModel.dart';
+import 'package:admin/models/users/user_analytics_model.dart';
 import 'package:admin/models/users/user_stats_model.dart';
-import 'package:admin/repositories/user_repository/user_repository.dart';
+import 'package:admin/models/users/users_model.dart';
+import 'package:admin/repositories/users_repository/users_repository.dart';
 import 'package:get/get.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class UserManagementController extends GetxController {
   var currentPage = 0.obs;
   var userStatsData = Rxn<UserStatsModel>();
-  UserRepository userRepository = UserRepository();
-
+  var usersData = <UsersModel>[].obs;
+  var pagination = Rxn<PaginationModel>(); // Add pagination observable
+  final userRepo = UserRepository();
+  final userAnalytics = Rxn<UserAnalytics>();
+  var isLoading = false.obs;
   @override
   void onInit() {
     super.onInit();
-    orderList.assignAll(allUsers); // Initially show all users
     fetchUserData();
     fetchUserStatsData();
+    fetchUserAnalytics();
   }
 
-  fetchUserStatsData() {
-    userRepository.getUserStats().then((response) {
-      response.fold((error) {}, (success) {
-        userStatsData.value = success;
-      });
-    });
+  fetchUserStatsData() async {
+    isLoading.value = true;
+    final result = await userRepo.getAllUsers(
+      page: currentPage.value + 1, // API pages usually start from 1
+      pageSize: 10,
+      status: "ALL",
+    );
+
+    result.fold(
+      (failure) {
+        print("❌ Error: ${failure.message}");
+        isLoading.value = false;
+      },
+      (response) {
+        usersData.value = response.users;
+        orderList
+            .assignAll(response.users); // Use real data instead of mock data
+        pagination.value = response.pagination; // Store pagination info
+        isLoading.value = false;
+      },
+    );
   }
 
-  // Master list (all users, unfiltered)
-  final RxList<UserModel> allUsers = <UserModel>[
-    UserModel(
-      userId: '001',
-      name: 'Alice Smith',
-      email: 'alice@example.com',
-      signupDate: DateTime(2023, 1, 10),
-      subscription: 'Free',
-      signupMethod: 'Email',
-      platform: 'iOS',
-      status: 'active',
-      country: 'United States',
-    ),
-    UserModel(
-      userId: '002',
-      name: 'Bob Johnson',
-      email: 'bob@example.com',
-      signupDate: DateTime(2023, 2, 15),
-      subscription: 'Premium',
-      signupMethod: 'Google',
-      platform: 'Android',
-      status: 'active',
-      country: 'Canada',
-    ),
-    UserModel(
-      userId: '003',
-      name: 'Charlie Davis',
-      email: 'charlie@example.com',
-      signupDate: DateTime(2023, 3, 20),
-      subscription: 'Basic',
-      signupMethod: 'Facebook',
-      platform: 'Web',
-      status: 'Block',
-      country: 'United Kingdom',
-    ),
-    UserModel(
-      userId: '004',
-      name: 'Diana Moore',
-      email: 'diana@example.com',
-      signupDate: DateTime(2023, 4, 5),
-      subscription: 'Free',
-      signupMethod: 'Apple',
-      platform: 'iOS',
-      status: 'Block',
-      country: 'Australia',
-    ),
-    UserModel(
-      userId: '005',
-      name: 'Ethan Hall',
-      email: 'ethan@example.com',
-      signupDate: DateTime(2023, 5, 12),
-      subscription: 'Premium',
-      signupMethod: 'Email',
-      platform: 'Android',
-      status: 'active',
-      country: 'Germany',
-    ),
-    UserModel(
-      userId: '006',
-      name: 'Fiona Clark',
-      email: 'fiona@example.com',
-      signupDate: DateTime(2023, 6, 18),
-      subscription: 'Basic',
-      signupMethod: 'Google',
-      platform: 'Web',
-      status: 'Block',
-      country: 'France',
-    ),
-    UserModel(
-      userId: '007',
-      name: 'George Lee',
-      email: 'george@example.com',
-      signupDate: DateTime(2023, 7, 22),
-      subscription: 'Free',
-      signupMethod: 'Facebook',
-      platform: 'iOS',
-      status: 'active',
-      country: 'Japan',
-    ),
-    UserModel(
-      userId: '008',
-      name: 'Hannah King',
-      email: 'hannah@example.com',
-      signupDate: DateTime(2023, 8, 3),
-      subscription: 'Premium',
-      signupMethod: 'Apple',
-      platform: 'Android',
-      status: 'pending',
-      country: 'India',
-    ),
-    UserModel(
-      userId: '009',
-      name: 'Ivan Petrov',
-      email: 'ivan@example.com',
-      signupDate: DateTime(2023, 9, 14),
-      subscription: 'Basic',
-      signupMethod: 'Email',
-      platform: 'Web',
-      status: 'active',
-      country: 'Russia',
-    ),
-    UserModel(
-      userId: '010',
-      name: 'Julia Rossi',
-      email: 'julia@example.com',
-      signupDate: DateTime(2023, 10, 21),
-      subscription: 'Premium',
-      signupMethod: 'Google',
-      platform: 'Android',
-      status: 'active',
-      country: 'Italy',
-    ),
-    UserModel(
-      userId: '011',
-      name: 'Kevin Wu',
-      email: 'kevin@example.com',
-      signupDate: DateTime(2023, 11, 8),
-      subscription: 'Free',
-      signupMethod: 'Facebook',
-      platform: 'iOS',
-      status: 'Block',
-      country: 'China',
-    ),
-    UserModel(
-      userId: '012',
-      name: 'Laura Gomez',
-      email: 'laura@example.com',
-      signupDate: DateTime(2023, 12, 2),
-      subscription: 'Premium',
-      signupMethod: 'Apple',
-      platform: 'Web',
-      status: 'active',
-      country: 'Spain',
-    ),
-  ].obs;
+  fetchUserAnalytics() async {
+    isLoading.value = true;
+    final result = await userRepo.getUserAlalytics(
+      page: currentPage.value + 1, // API pages usually start from 1
+      pageSize: 10,
+      status: "ALL",
+    );
 
-  // Filtered list (used in UI)
-  final RxList<UserModel> orderList = <UserModel>[].obs;
+    result.fold(
+      (failure) {
+        print("❌ Error: ${failure.message}");
+        isLoading.value = false;
+      },
+      (response) {
+        userAnalytics.value = response;
+        isLoading.value = false;
+
+        // ✅ Update observables directly from API response
+
+        updatePlatformUsers(response.mobileUsers, response.webUsers);
+        updateUserStatus(response.activeUsers, response.suspendedUsers);
+        updateSignupMethods(response.googleSignups, response.appleSignups,
+            response.emailSignups);
+        totalUsers.value = response.totalUsers.totalCount;
+      },
+    );
+  }
+
+  // This will now hold the filtered UsersModel data
+  final RxList<UsersModel> orderList = <UsersModel>[].obs;
 
   // Observable variables for stats
   final RxInt totalUsers = 12480.obs;
@@ -202,26 +114,21 @@ class UserManagementController extends GetxController {
   int get totalSignupUsers =>
       googleSignups.value + appleSignups.value + emailSignups.value;
 
-  // Filtering method
+  // Updated filtering method for UsersModel
   void filterUsers(String query) {
     if (query.isEmpty) {
-      orderList.assignAll(allUsers);
+      orderList.assignAll(usersData);
     } else {
       final lowerQuery = query.toLowerCase();
-      orderList.assignAll(allUsers.where((user) {
-        return (user.name ?? '').toLowerCase().contains(lowerQuery) ||
-            (user.email ?? '').toLowerCase().contains(lowerQuery) ||
-            (user.userId ?? '').toLowerCase().contains(lowerQuery);
+      orderList.assignAll(usersData.where((user) {
+        final fullName = '${user.firstName} ${user.lastName}';
+        return fullName.toLowerCase().contains(lowerQuery) ||
+            user.email.toLowerCase().contains(lowerQuery) ||
+            user.id.toLowerCase().contains(lowerQuery) ||
+            user.phoneNo.toLowerCase().contains(lowerQuery);
       }));
     }
     currentPage.value = 0; // Reset pagination
-  }
-
-  // Data update methods
-  void updateTotalUsers(int users, double growth, String period) {
-    totalUsers.value = users;
-    growthPercentage.value = growth;
-    growthPeriod.value = period;
   }
 
   void updatePlatformUsers(int mobile, int web) {
@@ -248,12 +155,6 @@ class UserManagementController extends GetxController {
     touchedIndex.value = index;
   }
 
-  // Simulated API call
-  Future<void> fetchUserData() async {
-    await Future.delayed(const Duration(seconds: 1));
-    updateTotalUsers(15230, 32.1, 'Since Apr 2025');
-    updatePlatformUsers(4200, 2800);
-    updateUserStatus(13500, 980);
-    updateSignupMethods(7200, 3500, 3800);
-  }
+  // Simulated API call for stats
+  Future<void> fetchUserData() async {}
 }

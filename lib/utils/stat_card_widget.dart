@@ -56,29 +56,7 @@ Widget statCard(String title, String value, String icon, Color iconColor,  {bool
         const SizedBox(height: 16),
         Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: const Color.fromARGB(50, 21, 168, 31),
-              ),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.arrow_upward,
-                    size: 14,
-                    color: Color.fromARGB(255, 21, 168, 31),
-                  ),
-                  const SizedBox(width: 2),
-                  Text(
-                    "0.5%",
-                    style: CustomTextTheme.regular12.copyWith(
-                      color: Color.fromARGB(255, 21, 168, 31),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+           
             const SizedBox(width: 4),
             Text(
               "All Time",

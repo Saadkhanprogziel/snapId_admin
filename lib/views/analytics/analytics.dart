@@ -262,123 +262,122 @@ class Analytics extends StatelessWidget {
   }
 
   Widget _buildChartSection(AnalyticsController analyticsController,
-      bool isDesktop, bool isTablet, bool isMobile, bool isDark) {
-    if (isMobile) {
-      // For mobile, stack charts vertically
-      return Column(
-        children: [
-          // Document Chart Card
-          Container(
-            height: 300,
-            decoration: BoxDecoration(
-              color: isDark ? Color(0xFF23272F) : Colors.white,
-              border: Border.all(
-                  width: 0.4,
-                  color: isDark ? Colors.grey.shade800 : Colors.grey),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            child: Obx(() => DocumentTypeChart(
-                  chartData: analyticsController
-                          .allData[analyticsController.selectedPeriod.value] ??
-                      [],
-                  selectedPeriod: analyticsController.selectedPeriod.value,
-                  onPeriodChanged: (value) {
-                    analyticsController.selectedPeriod.value = value;
-                  },
-                )),
-          ),
-          const SizedBox(height: 16),
-          // Pie Chart Card
-          Container(
-            height: 300,
-            decoration: BoxDecoration(
-              color: isDark ? Color(0xFF23272F) : Colors.white,
-              border: Border.all(
-                  width: 0.4,
-                  color: isDark ? Colors.grey.shade800 : Colors.grey),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            padding: EdgeInsets.all(16),
-            child: _buildPieChart(isDark),
-          ),
-        ],
-      );
-    }
-
-    // For tablet and desktop, show charts side by side with separate cards
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    bool isDesktop, bool isTablet, bool isMobile, bool isDark) {
+  if (isMobile) {
+    // For mobile, stack charts vertically
+    return Column(
       children: [
-        // Document Chart Card - 70% width
-        Expanded(
-          flex: 70,
-          child: Container(
-            height: isMobile
-                ? 300
-                : isTablet
-                    ? 300
-                    : 320,
-            decoration: BoxDecoration(
-              color: isDark ? Color(0xFF23272F) : Colors.white,
-              border: Border.all(
-                  width: 0.4,
-                  color: isDark ? Colors.grey.shade800 : Colors.grey),
-              borderRadius: BorderRadius.circular(isMobile ? 16 : 25),
-            ),
-            padding: EdgeInsets.symmetric(
-              horizontal: isMobile
-                  ? 16
-                  : isTablet
-                      ? 24
-                      : 40,
-              vertical: 16,
-            ),
-            child: Obx(() => DocumentTypeChart(
-                  chartData: analyticsController
-                          .allData[analyticsController.selectedPeriod.value] ??
-                      [],
-                  selectedPeriod: analyticsController.selectedPeriod.value,
-                  onPeriodChanged: (value) {
-                    analyticsController.selectedPeriod.value = value;
-                  },
-                )),
+        // Document Chart Card
+        Container(
+          height: 400, // increased from 350 → 400
+          decoration: BoxDecoration(
+            color: isDark ? Color(0xFF23272F) : Colors.white,
+            border: Border.all(
+                width: 0.4,
+                color: isDark ? Colors.grey.shade800 : Colors.grey),
+            borderRadius: BorderRadius.circular(16),
           ),
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          child: Obx(() => DocumentTypeChart(
+                chartData: analyticsController
+                    .topDocumentTypesCount.value!.topDocumentTypes,
+                selectedPeriod: analyticsController.selectedDocTypePeriod.value,
+                onPeriodChanged: (value) {
+                  analyticsController.updateDocTypeFilter(value);
+                },
+              )),
         ),
-        // Margin between cards
-        SizedBox(
-            width: isMobile
-                ? 16
-                : isTablet
-                    ? 20
-                    : 24),
-        // Pie Chart Card - 30% width
-        Expanded(
-          flex: 30,
-          child: Container(
-            height: isMobile
-                ? 300
-                : isTablet
-                    ? 300
-                    : 320,
-            decoration: BoxDecoration(
-              color: isDark ? Color(0xFF23272F) : Colors.white,
-              border: Border.all(
-                  width: 0.4,
-                  color: isDark ? Colors.grey.shade800 : Colors.grey),
-              borderRadius: BorderRadius.circular(isMobile ? 16 : 25),
-            ),
-            padding: EdgeInsets.all(isMobile
-                ? 16
-                : isTablet
-                    ? 20
-                    : 24),
-            child: _buildPieChart(isDark),
+        const SizedBox(height: 16),
+        // Pie Chart Card
+        Container(
+          height: 400, // increased from 350 → 400
+          decoration: BoxDecoration(
+            color: isDark ? Color(0xFF23272F) : Colors.white,
+            border: Border.all(
+                width: 0.4,
+                color: isDark ? Colors.grey.shade800 : Colors.grey),
+            borderRadius: BorderRadius.circular(16),
           ),
+          padding: EdgeInsets.all(16),
+          child: _buildPieChart(isDark),
         ),
       ],
     );
   }
+
+  // For tablet and desktop, show charts side by side with separate cards
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // Document Chart Card - 70% width
+      Expanded(
+        flex: 70,
+        child: Container(
+          height: isMobile
+              ? 350
+              : isTablet
+                  ? 400 // increased from 350 → 400
+                  : 380, // increased from 320 → 380
+          decoration: BoxDecoration(
+            color: isDark ? Color(0xFF23272F) : Colors.white,
+            border: Border.all(
+                width: 0.4,
+                color: isDark ? Colors.grey.shade800 : Colors.grey),
+            borderRadius: BorderRadius.circular(isMobile ? 16 : 25),
+          ),
+          padding: EdgeInsets.symmetric(
+            horizontal: isMobile
+                ? 16
+                : isTablet
+                    ? 24
+                    : 40,
+            vertical: 16,
+          ),
+          child: Obx(() => DocumentTypeChart(
+                chartData: analyticsController
+                    .topDocumentTypesCount.value!.topDocumentTypes,
+                selectedPeriod: analyticsController.selectedDocTypePeriod.value,
+                onPeriodChanged: (value) {
+                  analyticsController.updateDocTypeFilter(value);
+                },
+              )),
+        ),
+      ),
+      // Margin between cards
+      SizedBox(
+          width: isMobile
+              ? 16
+              : isTablet
+                  ? 20
+                  : 24),
+      // Pie Chart Card - 30% width
+      Expanded(
+        flex: 30,
+        child: Container(
+          height: isMobile
+              ? 350
+              : isTablet
+                  ? 360 // increased from 300 → 360
+                  : 380, // increased from 320 → 380
+          decoration: BoxDecoration(
+            color: isDark ? Color(0xFF23272F) : Colors.white,
+            border: Border.all(
+                width: 0.4,
+                color: isDark ? Colors.grey.shade800 : Colors.grey),
+            borderRadius: BorderRadius.circular(isMobile ? 16 : 25),
+          ),
+          padding: EdgeInsets.all(isMobile
+              ? 16
+              : isTablet
+                  ? 20
+                  : 24),
+          child: _buildPieChart(isDark),
+        ),
+      ),
+    ],
+  );
+}
+
 
   Widget _buildPieChart(bool isDark) {
     return Column(
@@ -438,7 +437,7 @@ class Analytics extends StatelessWidget {
             }),
           ],
         ),
-        
+
         // Total count (dynamic from pieChartPeriod)
         Obx(() {
           final controller = Get.find<AnalyticsController>();
@@ -456,7 +455,7 @@ class Analytics extends StatelessWidget {
             ),
           );
         }),
-        
+
         // Legend centered below the total count
         _buildLegend(isDark),
         const SizedBox(height: 12), // Less space below legend before pie chart

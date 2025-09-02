@@ -4,7 +4,6 @@ import 'package:admin/views/user_management/users_list_widget/users_list_widget.
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 
 class UserManagement extends StatelessWidget {
   const UserManagement({Key? key}) : super(key: key);
@@ -12,7 +11,7 @@ class UserManagement extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(UserManagementController());
-
+   
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       backgroundColor:
@@ -147,7 +146,7 @@ class UserManagement extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      '${controller.userStatsData.value?.totalUsers.totalCount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}',
+                      '${controller.userAnalytics.value?.totalUsers.totalCount}',
                       style: const TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -156,20 +155,6 @@ class UserManagement extends StatelessWidget {
                     const SizedBox(height: 3),
                     Row(
                       children: [
-                        const Icon(
-                          Icons.arrow_upward,
-                          color: Colors.green,
-                          size: 16,
-                        ),
-                        Text(
-                          '${controller.growthPercentage.value}%',
-                          style: const TextStyle(
-                            color: Colors.green,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
                         Text(
                           controller.growthPeriod.value,
                           style: TextStyle(

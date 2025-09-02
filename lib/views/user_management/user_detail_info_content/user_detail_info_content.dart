@@ -1,6 +1,7 @@
 import 'package:admin/controller/app_controller.dart';
 import 'package:admin/controller/user_management_controller/user_info_detail_controller/user_info_detail_controller.dart';
 import 'package:admin/models/chartsTablesModel.dart';
+import 'package:admin/models/users/users_model.dart';
 import 'package:admin/theme/text_theme.dart';
 
 import 'package:admin/utils/custom_spaces.dart';
@@ -8,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class UserInfoContent extends StatelessWidget {
-  final UserModel? userModel;
+  final UsersModel? userModel;
   const UserInfoContent({super.key, this.userModel});
 
   @override
@@ -293,7 +294,7 @@ class UserInfoContent extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _buildFormField('Full Name', userModel?.name ?? ""),
+                child: _buildFormField('Full Name', userModel?.firstName ?? ""),
               ),
               SizedBox(width: 20),
               Expanded(
@@ -321,7 +322,8 @@ class UserInfoContent extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _buildFormField('Subscription Plan', userModel?.subscription ?? "Photo 1"),
+                // child: _buildFormField('Subscription Plan', userModel?.subscription ?? "Photo 1"),
+                child: _buildFormField('Subscription Plan', "Photo 1"),
               ),
               SizedBox(width: 20),
               Expanded(
@@ -335,7 +337,7 @@ class UserInfoContent extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _buildFormField('Signup Method', userModel?.signupMethod ?? ""),
+                child: _buildFormField('Signup Method', userModel?.authProvider ?? ""),
               ),
               SizedBox(width: 20),
               Expanded(
@@ -358,15 +360,15 @@ class UserInfoContent extends StatelessWidget {
                           height: 8,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: userModel?.status?.toLowerCase() == "block" ? Colors.redAccent: Colors.green,
+                            color: userModel?.isActive?.toLowerCase() == "block" ? Colors.redAccent: Colors.green,
                           ),
                         ),
                         SizedBox(width: 8),
                         Text(
-                          userModel?.status ?? "Active",
+                          userModel?.isActive ?? "Active",
                           style: TextStyle(
                             fontSize: 14,
-                            color: userModel?.status?.toLowerCase() == "block" ? Colors.redAccent: Colors.green,
+                            color: userModel?.isActive?.toLowerCase() == "block" ? Colors.redAccent: Colors.green,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
