@@ -1,8 +1,5 @@
-
-// ============================================================================
-// SUBSCRIPTION CHART WIDGET
-// ============================================================================
 import 'package:admin/controller/orders_management_controller/order_management.dart';
+import 'package:admin/models/orders/subscribers_analytics_data.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -48,20 +45,13 @@ class SubscriptionsChartWidget extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Obx(() {
-                    final currentData = controller.getCurrentSubscriptionData();
-                    int totalSubscriptions = 0;
-                    for (var item in currentData) {
-                      totalSubscriptions += ((item['photo1'] ?? 0) + 
-                                          (item['photo2'] ?? 0) + 
-                                          (item['photo3'] ?? 0)) as int;
-                    }
-
+                    final SubscriptionAnalyticsData? analyticsData = controller.subscriberAnalytics.value;
+                    int totalSubscriptions = analyticsData?.totalSubscription ?? 0;
                     return Text(
                       _formatNumber(totalSubscriptions),
                       style: TextStyle(
                         fontSize: isMobile ? 24 : 28,
                         fontWeight: FontWeight.bold,
-                        // color: Colors.black87,
                       ),
                     );
                   }),
@@ -74,10 +64,55 @@ class SubscriptionsChartWidget extends StatelessWidget {
           SizedBox(
             height: isMobile ? 200 : isTablet ? 250 : 300,
             child: Obx(() {
-              final barGroups = controller.getSubscriptionBarGroups();
-              final maxValue = _getMaxYValue(barGroups);
-              final dataLength = controller.getCurrentSubscriptionData().length;
-
+              final SubscriptionAnalyticsData? analyticsData = controller.subscriberAnalytics.value;
+              final List<SubscriptionSummary> summaryList = analyticsData?.subscriptionSummary ?? [];
+              final barGroups = <BarChartGroupData>[];
+              double maxValue = 0;
+              
+              // Store data for tooltips
+              List<Map<String, dynamic>> chartData = [];
+              
+              for (int i = 0; i < summaryList.length; i++) {
+                final summary = summaryList[i];
+                final familyPack = summary.items['Family Pack']?.count ?? 0;
+                final standardPack = summary.items['Standard Pack']?.count ?? 0;
+                final singlePhoto = summary.items['Single Photo']?.count ?? 0;
+                final total = familyPack + standardPack + singlePhoto;
+                maxValue = [maxValue, total.toDouble()].reduce((a, b) => a > b ? a : b);
+                
+                // Store data for tooltips
+                chartData.add({
+                  'familyPack': familyPack,
+                  'standardPack': standardPack,
+                  'singlePhoto': singlePhoto,
+                  'total': total,
+                  'label': summary.label,
+                });
+                
+                barGroups.add(
+                  BarChartGroupData(
+                    x: i,
+                    barRods: [
+                      BarChartRodData(
+                        toY: total.toDouble(),
+                        width: 22,
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.all(Radius.circular(4)),
+                        rodStackItems: [
+                          BarChartRodStackItem(0, familyPack.toDouble(), const Color.fromARGB(255, 151, 135, 255)),
+                          BarChartRodStackItem(familyPack.toDouble(), familyPack.toDouble() + standardPack.toDouble(), const Color.fromARGB(255, 200, 147, 253)),
+                          BarChartRodStackItem(familyPack.toDouble() + standardPack.toDouble(), total.toDouble(), const Color.fromARGB(255, 198, 210, 253)),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              }
+              
+              // Calculate proper max value with padding
+              maxValue = _calculateMaxValue(maxValue);
+              final interval = _getYAxisInterval(maxValue);
+              
               return BarChart(
                 BarChartData(
                   alignment: BarChartAlignment.spaceAround,
@@ -85,10 +120,31 @@ class SubscriptionsChartWidget extends StatelessWidget {
                   barTouchData: BarTouchData(
                     enabled: true,
                     touchTooltipData: BarTouchTooltipData(
+                      // tooltipBgColor: isDark ? Colors.grey.shade800 : Colors.white,
+                      tooltipBorder: BorderSide(color: Colors.grey.shade400, width: 1),
+                      // tooltipRoundedRadius: 8,
+                      tooltipPadding: const EdgeInsets.all(12),
                       getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                        if (groupIndex >= chartData.length) return null;
+                        
+                        final data = chartData[groupIndex];
+                        final familyPack = data['familyPack'];
+                        final standardPack = data['standardPack'];
+                        final singlePhoto = data['singlePhoto'];
+                        final total = data['total'];
+                        final label = data['label'];
+                        
                         return BarTooltipItem(
-                          '${rod.toY.round()}',
-                          const TextStyle(color: Colors.white, fontSize: 12),
+                          '$label\n'
+                          'Family Pack: $familyPack\n'
+                          'Standard: $standardPack\n'
+                          'Single Photo: $singlePhoto\n'
+                          'Total: $total',
+                          TextStyle(
+                            color:Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
                         );
                       },
                     ),
@@ -104,8 +160,8 @@ class SubscriptionsChartWidget extends StatelessWidget {
                         interval: 1,
                         getTitlesWidget: (value, meta) {
                           final index = value.toInt();
-                          if (index >= 0 && index < dataLength) {
-                            final label = controller.getLabel(index, controller.selectedSubscriptionRange.value, false);
+                          if (index >= 0 && index < summaryList.length) {
+                            final label = summaryList[index].label;
                             if (label.isNotEmpty) {
                               return Text(
                                 label,
@@ -124,9 +180,9 @@ class SubscriptionsChartWidget extends StatelessWidget {
                       sideTitles: SideTitles(
                         showTitles: true,
                         reservedSize: 40,
+                        interval: interval,
                         getTitlesWidget: (value, meta) {
-                          final interval = _getYAxisInterval(maxValue);
-                          if (value % interval == 0) {
+                          if (value % interval == 0 && value <= maxValue) {
                             return Text(
                               '${value.toInt()}',
                               style: TextStyle(
@@ -145,12 +201,17 @@ class SubscriptionsChartWidget extends StatelessWidget {
                   gridData: FlGridData(
                     show: true,
                     drawVerticalLine: false,
-                    horizontalInterval: _getYAxisInterval(maxValue),
+                    horizontalInterval: interval,
                     getDrawingHorizontalLine: (value) {
-                      return FlLine(
-                        color: Colors.grey.shade200,
-                        strokeWidth: 1,
-                      );
+                      // Only show grid lines for values that are multiples of interval and within maxValue
+                      if (value % interval == 0 && value <= maxValue && value > 0) {
+                        return FlLine(
+                          color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+                          strokeWidth: 1,
+                          dashArray: [6, 4],
+                        );
+                      }
+                      return FlLine(color: Colors.transparent);
                     },
                   ),
                 ),
@@ -159,33 +220,42 @@ class SubscriptionsChartWidget extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           _buildChartLegend([
-            {'label': 'Photo 1', 'color': const Color.fromARGB(255, 151, 135, 255)},
-            {'label': 'Photo 2', 'color': const Color.fromARGB(255, 200, 147, 253)},
-            {'label': 'Photo 3', 'color': const Color.fromARGB(255, 198, 210, 253)},
+            {'label': 'Family Pack', 'color': const Color.fromARGB(255, 151, 135, 255)},
+            {'label': 'Standard', 'color': const Color.fromARGB(255, 200, 147, 253)},
+            {'label': 'Single Photo', 'color': const Color.fromARGB(255, 198, 210, 253)},
           ]),
         ],
       ),
     );
   }
 
-  double _getMaxYValue(List<BarChartGroupData> barGroups) {
-    if (barGroups.isEmpty) return 100;
+  double _calculateMaxValue(double dataMaxValue) {
+    if (dataMaxValue == 0) return 100;
     
-    double maxValue = 0;
-    for (var group in barGroups) {
-      for (var rod in group.barRods) {
-        if (rod.toY > maxValue) maxValue = rod.toY;
-      }
-    }
-    return (maxValue * 1.2).ceilToDouble();
+    // Add 20% padding and round to nearest appropriate value
+    double paddedMax = dataMaxValue * 1.2;
+    
+    if (paddedMax <= 10) return 10;
+    if (paddedMax <= 20) return 20;
+    if (paddedMax <= 50) return 50;
+    if (paddedMax <= 100) return 100;
+    if (paddedMax <= 200) return 200;
+    if (paddedMax <= 500) return 500;
+    if (paddedMax <= 1000) return 1000;
+    
+    // For larger values, round to nearest 100
+    return (paddedMax / 100).ceil() * 100;
   }
 
   double _getYAxisInterval(double maxValue) {
-    if (maxValue >= 2000) return 500;
-    if (maxValue >= 1000) return 200;
-    if (maxValue >= 500) return 100;
-    if (maxValue >= 100) return 50;
-    return 20;
+    if (maxValue <= 10) return 2;
+    if (maxValue <= 20) return 5;
+    if (maxValue <= 50) return 10;
+    if (maxValue <= 100) return 20;
+    if (maxValue <= 200) return 25;
+    if (maxValue <= 500) return 50;
+    if (maxValue <= 1000) return 100;
+    return 200;
   }
 
   String _formatNumber(int value) {
@@ -240,28 +310,40 @@ class SubscriptionsChartWidget extends StatelessWidget {
         child: Obx(() {
           final value = controller.selectedSubscriptionRange.value;
 
-          return DropdownButton<DataRange>(
+          return DropdownButton(
             value: value,
             isDense: true,
             style:  TextStyle(fontSize: 14,color: isDark ? Colors.white : Colors.grey),
             menuMaxHeight: 250,
             items: const [
+               DropdownMenuItem(
+                value: "today",
+                child: Text('Today', style: TextStyle(fontSize: 14)),
+              ),
               DropdownMenuItem(
-                value: DataRange.weekly,
+                value: "this_week",
                 child: Text('Week', style: TextStyle(fontSize: 14)),
               ),
               DropdownMenuItem(
-                value: DataRange.monthly,
+                value: "this_month",
                 child: Text('Month', style: TextStyle(fontSize: 14)),
               ),
-              // DropdownMenuItem(
-              //   value: DataRange.threeMonths,
-              //   child: Text('3 Months', style: TextStyle(fontSize: 14)),
-              // ),
+              DropdownMenuItem(
+                value: "last_month",
+                child: Text('Month', style: TextStyle(fontSize: 14)),
+              ),
+              DropdownMenuItem(
+                value: "last_6_months",
+                child: Text('Last 6 Months', style: TextStyle(fontSize: 14)),
+              ),
+              DropdownMenuItem(
+                value: "this_year",
+                child: Text('This Year', style: TextStyle(fontSize: 14)),
+              ),
             ],
             onChanged: (newValue) {
               if (newValue != null) {
-                controller.updateSubscriptionRange(newValue);
+                controller.updateSubscriberFilter(newValue);
               }
             },
           );

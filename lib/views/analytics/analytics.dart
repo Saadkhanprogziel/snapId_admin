@@ -1,9 +1,7 @@
 import 'package:admin/controller/analytics_controller/analytics_controller.dart';
-import 'package:admin/models/analytics/processed_count.dart';
-import 'package:admin/utils/custom_spaces.dart';
-import 'package:admin/utils/stat_card_widget.dart';
 import 'package:admin/views/analytics/analytics_list_widget/analytics_list_widget.dart';
 import 'package:admin/views/analytics/document_chart/document_chart.dart';
+import 'package:admin/widgets/jumping_dots.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -25,67 +23,78 @@ class Analytics extends StatelessWidget {
         final isMobile = screenWidth <= 600;
         final isDark = Theme.of(context).brightness == Brightness.dark;
 
-        return Container(
-          color:
-              isDark ? Theme.of(context).scaffoldBackgroundColor : Colors.white,
-          child: SingleChildScrollView(
-            padding: EdgeInsets.all(isMobile
-                ? 16
-                : isTablet
-                    ? 20
-                    : 24),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
-              child: IntrinsicHeight(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Stat Cards Section
+        return Obx(() {
+          if (analyticsController.isLoadingDocTypes.value && analyticsController.isLoadingProcessedDocs.value) {
+            return Row(
+              children: [
+                Spacer(),
+                JumpingDots(numberOfDots: 3),
+                Spacer(),
+              ],
+            );
+          }
+          return Container(
+            color: isDark
+                ? Theme.of(context).scaffoldBackgroundColor
+                : Colors.white,
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(isMobile
+                  ? 16
+                  : isTablet
+                      ? 20
+                      : 24),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: IntrinsicHeight(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Stat Cards Section
 
-                    // Chart Section
-                    _buildChartSection(
-                        analyticsController, isDesktop, isTablet, isMobile, isDark),
+                      // Chart Section
+                      _buildChartSection(analyticsController, isDesktop,
+                          isTablet, isMobile, isDark),
 
-                    SizedBox(
+                      SizedBox(
+                          height: isMobile
+                              ? 16
+                              : isTablet
+                                  ? 20
+                                  : 24),
+
+                      // List Widget Section
+                      Container(
                         height: isMobile
-                            ? 16
+                            ? 500
                             : isTablet
-                                ? 20
-                                : 24),
-
-                    // List Widget Section
-                    Container(
-                      height: isMobile
-                          ? 500
-                          : isTablet
-                              ? 600
-                              : 700,
-                      decoration: BoxDecoration(
-                        color: isDark ? Color(0xFF23272F) : Colors.white,
-                        border: Border.all(
-                            width: 0.4,
-                            color: isDark ? Colors.grey.shade800 : Colors.grey),
-                        borderRadius: BorderRadius.circular(isMobile ? 16 : 25),
+                                ? 600
+                                : 700,
+                        decoration: BoxDecoration(
+                          color: isDark ? Color(0xFF23272F) : Colors.white,
+                          border: Border.all(
+                              width: 0.4,
+                              color:
+                                  isDark ? Colors.grey.shade800 : Colors.grey),
+                          borderRadius:
+                              BorderRadius.circular(isMobile ? 16 : 25),
+                        ),
+                        child: AnalyticsListWidget(
+                          controller: analyticsController,
+                          isMobile: isMobile,
+                          isTablet: isTablet,
+                        ),
                       ),
-                      child: AnalyticsListWidget(
-                        controller: analyticsController,
-                        isMobile: isMobile,
-                        isTablet: isTablet,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        );
+          );
+        });
       },
     );
   }
 
-  // ---------------- Stat Cards ----------------
-
-  
   // ---------------- Chart Section ----------------
 
   Widget _buildChartSection(AnalyticsController analyticsController,
@@ -221,20 +230,27 @@ class Analytics extends StatelessWidget {
                     menuMaxHeight: 250,
                     items: const [
                       DropdownMenuItem(
+                        value: 'all_time',
+                        child: Text('All Time', style: TextStyle(fontSize: 14)),
+                      ),
+                      DropdownMenuItem(
                         value: 'this_week',
                         child: Text('Week', style: TextStyle(fontSize: 14)),
                       ),
                       DropdownMenuItem(
                         value: 'last_month',
-                        child: Text('Last Month', style: TextStyle(fontSize: 14)),
+                        child:
+                            Text('Last Month', style: TextStyle(fontSize: 14)),
                       ),
                       DropdownMenuItem(
                         value: 'this_month',
-                        child: Text('This Month', style: TextStyle(fontSize: 14)),
+                        child:
+                            Text('This Month', style: TextStyle(fontSize: 14)),
                       ),
                       DropdownMenuItem(
                         value: 'this_year',
-                        child: Text('This Year', style: TextStyle(fontSize: 14)),
+                        child:
+                            Text('This Year', style: TextStyle(fontSize: 14)),
                       ),
                     ],
                     onChanged: (value) {
@@ -250,7 +266,8 @@ class Analytics extends StatelessWidget {
         // Total + Chart
         Obx(() {
           final controller = Get.find<AnalyticsController>();
-          final status = controller.processedDocumentCount.value?.sessionByStatus;
+          final status =
+              controller.processedDocumentCount.value?.sessionByStatus;
 
           if (status == null) return SizedBox();
 
@@ -300,16 +317,11 @@ class Analytics extends StatelessWidget {
                         ),
                         pieTouchData: PieTouchData(
                           touchCallback: (event, pieTouchResponse) {
-                            if (event is FlPointerHoverEvent) {
-                              if (pieTouchResponse != null &&
-                                  pieTouchResponse.touchedSection != null) {
-                                hoveredIndex.value = pieTouchResponse
-                                    .touchedSection!.touchedSectionIndex;
-                              } else {
-                                hoveredIndex.value = null;
-                              }
-                            } else if (event is FlLongPressEnd ||
-                                event is FlPanEndEvent) {
+                            if (pieTouchResponse != null &&
+                                pieTouchResponse.touchedSection != null) {
+                              hoveredIndex.value = pieTouchResponse
+                                  .touchedSection!.touchedSectionIndex;
+                            } else {
                               hoveredIndex.value = null;
                             }
                           },

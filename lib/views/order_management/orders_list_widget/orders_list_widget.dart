@@ -4,6 +4,7 @@ import 'package:admin/models/chartsTablesModel.dart';
 import 'package:admin/theme/text_theme.dart';
 import 'package:admin/views/order_management/order_info_content/order_info_content.dart';
 import 'package:admin/views/support/filter_panel.dart';
+import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -45,87 +46,103 @@ class OrdersListWidget extends StatelessWidget {
                           ? 24
                           : 32),
         
-              // Table Header
-              _buildTableHeader(),
-        
-              SizedBox(height: isMobile ? 8 : 12),
-        
-              // Table Content
-              Expanded(
-                child: Obx(() {
-                  // Calculate pagination
-                  const itemsPerPage = 10;
-                  // final totalPages =
-                  //     (controller.orderList.length / itemsPerPage).ceil();
-                  final currentPage = controller.currentPage.value;
-                  final startIndex = currentPage * itemsPerPage;
-                  final endIndex =
-                      (startIndex + itemsPerPage) > controller.orderList.length
-                          ? controller.orderList.length
-                          : (startIndex + itemsPerPage);
-                  final paginatedList =
-                      controller.orderList.sublist(startIndex, endIndex);
-        
-                  return ListView.builder(
-                    itemCount: paginatedList.length,
-                    itemBuilder: (context, index) =>
-                        _buildTableRow(paginatedList[index], isDark, context),
-                  );
-                }),
-              ),
-        
-              // Pagination Controls
-              Obx(() {
-                const itemsPerPage = 10;
-                final totalPages =
-                    (controller.orderList.length / itemsPerPage).ceil();
-                final currentPage = controller.currentPage.value;
-        
-                return Container(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        onPressed: currentPage > 0
-                            ? () => controller.currentPage.value--
-                            : null,
-                        icon: Icon(
-                          Icons.chevron_left,
-                          color: currentPage > 0
-                              ? Colors.grey.shade700
-                              : Colors.grey.shade400,
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          'Page ${currentPage + 1} of $totalPages',
-                          style: TextStyle(
-                            color: Colors.grey.shade700,
-                            fontSize: isMobile ? 12 : 14,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: currentPage < totalPages - 1
-                            ? () => controller.currentPage.value++
-                            : null,
-                        icon: Icon(
-                          Icons.chevron_right,
-                          color: currentPage < totalPages - 1
-                              ? Colors.grey.shade700
-                              : Colors.grey.shade400,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }),
+          //     Expanded(
+          //   child: Obx(() {
+          //     // if (controller.isLoading.value) {
+          //     //   return const Center(child: CircularProgressIndicator());
+          //     // }
+
+          //     if (controller.orderList.isEmpty) {
+          //       return const Center(
+          //         child: Text(
+          //           'No users found',
+          //           style: TextStyle(fontSize: 16, color: Colors.grey),
+          //         ),
+          //       );
+          //     }
+
+          //     return Column(
+          //       children: [
+          //         Expanded(
+          //           child: DataTable2(
+          //             columnSpacing: 12,
+          //             horizontalMargin: 12,
+          //             minWidth: 800,
+          //             dataRowHeight: 70,
+          //             headingRowHeight: 56,
+          //             columns: [
+          //               DataColumn2(label: const Text('Name'), size: ColumnSize.S),
+          //               DataColumn2(label: const Text('Email'), size: ColumnSize.L),
+          //               DataColumn2(label: const Text('Phone'), size: ColumnSize.L),
+          //               DataColumn2(label: const Text('Created Date'), size: ColumnSize.M),
+          //               DataColumn2(label: const Text('Credits'), size: ColumnSize.S),
+          //               DataColumn2(label: const Text('Auth Provider'), size: ColumnSize.S),
+          //               DataColumn2(label: const Text('Platform'), size: ColumnSize.S),
+          //               DataColumn2(label: const Text('Status'), size: ColumnSize.S),
+          //               DataColumn2(label: const Text('Actions'), size: ColumnSize.S),
+          //             ],
+          //             rows: controller.orderList.map((user) {
+          //               return DataRow(cells: [
+          //                 DataCell(Text("${user.firstName} ${user.lastName}")),
+          //                 DataCell(Text(user.email)),
+          //                 DataCell(Text(user.phoneNo)),
+          //                 DataCell(Text(_formatDate(user.createdAt))),
+          //                 DataCell(Text('${user.credits}')),
+          //                 DataCell(Text(user.authProvider)),
+          //                 DataCell(Text(user.platform)),
+          //                 DataCell(_buildStatusChip(user.isActive)),
+          //                 DataCell(
+          //                   _buildActionButton(Icons.visibility, "View", context, userModel: user),
+          //                 ),
+          //               ]);
+          //             }).toList(),
+          //           ),
+          //         ),
+
+          //         // 🔹 Pagination Controls
+          //         Obx(() {
+          //           final pagination = controller.pagination.value;
+          //           if (pagination == null) return const SizedBox();
+
+          //           return Padding(
+          //             padding: const EdgeInsets.symmetric(vertical: 12),
+          //             child: Row(
+          //               mainAxisAlignment: MainAxisAlignment.center,
+          //               children: [
+          //                 IconButton(
+          //                   icon: const Icon(Icons.chevron_left),
+          //                   onPressed: controller.currentPage.value > 0
+          //                       ? () {
+          //                           controller.currentPage.value--;
+          //                           controller.fetchUserStatsData();
+          //                         }
+          //                       : null,
+          //                 ),
+          //                 Text(
+          //                   "Page ${controller.currentPage.value + 1} of ${pagination.totalPages}",
+          //                   style: const TextStyle(fontSize: 14),
+          //                 ),
+          //                 IconButton(
+          //                   icon: const Icon(Icons.chevron_right),
+          //                   onPressed: controller.currentPage.value < pagination.totalPages - 1
+          //                       ? () {
+          //                           controller.currentPage.value++;
+          //                           controller.fetchUserStatsData();
+          //                         }
+          //                       : null,
+          //                 ),
+          //               ],
+          //             ),
+          //           );
+          //         }),
+          //       ],
+          //     );
+          //   }),
+          // ),
+             
             ],
           ),
         ),
-
 
         Obx(() => appController.showFilter.value
             ? GestureDetector(
@@ -151,7 +168,43 @@ class OrdersListWidget extends StatelessWidget {
     );
   }
 
-
+  Widget _buildFilterButton(BuildContext context) {
+    final drawerController = Get.find<AppController>();
+    return InkWell(
+      onTap: () {
+        drawerController.showFilter.value = true;
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: isMobile ? 6 : 8,
+          vertical: isMobile ? 6 : 8,
+        ),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (!isMobile) ...[
+              Text(
+                "Filter",
+                style: TextStyle(
+                  fontSize: isTablet ? 12 : 14,
+                ),
+              ),
+              const SizedBox(width: 6),
+            ],
+            Icon(
+              Icons.filter_list,
+              size: isMobile ? 14 : 16,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _buildFilterPanel(bool isDark, AppController appController) {
     return Column(
@@ -218,7 +271,6 @@ class OrdersListWidget extends StatelessWidget {
               .toList(),
           onChanged: (value) {
             controller.selectedSubscription.value = value ?? '';
-          
           },
         ),
         const SizedBox(height: 24),
@@ -242,7 +294,6 @@ class OrdersListWidget extends StatelessWidget {
               onPressed: () {
                 // Apply filter logic here
                 appController.showFilter.value = false;
-
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF4F46E5),
@@ -270,11 +321,7 @@ class OrdersListWidget extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                  child: _buildActionButton(Icons.download, "Export", context)),
-              const SizedBox(width: 8),
-              Expanded(
-                  child:
-                      _buildActionButton(Icons.filter_list, "Filter", context)),
+                  child: _buildFilterButton(context)),
             ],
           ),
         ],
@@ -329,9 +376,7 @@ class OrdersListWidget extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              _buildActionButton(Icons.download, "Export", context),
-              const SizedBox(width: 8),
-              _buildActionButton(Icons.filter_list, "Filter", context),
+              _buildFilterButton(context),
             ],
           ),
         ],
@@ -339,149 +384,7 @@ class OrdersListWidget extends StatelessWidget {
     }
   }
 
-  Widget _buildTableHeader() {
-    if (isMobile) {
-      // Mobile: Show simplified header
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-        child: Row(
-          children: const [
-            Expanded(flex: 2, child: Text('Order ID', style: _headerStyle)),
-            Expanded(flex: 3, child: Text('Amount', style: _headerStyle)),
-            Expanded(flex: 2, child: Text('Status', style: _headerStyle)),
-            SizedBox(width: 60, child: Text('Actions', style: _headerStyle)),
-          ],
-        ),
-      );
-    } else if (isTablet) {
-      // Tablet: Show medium complexity header
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        child: Row(children: const [
-          Expanded(flex: 1, child: Text('Order ID', style: _headerStyle)),
-          Expanded(flex: 2, child: Text('Email', style: _headerStyle)),
-          Expanded(flex: 2, child: Text('Amount', style: _headerStyle)),
-          Expanded(flex: 2, child: Text('Status', style: _headerStyle)),
-          Expanded(flex: 2, child: Text('Subscription', style: _headerStyle)),
-          SizedBox(width: 70, child: Text('Actions', style: _headerStyle)),
-        ]),
-      );
-    } else {
-      // Desktop: Show full header
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Row(children: const [
-          Expanded(flex: 1, child: Text('Order ID', style: _headerStyle)),
-          Expanded(flex: 2, child: Text('Date', style: _headerStyle)),
-          Expanded(flex: 2, child: Text('Status', style: _headerStyle)),
-          Expanded(flex: 3, child: Text('Email', style: _headerStyle)),
-          Expanded(flex: 2, child: Text('Subscription', style: _headerStyle)),
-          Expanded(flex: 2, child: Text('Amount', style: _headerStyle)),
-          Expanded(flex: 2, child: Text('Note', style: _headerStyle)),
-          SizedBox(width: 80, child: Text('Actions', style: _headerStyle)),
-        ]),
-      );
-    }
-  }
-
-  Widget _buildTableRow(
-    OrderData data,
-    bool isDark,
-    BuildContext context,
-  ) {
-    final padding = isMobile
-        ? 8.0
-        : isTablet
-            ? 12.0
-            : 16.0;
-
-    if (isMobile) {
-      // Mobile: Simplified row
-      return Container(
-        padding: EdgeInsets.symmetric(horizontal: padding, vertical: 12),
-        decoration: BoxDecoration(
-          border: Border(
-              top: BorderSide(
-                  color: isDark ? Colors.grey.shade600 : Colors.grey,
-                  width: 0.5)),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-                flex: 2,
-                child: Text(data.orderId,
-                    style: _rowStyle, overflow: TextOverflow.ellipsis)),
-            Expanded(
-                flex: 3,
-                child: Text("${data.amount}",
-                    style: _rowStyle, overflow: TextOverflow.ellipsis)),
-            Expanded(flex: 2, child: _buildStatusChip(data.status)),
-            SizedBox(
-                width: 60,
-              child: _buildActionButton(Icons.visibility, "View", context,orderData: data)),
-          ],
-        ),
-      );
-    } else if (isTablet) {
-      // Tablet: Medium complexity row
-      return Container(
-        padding: EdgeInsets.symmetric(horizontal: padding, vertical: 14),
-        decoration: BoxDecoration(
-          border: Border(
-              top: BorderSide(
-                  color: isDark ? Colors.grey.shade600 : Colors.grey,
-                  width: 0.5)),
-        ),
-        child: Row(children: [
-          Expanded(flex: 1, child: Text('${data.orderId}', style: _rowStyle)),
-          Expanded(
-              flex: 2,
-              child: Text(data.userEmail,
-                  style: _rowStyle, overflow: TextOverflow.ellipsis)),
-          Expanded(
-              flex: 2, child: Text(data.amount.toString(), style: _rowStyle)),
-          Expanded(flex: 2, child: _buildStatusChip(data.status)),
-          Expanded(flex: 2, child: Text(data.subscription, style: _rowStyle)),
-          SizedBox(
-              width: 70,
-              child: _buildActionButton(Icons.visibility, "View", context,orderData: data)),
-        ]),
-      );
-    } else {
-      // Desktop: Full row
-      return Container(
-        padding: EdgeInsets.symmetric(horizontal: padding, vertical: 16),
-        decoration: BoxDecoration(
-          border: Border(
-              top: BorderSide(
-                  color: isDark ? Colors.grey.shade600 : Colors.grey,
-                  width: 0.5)),
-        ),
-        child: Row(children: [
-          Expanded(flex: 1, child: Text('${data.orderId}', style: _rowStyle)),
-          Expanded(flex: 2, child: Text(data.date, style: _rowStyle)),
-          Expanded(flex: 2, child: _buildStatusChip(data.status)),
-          Expanded(
-              flex: 3,
-              child: Text(data.userEmail,
-                  style: _rowStyle, overflow: TextOverflow.ellipsis)),
-          Expanded(
-              flex: 2, child: Text('${data.subscription}', style: _rowStyle)),
-          Expanded(
-              flex: 2,
-              child: Text('\$${data.amount.toStringAsFixed(2)}',
-                  style: _rowStyle)),
-          Expanded(
-              flex: 2,
-              child: Text(data.notes,
-                  style: _rowStyle, overflow: TextOverflow.ellipsis)),
-          SizedBox(
-              width: 80,
-              child: _buildActionButton(Icons.visibility, "View", context,orderData: data)),
-        ]),
-      );
-    }
-  }
+  
 
   Widget _buildStatusChip(String? status) {
     bool isBlocked = (status ?? "").toLowerCase() == "failed";
@@ -542,25 +445,18 @@ class OrdersListWidget extends StatelessWidget {
     );
   }
 
-Widget _buildActionButton(
-  IconData icon,
-  String label,
-  BuildContext context, {
-  OrderData? orderData,
-}) {    final drawerController = Get.find<AppController>();
+  Widget _buildActionButton(
+    IconData icon,
+    String label,
+    BuildContext context, {
+    OrderData? orderData,
+  }) {    
+    final drawerController = Get.find<AppController>();
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return InkWell(
       onTap: () {
-        if (label.trim().toLowerCase() == 'export'){
-        print(label.trim().toLowerCase());
-          drawerController.showFilter.value = true;
-        }
-        else{
-
         drawerController.setDrawerContent(OrderDetailScreen(orderData: orderData,));
         drawerController.toggleDrawer();
-        }
       },
       child: Container(
         padding: EdgeInsets.symmetric(
@@ -579,7 +475,6 @@ Widget _buildActionButton(
               Text(
                 label,
                 style: TextStyle(
-                
                   fontSize: isTablet ? 12 : 14,
                 ),
               ),
@@ -587,7 +482,6 @@ Widget _buildActionButton(
             ],
             Icon(
               icon,
-             
               size: isMobile ? 14 : 16,
             ),
           ],
@@ -596,14 +490,4 @@ Widget _buildActionButton(
     );
   }
 
-  static const _headerStyle = TextStyle(
-    color: Colors.grey,
-    fontSize: 14,
-    fontWeight: FontWeight.w600,
-  );
-
-  static const _rowStyle = TextStyle(
-    fontSize: 14,
-    fontWeight: FontWeight.w500,
-  );
 }

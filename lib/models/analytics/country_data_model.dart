@@ -1,12 +1,12 @@
 class CountryData {
-  final int rank;
+  final int? rank;
   final String countryName;
   final int totalOrders;
-  final double revenue;
+  final String revenue;
   final String platformBreakdown;
 
   CountryData({
-    required this.rank,
+    this.rank,
     required this.countryName,
     required this.totalOrders,
     required this.revenue,
@@ -15,11 +15,16 @@ class CountryData {
 
   factory CountryData.fromJson(Map<String, dynamic> json) {
     return CountryData(
-      rank: json['rank'] as int,
+      rank: json['rank'] as int?,
       countryName: json['countryName'] as String,
       totalOrders: json['totalOrders'] as int,
-      revenue: (json['revenue'] as num).toDouble(),
+      revenue: (json['revenue'] ),
       platformBreakdown: json['platformBreakdown'] as String,
     );
+  }
+
+  @override
+  String toString() {
+    return 'CountryData(rank: $rank, countryName: $countryName, totalOrders: $totalOrders, revenue: $revenue, platformBreakdown: $platformBreakdown)';
   }
 }

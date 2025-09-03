@@ -65,6 +65,10 @@ Widget build(BuildContext context) {
                 menuMaxHeight: 250,
                 items: const [
                   DropdownMenuItem(
+                    value: 'all_time',
+                    child: Text('All Time', style: TextStyle(fontSize: 14)),
+                  ),
+                  DropdownMenuItem(
                     value: 'today',
                     child: Text('Today', style: TextStyle(fontSize: 14)),
                   ),
@@ -99,7 +103,7 @@ Widget build(BuildContext context) {
 
       // Chart / Empty state
       chartData.isEmpty
-          ? const Center(child: Text("No data available."))
+          ? const Center(child: Text("No data in this Period."))
           : Padding(
               padding: const EdgeInsets.only(bottom: 24), // extra breathing space
               child: Column(

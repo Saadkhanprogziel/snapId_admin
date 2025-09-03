@@ -1,5 +1,5 @@
 import 'package:admin/models/analytics/processed_count.dart';
-import 'package:admin/models/chartsTablesModel.dart';
+import 'package:admin/models/analytics/top_buyer_model.dart';
 import 'package:admin/models/analytics/country_data_model.dart';
 import 'package:admin/models/analytics/top_documents_type.dart';
 import 'package:admin/repositories/analytics_repository/analytics_repository.dart';
@@ -9,9 +9,20 @@ class AnalyticsController extends GetxController {
   AnalyticsRepository analyticsRepository = AnalyticsRepository();
 
   var topDocumentTypesCount = Rxn<TopDocumentTypesResponse>();
-  var processedDocumentCount= Rxn<ProcessedDocCountModel>();
-  var topCountries= <CountryData>[].obs;
-  final pieChartPeriod = 'last_month'.obs;
+  var processedDocumentCount = Rxn<ProcessedDocCountModel>();
+  var topCountries = <CountryData>[].obs;
+  var topBuyers = <TopBuyerModel>[].obs;
+
+  /// Loading flags
+  var isLoadingTopCountries = false.obs;
+  var isLoadingTopBuyers = false.obs;
+  var isLoadingDocTypes = false.obs;
+  var isLoadingProcessedDocs = false.obs;
+
+  final pieChartPeriod = 'all_time'.obs;
+  var selectedDocTypePeriod = 'all_time'.obs;
+  var selectedTopTab = 0.obs;
+  var currentPage = 0.obs;
 
   @override
   void onInit() {
@@ -19,100 +30,73 @@ class AnalyticsController extends GetxController {
     fetchTopDocuments();
     fetchProcessedDocCount();
     fetchTopCountries();
+    fetchTopBuyers();
   }
 
-
   
-  var selectedDocTypePeriod = 'last_month'.obs;
-  var selectedTopTab = 0.obs; // 0 = Top Countries, 1 = Top Buyers
-  var currentPage = 0.obs;
 
   void updatePieChartFilter(String filter) {
     pieChartPeriod.value = filter;
     fetchProcessedDocCount();
   }
+
   void updateDocTypeFilter(String filter) {
     selectedDocTypePeriod.value = filter;
     fetchTopDocuments();
-    
   }
 
+  /// Fetch Top Documents
   void fetchTopDocuments() async {
-    analyticsRepository.getTopDocumentTypesCount(selectedDocTypePeriod.value).then((response) {
+    isLoadingDocTypes.value = true;
+    analyticsRepository
+        .getTopDocumentTypesCount(selectedDocTypePeriod.value)
+        .then((response) {
       response.fold((error) {
-        print("error $error");
+        isLoadingDocTypes.value = false;
       }, (success) {
         topDocumentTypesCount.value = success;
+        isLoadingDocTypes.value = false;
       });
     });
   }
 
+  /// Fetch Processed Documents
   void fetchProcessedDocCount() async {
+    isLoadingProcessedDocs.value = true;
     analyticsRepository.getProcessedDocumentCount(pieChartPeriod.value).then((response) {
       response.fold((error) {
         print("error $error");
+        isLoadingProcessedDocs.value = false;
       }, (success) {
         processedDocumentCount.value = success;
-      });
-    });
-  }
-  void fetchTopCountries() async {
-    analyticsRepository.getTopCountries().then((response) {
-      response.fold((error) {
-        print("errrrrrrrrrror $error");
-      }, (success) {
-        print("janab");
-        topCountries.value = success; 
+        isLoadingProcessedDocs.value = false;
       });
     });
   }
 
-  
-  List<BuyerData> dummyBuyers = [
-    BuyerData(
-      rank: 1,
-      name: 'John Joe',
-      country: 'United States',
-      email: 'johnjoe@example.com',
-      orders: 122,
-      revenue: 4350.75,
-      plateform: 'Web',
-    ),
-    BuyerData(
-      rank: 2,
-      name: 'Sarah Khan',
-      country: 'Pakistan',
-      email: 'sarah.k@example.com',
-      orders: 98,
-      revenue: 3920.50,
-      plateform: 'Mobile',
-    ),
-    BuyerData(
-      rank: 3,
-      name: 'Olga Petrova',
-      country: 'Ukraine',
-      email: 'olga.p@example.com',
-      orders: 87,
-      revenue: 3550.00,
-      plateform: 'Desktop',
-    ),
-    BuyerData(
-      rank: 4,
-      name: 'Mohammed Ali',
-      country: 'UAE',
-      email: 'm.ali@example.com',
-      orders: 80,
-      revenue: 3400.25,
-      plateform: 'Web',
-    ),
-    BuyerData(
-      rank: 5,
-      name: 'Ava Brown',
-      country: 'UK',
-      email: 'ava.b@example.com',
-      orders: 72,
-      revenue: 3200.00,
-      plateform: 'Mobile',
-    ),
-  ];
+  /// Fetch Top Countries
+  void fetchTopCountries() async {
+    isLoadingTopCountries.value = true;
+    analyticsRepository.getTopCountries().then((response) {
+      response.fold((error) {
+        isLoadingTopCountries.value = false;
+      }, (success) {
+        topCountries.value = success;
+        isLoadingTopCountries.value = false;
+      });
+    });
+  }
+
+  /// Fetch Top Buyers
+  void fetchTopBuyers() async {
+    isLoadingTopBuyers.value = true;
+    analyticsRepository.getTopBuyers().then((response) {
+      response.fold((error) {
+        isLoadingTopBuyers.value = false;
+      }, (success) {
+        topBuyers.value = success;
+        isLoadingTopBuyers.value = false;
+      });
+    });
+  }
 }

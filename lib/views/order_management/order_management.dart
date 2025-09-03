@@ -30,7 +30,7 @@ class OrderManagement extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildStatCardsSection(isDesktop, isTablet, isMobile, isDark),
+                Obx(() => _buildStatCardsSection(controller, isDesktop, isTablet, isMobile, isDark)),
               SizedBox(
                   height: isMobile
                       ? 20
@@ -75,28 +75,25 @@ class OrderManagement extends StatelessWidget {
     );
   }
 
-  Widget _buildStatCardsSection(
+  Widget _buildStatCardsSection(OrderManagementController controller,
       bool isDesktop, bool isTablet, bool isMobile, bool isDark) {
+    if (controller.isLoadingStats.value) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32.0),
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
     if (isDesktop) {
       return Row(
         children: [
           Expanded(
-              child: _buildStatCard("Active Subscribers", "2,500", "28.4%",
+              child: _buildStatCard("Active Subscribers", "${controller.ordersStatsData.value?.activeSubscribers}", "28.4%",
                   true, "This month", Icons.group, Colors.blue, isDark)),
           SizedBox(width: isMobile ? 12 : 16),
           Expanded(
-              child: _buildStatCard(
-                  "Expiring Soon",
-                  "82",
-                  "8.4%",
-                  false,
-                  "In next 24 hours",
-                  Icons.access_time,
-                  Colors.orange,
-                  isDark)),
-          SizedBox(width: isMobile ? 12 : 16),
-          Expanded(
-              child: _buildStatCard("Top Plan Type", "Photo I", "0.4%", true,
+              child: _buildStatCard("Top Plan Type", "${controller.ordersStatsData.value?.topPlan.name}", "0.4%", true,
                   "This month", Icons.diamond, Colors.purple, isDark)),
         ],
       );
@@ -107,7 +104,7 @@ class OrderManagement extends StatelessWidget {
             children: [
               Expanded(
                   child: _buildStatCard("Active Subscribers", "2,500", "28.4%",
-                      true, "This month", Icons.group, Colors.blue, isDark)),
+                      true, "All Time", Icons.group, Colors.blue, isDark)),
               SizedBox(width: 16),
               Expanded(
                   child: _buildStatCard(
@@ -122,7 +119,7 @@ class OrderManagement extends StatelessWidget {
             ],
           ),
           SizedBox(height: 16),
-          _buildStatCard("Top Plan Type", "Photo I", "0.4%", true, "This month",
+          _buildStatCard("Top Plan Type", "Photo I", "0.4%", true, "All Time",
               Icons.diamond, Colors.purple, isDark),
         ],
       );
@@ -130,12 +127,10 @@ class OrderManagement extends StatelessWidget {
       return Column(
         children: [
           _buildStatCard("Active Subscribers", "2,500", "28.4%", true,
-              "This month", Icons.group, Colors.blue, isDark),
+              "All Time", Icons.group, Colors.blue, isDark),
           SizedBox(height: 12),
-          _buildStatCard("Expiring Soon", "82", "8.4%", false,
-              "In next 24 hours", Icons.access_time, Colors.orange, isDark),
-          SizedBox(height: 12),
-          _buildStatCard("Top Plan Type", "Photo I", "0.4%", true, "This month",
+         
+          _buildStatCard("Top Plan Type", "Photo I", "0.4%", true, "All Time",
               Icons.diamond, Colors.purple, isDark),
         ],
       );
@@ -198,21 +193,7 @@ class OrderManagement extends StatelessWidget {
           const SizedBox(height: 8),
           Row(
             children: [
-              Icon(
-                isPositive ? Icons.trending_up : Icons.trending_down,
-                color: isPositive ? Colors.green : Colors.red,
-                size: 16,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                percentage,
-                style: TextStyle(
-                  color: isPositive ? Colors.green : Colors.red,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 12,
-                ),
-              ),
-              const SizedBox(width: 8),
+             
               Text(
                 period,
                 style: TextStyle(

@@ -1,6 +1,7 @@
 import 'package:admin/controller/user_management_controller/user_management_controller.dart';
 
 import 'package:admin/views/user_management/users_list_widget/users_list_widget.dart';
+import 'package:admin/widgets/jumping_dots.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:get/get.dart';
@@ -11,7 +12,7 @@ class UserManagement extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(UserManagementController());
-   
+
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       backgroundColor:
@@ -23,77 +24,86 @@ class UserManagement extends StatelessWidget {
           final isMobile = screenWidth <= 600;
 
           final cardWidth = isTablet
-              ? (screenWidth - 48) /
-                  2 
+              ? (screenWidth - 48) / 2
               : isMobile
                   ? screenWidth - 32
-                  : (screenWidth - 80) /
-                      4; 
+                  : (screenWidth - 80) / 4;
 
-          return SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
+          return Obx(() {
+            if (controller.isLoading.value) {
+              return Row(
                 children: [
-                  Wrap(
-                    spacing: 16,
-                    runSpacing: 16,
-                    children: [
-                      SizedBox(
-                        width: cardWidth,
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(
-                              minHeight: 300), // Ensure uniform height
-                          child: _buildTotalUsersCard(controller, isDark),
-                        ),
-                      ),
-                      SizedBox(
-                        width: cardWidth,
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(minHeight: 300),
-                          child: _buildUsersPlatformCard(controller, isDark),
-                        ),
-                      ),
-                      SizedBox(
-                        width: cardWidth,
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(minHeight: 300),
-                          child: _buildUserStatusCard(controller, isDark),
-                        ),
-                      ),
-                      SizedBox(
-                        width: cardWidth,
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(minHeight: 300),
-                          child: _buildSignupMethodsCard(controller, isDark),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Container(
-                    height: isMobile
-                        ? 500
-                        : isTablet
-                            ? 600
-                            : 700,
-                    decoration: BoxDecoration(
-                      color: isDark ? Color(0xFF23272F) : Colors.white,
-                      border: Border.all(
-                          width: 0.4,
-                          color: isDark ? Colors.grey.shade600 : Colors.grey),
-                      borderRadius: BorderRadius.circular(isMobile ? 16 : 25),
-                    ),
-                    child: UsersListWidget(
-                      controller: controller,
-                      isMobile: isMobile,
-                      isTablet: isTablet,
-                    ),
-                  ),
+                  Spacer(),
+                  JumpingDots(numberOfDots: 3),
+                  Spacer(),
                 ],
+              );
+            }
+            return SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    Wrap(
+                      spacing: 16,
+                      runSpacing: 16,
+                      children: [
+                        SizedBox(
+                          width: cardWidth,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(
+                                minHeight: 300), // Ensure uniform height
+                            child: _buildTotalUsersCard(controller, isDark),
+                          ),
+                        ),
+                        SizedBox(
+                          width: cardWidth,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(minHeight: 300),
+                            child: _buildUsersPlatformCard(controller, isDark),
+                          ),
+                        ),
+                        SizedBox(
+                          width: cardWidth,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(minHeight: 300),
+                            child: _buildUserStatusCard(controller, isDark),
+                          ),
+                        ),
+                        SizedBox(
+                          width: cardWidth,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(minHeight: 300),
+                            child: _buildSignupMethodsCard(controller, isDark),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      height: isMobile
+                          ? 500
+                          : isTablet
+                              ? 600
+                              : 700,
+                      decoration: BoxDecoration(
+                        color: isDark ? Color(0xFF23272F) : Colors.white,
+                        border: Border.all(
+                            width: 0.4,
+                            color: isDark ? Colors.grey.shade600 : Colors.grey),
+                        borderRadius: BorderRadius.circular(isMobile ? 16 : 25),
+                      ),
+                      child: UsersListWidget(
+                        controller: controller,
+                        isMobile: isMobile,
+                        isTablet: isTablet,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
+            );
+          });
         },
       ),
     );

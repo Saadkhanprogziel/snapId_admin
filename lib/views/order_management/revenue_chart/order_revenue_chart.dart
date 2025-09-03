@@ -1,5 +1,5 @@
-
 import 'package:admin/controller/orders_management_controller/order_management.dart';
+import 'package:admin/models/orders/revenue_summary.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -19,16 +19,21 @@ class RevenueChartWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: EdgeInsets.all(isMobile ? 16 : 20),
       decoration: BoxDecoration(
-        color: isDark ? Color(0xFF23272F) : Colors.transparent,
+        color: isDark ? const Color(0xFF23272F) : Colors.transparent,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: isDark ? Colors.grey.shade800 : Colors.grey, width: 0.5),
+        border: Border.all(
+          color: isDark ? Colors.grey.shade800 : Colors.grey,
+          width: 0.5,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header + Total Revenue
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -45,18 +50,22 @@ class RevenueChartWidget extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Obx(() {
-                    final currentData = controller.getCurrentRevenueData();
-                    double totalRevenue = 0;
-                    for (var item in currentData) {
-                      totalRevenue += (item['all'] ?? 0).toDouble();
+                    final SummaryRevenue? summary =
+                        controller.summaryRevenue.value;
+
+                    if (summary == null) {
+                      return const Text(
+                        '\$0.00',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      );
                     }
 
                     return Text(
-                      '\$${_formatCurrency(totalRevenue)}',
+                      '\$${_formatCurrency(summary.totalRevenue)}',
                       style: TextStyle(
                         fontSize: isMobile ? 24 : 28,
                         fontWeight: FontWeight.bold,
-                        // color: Colors.black87,
                       ),
                     );
                   }),
@@ -65,7 +74,10 @@ class RevenueChartWidget extends StatelessWidget {
               _buildDropdownButton(controller, true, isDark),
             ],
           ),
+
           const SizedBox(height: 24),
+
+          // Revenue Chart
           SizedBox(
             height: isMobile
                 ? 200
@@ -73,9 +85,14 @@ class RevenueChartWidget extends StatelessWidget {
                     ? 250
                     : 300,
             child: Obx(() {
+              final SummaryRevenue? summary = controller.summaryRevenue.value;
+
+              if (summary == null) {
+                return const Center(child: Text("No data available"));
+              }
+
               final barGroups = controller.getRevenueBarGroups();
               final maxValue = _getMaxYValue(barGroups);
-              final dataLength = controller.getCurrentRevenueData().length;
 
               return BarChart(
                 BarChartData(
@@ -85,12 +102,15 @@ class RevenueChartWidget extends StatelessWidget {
                     enabled: true,
                     touchTooltipData: BarTouchTooltipData(
                       getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                        final labels = ['Photo 1', 'Photo 2', 'Photo 3'];
-                        final label = rodIndex < labels.length
-                            ? labels[rodIndex]
+                        final products = summary
+                            .revenueSummary[groupIndex].items.keys
+                            .toList();
+                        final product = rodIndex < products.length
+                            ? products[rodIndex]
                             : 'Unknown';
+
                         return BarTooltipItem(
-                          '$label\n\$${_formatCurrency(rod.toY)}',
+                          '$product\n\$${_formatCurrency(rod.toY)}',
                           const TextStyle(color: Colors.white, fontSize: 12),
                         );
                       },
@@ -109,18 +129,15 @@ class RevenueChartWidget extends StatelessWidget {
                         interval: 1,
                         getTitlesWidget: (value, meta) {
                           final index = value.toInt();
-                          if (index >= 0 && index < dataLength) {
-                            final label = controller.getLabel(index,
-                                controller.selectedRevenueRange.value, true);
-                            if (label.isNotEmpty) {
-                              return Text(
-                                label,
-                                style: TextStyle(
-                                  color: Colors.grey.shade600,
-                                  fontSize: 12,
-                                ),
-                              );
-                            }
+                          if (index >= 0 &&
+                              index < summary.revenueSummary.length) {
+                            return Text(
+                              summary.revenueSummary[index].label,
+                              style: TextStyle(
+                                color: Colors.grey.shade600,
+                                fontSize: 12,
+                              ),
+                            );
                           }
                           return const SizedBox.shrink();
                         },
@@ -150,8 +167,9 @@ class RevenueChartWidget extends StatelessWidget {
                     horizontalInterval: _getGridInterval(maxValue),
                     getDrawingHorizontalLine: (value) {
                       return FlLine(
-                        color: Colors.grey.shade200,
+                        color: Colors.grey.shade300,
                         strokeWidth: 1,
+                        dashArray: [6, 4],
                       );
                     },
                   ),
@@ -159,63 +177,74 @@ class RevenueChartWidget extends StatelessWidget {
               );
             }),
           ),
+
           const SizedBox(height: 16),
-          _buildChartLegend([
-            {
-              'label': 'Photo 1',
-              'color': const Color.fromARGB(255, 151, 135, 255)
-            },
-            {
-              'label': 'Photo 2',
-              'color': const Color.fromARGB(255, 200, 147, 253)
-            },
-            {
-              'label': 'Photo 3',
-              'color': const Color.fromARGB(255, 198, 210, 253)
-            },
-          ]),
+
+          // Legend
+          Obx(() {
+            final SummaryRevenue? summary = controller.summaryRevenue.value;
+            if (summary == null || summary.revenueSummary.isEmpty) {
+              return const SizedBox.shrink();
+            }
+
+            // Fixed product colors
+            final Map<String, Color> productColors = {
+              "Family Pack": const Color(0xFF9787FF),
+              "Single Photo": const Color(0xFFC6D2FD),
+              "Standard Pack": const Color(0xFFC893FD),
+            };
+
+            
+            final productOrder = [
+              "Single Photo",
+              "Family Pack",
+              "Standard Pack"
+            ];
+
+            return _buildChartLegend([
+              for (final product in productOrder)
+                {
+                  'label': product,
+                  'color': productColors[product] ?? Colors.grey,
+                }
+            ]);
+          }),
         ],
       ),
     );
   }
 
+
+  // -------------------------
+  // Helper methods
+  // -------------------------
+
   double _getMaxYValue(List<BarChartGroupData> barGroups) {
     if (barGroups.isEmpty) return 100;
-
     double maxValue = 0;
     for (var group in barGroups) {
       for (var rod in group.barRods) {
         if (rod.toY > maxValue) maxValue = rod.toY;
       }
     }
-    return (maxValue * 1.2).ceilToDouble();
+    return (maxValue * 1.2);
   }
 
   String _formatCurrency(double value) {
-    if (value >= 1000000) {
-      return '${(value / 1000000).toStringAsFixed(1)}M';
-    } else if (value >= 1000) {
-      return '${(value / 1000).toStringAsFixed(1)}K';
-    } else {
-      return value.toStringAsFixed(0);
-    }
+    // Always show 2 decimals (no rounding to K/M)
+    return value.toStringAsFixed(2);
   }
 
   String _formatYAxisLabel(double value) {
-    if (value >= 1000000) {
-      return '${(value / 1000000).toInt()}M';
-    } else if (value >= 1000) {
-      return '${(value / 1000).toInt()}K';
-    } else {
-      return '${value.toInt()}';
-    }
+    return value.toStringAsFixed(2);
   }
 
   double _getGridInterval(double maxValue) {
-    if (maxValue >= 100000) return 20000;
-    if (maxValue >= 50000) return 10000;
-    if (maxValue >= 10000) return 5000;
-    return 1000;
+    if (maxValue <= 50) return 10;
+    if (maxValue <= 100) return 20;
+    if (maxValue <= 500) return 50;
+    if (maxValue <= 1000) return 100;
+    return 200;
   }
 
   Widget _buildChartLegend(List<Map<String, dynamic>> legendItems) {
@@ -249,46 +278,55 @@ class RevenueChartWidget extends StatelessWidget {
   }
 
   Widget _buildDropdownButton(
-      OrderManagementController controller, bool isRevenue,bool isDark) {
+      OrderManagementController controller, bool isRevenue, bool isDark) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        // color: Colors.white,
-        border: Border.all(width: 0.5,color: Colors.grey.shade600),
+        border: Border.all(width: 0.5, color: Colors.grey.shade600),
         borderRadius: BorderRadius.circular(8),
       ),
       child: DropdownButtonHideUnderline(
         child: Obx(() {
-          final value = isRevenue
-              ? controller.selectedRevenueRange.value
-              : controller.selectedSubscriptionRange.value;
-
-          return DropdownButton<DataRange>(
+          final value = 
+               controller.selectedRevenueRange.value;
+              
+          return DropdownButton(
             value: value,
             isDense: true,
-            style:  TextStyle(fontSize: 14,color: isDark ? Colors.white : Colors.grey),
+            style: TextStyle(
+              fontSize: 14,
+              color: isDark ? Colors.white : Colors.grey,
+            ),
             menuMaxHeight: 250,
             items: const [
               DropdownMenuItem(
-                value: DataRange.weekly,
+                value: "today",
+                child: Text('Today', style: TextStyle(fontSize: 14)),
+              ),
+              DropdownMenuItem(
+                value: "this_week",
                 child: Text('Week', style: TextStyle(fontSize: 14)),
               ),
               DropdownMenuItem(
-                value: DataRange.monthly,
+                value: "this_month",
                 child: Text('Month', style: TextStyle(fontSize: 14)),
               ),
-              // DropdownMenuItem(
-              //   value: DataRange.threeMonths,
-              //   child: Text('3 Months', style: TextStyle(fontSize: 14)),
-              // ),
+              DropdownMenuItem(
+                value: "last_month",
+                child: Text('Month', style: TextStyle(fontSize: 14)),
+              ),
+              DropdownMenuItem(
+                value: "last_6_months",
+                child: Text('Last 6 Months', style: TextStyle(fontSize: 14)),
+              ),
+              DropdownMenuItem(
+                value: "this_year",
+                child: Text('This Year', style: TextStyle(fontSize: 14)),
+              ),
             ],
             onChanged: (newValue) {
               if (newValue != null) {
-                if (isRevenue) {
-                  controller.updateRevenueRange(newValue);
-                } else {
-                  controller.updateSubscriptionRange(newValue);
-                }
+                controller.updateRevenueFilter(newValue);
               }
             },
           );
