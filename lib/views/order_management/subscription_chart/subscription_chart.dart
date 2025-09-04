@@ -1,4 +1,4 @@
-import 'package:admin/controller/orders_management_controller/order_management.dart';
+import 'package:admin/controller/orders_management_controller/order_management_controller.dart';
 import 'package:admin/models/orders/subscribers_analytics_data.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';

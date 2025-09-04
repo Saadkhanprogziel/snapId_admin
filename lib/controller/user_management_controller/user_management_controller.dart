@@ -1,12 +1,79 @@
-import 'package:admin/models/chartsTablesModel.dart';
 import 'package:admin/models/users/user_analytics_model.dart';
 import 'package:admin/models/users/user_stats_model.dart';
 import 'package:admin/models/users/users_model.dart';
 import 'package:admin/repositories/users_repository/users_repository.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get/get_rx/src/rx_workers/utils/debouncer.dart';
+
 import 'package:fl_chart/fl_chart.dart';
 
 class UserManagementController extends GetxController {
+  // Filter variables
+  var selectedStatus = 'ALL'.obs;
+  var selectedSort = 'Newest'.obs;
+  var selectedSubscription = 'ALL'.obs;
+  var selectedPlatform = 'ALL'.obs;
+  var selectedDateRange = Rxn<DateTimeRange>();
+  final dateRangeController = Rxn<String>();
+  var searchQuery = ''.obs;
+  final debouncer = Debouncer(delay: Duration(milliseconds: 300));
+
+  // Filter options
+  final List<String> statusFilter = [
+    'ALL',
+    'ACTIVE',
+    'BLOCKED',
+    'DELETED',
+  ];
+  final List<String> sortFilter = [
+    'Newest',
+    'Oldest',
+  ];
+  final List<String> subscriptionFilter = [
+    'ALL',
+    'Family Pack',
+    'Standard Pack',
+    'Single Photo',
+  ];
+  final List<String> platformFilter = [
+    'ALL',
+    'MOBILE_APP',
+    'WEB_APP',
+  ];
+
+  // Pagination and filtering functions
+  void applyFilters() {
+    currentPage.value = 0;
+    fetchUserStatsData();
+  }
+
+  void resetFilters() {
+    selectedStatus.value = 'ALL';
+    selectedSort.value = 'ALL';
+    selectedSubscription.value = 'ALL';
+    selectedPlatform.value = 'ALL';
+    selectedDateRange.value = null;
+    dateRangeController.value = null;
+    currentPage.value = 0;
+    fetchUserStatsData();
+  }
+
+  void goToNextPage() {
+    if (pagination.value != null &&
+        currentPage.value < pagination.value!.totalPages - 1) {
+      currentPage.value++;
+      fetchUserStatsData();
+    }
+  }
+
+  void goToPreviousPage() {
+    if (currentPage.value > 0) {
+      currentPage.value--;
+      fetchUserStatsData();
+    }
+  }
+
   var currentPage = 0.obs;
   var userStatsData = Rxn<UserStatsModel>();
   var usersData = <UsersModel>[].obs;
@@ -22,17 +89,42 @@ class UserManagementController extends GetxController {
     fetchUserAnalytics();
   }
 
+  void searchOrders(String query) {
+    searchQuery.value = query;
+    currentPage.value = 0; // Reset to first page
+    debouncer.call(() {
+      fetchUserStatsData();
+    });
+  }
+
   fetchUserStatsData() async {
     isLoading.value = true;
+    // Prepare filter parameters
+    String status = selectedStatus.value;
+    String sortBy = selectedSort.value;
+    String subscription = selectedSubscription.value;
+    String platform = selectedPlatform.value;
+    String startDate = '';
+    String endDate = '';
+    final range = selectedDateRange.value;
+    if (range != null) {
+      startDate = range.start.toString().split(' ')[0];
+      endDate = range.end.toString().split(' ')[0];
+    }
     final result = await userRepo.getAllUsers(
-      page: currentPage.value + 1, // API pages usually start from 1
+      page: currentPage.value + 1,
       pageSize: 10,
-      status: "ALL",
+      status: status,
+      sortBy: sortBy,
+      subscription: subscription,
+      platform: platform,
+      startDate: startDate,
+      endDate: endDate,
+      searchQuery: searchQuery.value,
     );
 
     result.fold(
       (failure) {
-        print("❌ Error: ${failure.message}");
         isLoading.value = false;
       },
       (response) {
@@ -55,7 +147,6 @@ class UserManagementController extends GetxController {
 
     result.fold(
       (failure) {
-        print("❌ Error: ${failure.message}");
         isLoading.value = false;
       },
       (response) {

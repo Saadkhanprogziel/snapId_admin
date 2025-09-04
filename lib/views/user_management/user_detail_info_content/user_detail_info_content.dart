@@ -1,9 +1,8 @@
 import 'package:admin/controller/app_controller.dart';
 import 'package:admin/controller/user_management_controller/user_info_detail_controller/user_info_detail_controller.dart';
-import 'package:admin/models/chartsTablesModel.dart';
 import 'package:admin/models/users/users_model.dart';
+import 'package:admin/models/users/users_order_data.dart';
 import 'package:admin/theme/text_theme.dart';
-
 import 'package:admin/utils/custom_spaces.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -16,10 +15,15 @@ class UserInfoContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final UserInfoDetailController userInfoController =
         Get.put(UserInfoDetailController());
-        final AppController drawerController = Get.find<AppController>();
+    final AppController drawerController = Get.find<AppController>();
+
+    if (userModel != null) {
+      userInfoController.setUserModel(userModel!);
+    }
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: isDark ? Theme.of(context).scaffoldBackgroundColor : Colors.white,
+      backgroundColor:
+          isDark ? Theme.of(context).scaffoldBackgroundColor : Colors.white,
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 30, vertical: 25),
         child: Column(
@@ -38,7 +42,9 @@ class UserInfoContent extends StatelessWidget {
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: isDark ? Color(0xFF23272F) : const Color.fromARGB(255, 255, 255, 255),
+                          color: isDark
+                              ? Color(0xFF23272F)
+                              : const Color.fromARGB(255, 255, 255, 255),
                           borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
@@ -48,7 +54,7 @@ class UserInfoContent extends StatelessWidget {
                             ),
                           ],
                         ),
-                        child:  Icon(
+                        child: Icon(
                           Icons.arrow_forward,
                           size: 18,
                           color: isDark ? Colors.white : Color(0xFF6B7280),
@@ -65,31 +71,36 @@ class UserInfoContent extends StatelessWidget {
                     ],
                   ),
                 ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: Colors.red.withOpacity(0.3)),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        "Block",
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
+                InkWell(
+                  onTap: (){
+                    
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: Colors.red.withOpacity(0.3)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          "Block",
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                      SizedBox(width: 4),
-                      Icon(
-                        Icons.block,
-                        size: 16,
-                        color: Colors.red,
-                      ),
-                    ],
+                        SizedBox(width: 4),
+                        Icon(
+                          Icons.block,
+                          size: 16,
+                          color: Colors.red,
+                        ),
+                      ],
+                    ),
                   ),
                 )
               ],
@@ -127,17 +138,6 @@ class UserInfoContent extends StatelessWidget {
                             )),
                         const SizedBox(height: 8),
                         Obx(() => _buildSidebarItem(
-                              title: 'Activity',
-                              icon: Icons.trending_up_outlined,
-                              isActive:
-                                  userInfoController.selectedScreen.value ==
-                                      'Activity',
-                              isDark: isDark,
-                              onTap: () =>
-                                  userInfoController.changeScreen('Activity'),
-                            )),
-                        const SizedBox(height: 8),
-                        Obx(() => _buildSidebarItem(
                               title: 'Moderation History',
                               icon: Icons.security_outlined,
                               isActive:
@@ -157,12 +157,10 @@ class UserInfoContent extends StatelessWidget {
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
-                       color: isDark ? Color(0xFF23272F) : Colors.white,
+                        color: isDark ? Color(0xFF23272F) : Colors.white,
                         borderRadius: BorderRadius.circular(16),
-                        
                         border:
                             Border.all(width: 0.5, color: Colors.grey.shade500),
-                        
                       ),
                       padding: const EdgeInsets.all(40),
                       child: Column(
@@ -185,16 +183,13 @@ class UserInfoContent extends StatelessWidget {
                               } else if (userInfoController
                                       .selectedScreen.value ==
                                   'Orders') {
-                                return _buildOrdersContent(userInfoController);
-                              } else if (userInfoController
-                                      .selectedScreen.value ==
-                                  'Activity') {
-                                return _buildActivityContent(
-                                    userInfoController);
+                                return _buildOrdersDataTable(
+                                    userInfoController, isDark);
                               } else if (userInfoController
                                       .selectedScreen.value ==
                                   'Moderation History') {
-                                return _buildModerationHistoryContent();
+                                return _buildModerationHistoryDataTable(
+                                    userInfoController, isDark);
                               }
                               return const SizedBox();
                             }),
@@ -224,7 +219,9 @@ class UserInfoContent extends StatelessWidget {
       decoration: BoxDecoration(
         color: isActive ? const Color(0xFF6366F1) : Colors.transparent,
         borderRadius: BorderRadius.circular(12),
-        border: !isActive ? Border.all(width: 0.5,color: Colors.grey.shade500) : null,
+        border: !isActive
+            ? Border.all(width: 0.5, color: Colors.grey.shade500)
+            : null,
       ),
       child: ListTile(
         onTap: onTap,
@@ -308,7 +305,8 @@ class UserInfoContent extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _buildFormField('Country', userModel?.country ?? "United States"),
+                child: _buildFormField(
+                    'Country', userModel?.country ?? "United States"),
               ),
               SizedBox(width: 20),
               Expanded(
@@ -322,12 +320,12 @@ class UserInfoContent extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                // child: _buildFormField('Subscription Plan', userModel?.subscription ?? "Photo 1"),
                 child: _buildFormField('Subscription Plan', "Photo 1"),
               ),
               SizedBox(width: 20),
               Expanded(
-                child: _buildFormField('User Platform', userModel?.platform ?? ""),
+                child:
+                    _buildFormField('User Platform', userModel?.platform ?? ""),
               ),
             ],
           ),
@@ -337,7 +335,8 @@ class UserInfoContent extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _buildFormField('Signup Method', userModel?.authProvider ?? ""),
+                child: _buildFormField(
+                    'Signup Method', userModel?.authProvider ?? ""),
               ),
               SizedBox(width: 20),
               Expanded(
@@ -360,7 +359,9 @@ class UserInfoContent extends StatelessWidget {
                           height: 8,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: userModel?.isActive?.toLowerCase() == "block" ? Colors.redAccent: Colors.green,
+                            color: userModel?.isActive?.toLowerCase() == "block"
+                                ? Colors.redAccent
+                                : Colors.green,
                           ),
                         ),
                         SizedBox(width: 8),
@@ -368,7 +369,9 @@ class UserInfoContent extends StatelessWidget {
                           userModel?.isActive ?? "Active",
                           style: TextStyle(
                             fontSize: 14,
-                            color: userModel?.isActive?.toLowerCase() == "block" ? Colors.redAccent: Colors.green,
+                            color: userModel?.isActive?.toLowerCase() == "block"
+                                ? Colors.redAccent
+                                : Colors.green,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -426,446 +429,236 @@ class UserInfoContent extends StatelessWidget {
     );
   }
 
-  Widget _buildOrdersContent(UserInfoDetailController controller) {
+  Widget _buildOrdersDataTable(
+      UserInfoDetailController controller, bool isDark) {
     return Column(
       children: [
-        // Orders Table
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.shade300),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            children: [
-              // Table Header
-              Container(
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  // color: Colors.grey.shade50,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    topRight: Radius.circular(12),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(flex: 2, child: _buildTableHeader('Order ID')),
-                    Expanded(
-                        flex: 2,
-                        child: _buildTableHeader(
-                            'Notes')), // Updated to match OrderData
-                    Expanded(flex: 2, child: _buildTableHeader('Subscription')),
-                    Expanded(
-                        flex: 1,
-                        child: _buildTableHeader(
-                            'Amount')), // Updated to match OrderData
-                    Expanded(flex: 1, child: _buildTableHeader('Action')),
-                  ],
-                ),
-              ),
-              Container(
-                height: 400,
-                child: Obx(() {
-                  const itemsPerPage = 10;
-                  // final totalPages =
-                  //     (controller.orderList.length / itemsPerPage)
-                  //         .ceil(); // Use orderList.length
-                  final currentPage = controller.currentPage.value;
-                  final startIndex = currentPage * itemsPerPage;
-                  final endIndex =
-                      (startIndex + itemsPerPage) > controller.orderList.length
-                          ? controller.orderList.length
-                          : (startIndex + itemsPerPage);
-                  final paginatedList =
-                      controller.orderList.sublist(startIndex, endIndex);
-
-                  return ListView.builder(
-                    itemCount: paginatedList.length,
-                    itemBuilder: (context, index) =>
-                        _buildOrderRow(paginatedList[index]),
-                  );
-                }),
-              ),
-              Obx(() {
+        Expanded(
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey.shade300),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Obx(() {
                 const itemsPerPage = 10;
-                final totalPages = (controller.orderList.length / itemsPerPage)
-                    .ceil(); // Use orderList.length
                 final currentPage = controller.currentPage.value;
+                final startIndex = currentPage * itemsPerPage;
+                final endIndex = (startIndex + itemsPerPage) >
+                        controller.orderList.value.length
+                    ? controller.orderList.value.length
+                    : (startIndex + itemsPerPage);
+                final paginatedList =
+                    controller.orderList.value.sublist(startIndex, endIndex);
 
-                return Container(
-                  padding: EdgeInsets.only(top: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        onPressed: currentPage > 0
-                            ? () => controller.currentPage.value--
-                            : null,
-                        icon: Icon(
-                          Icons.chevron_left,
-                          color: currentPage > 0
-                              ? Colors.grey.shade700
-                              : Colors.grey.shade400,
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          'Page ${currentPage + 1} of $totalPages',
-                          style: TextStyle(
-                            color: Colors.grey.shade700,
-                            fontSize: 12,
+                return Column(
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        width: double
+                            .infinity, // 👈 Forces table to stretch horizontally
+                        child: DataTable(
+                          headingRowHeight: 60,
+                          columnSpacing: 60,
+                          horizontalMargin: 24,
+                          decoration: BoxDecoration(
+                            color: isDark ? Color(0xFF23272F) : Colors.white,
                           ),
-                          textAlign: TextAlign.center,
+                          headingRowColor: MaterialStateProperty.all(
+                            isDark ? Color(0xFF1A1D23) : Colors.grey.shade50,
+                          ),
+                          columns: const [
+                            DataColumn(label: Text('Plan')),
+                            DataColumn(label: Text('Status')),
+                            DataColumn(label: Text('Platform')),
+                            DataColumn(label: Text('Amount'), numeric: true),
+                          ],
+                          rows: paginatedList.map((order) {
+                            return DataRow(cells: [
+                              DataCell(Text(order.planId)),
+                              DataCell(Text(order.status)),
+                              DataCell(Text(order.platform)),
+                              DataCell(Text(
+                                  '${order.currency} ${order.amount.toStringAsFixed(2)}')),
+                            ]);
+                          }).toList(),
                         ),
                       ),
-                      IconButton(
-                        onPressed: currentPage < totalPages - 1
-                            ? () => controller.currentPage.value++
-                            : null,
-                        icon: Icon(
-                          Icons.chevron_right,
-                          color: currentPage < totalPages - 1
-                              ? Colors.grey.shade700
-                              : Colors.grey.shade400,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildOrderRow(OrderData data) {
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(color: Colors.grey.shade200),
-        ),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              data.orderId,
-              style: TextStyle(
-                fontSize: 14,
-                // color: Colors.grey.shade600,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(
-              data.notes, // Changed from document to notes as per OrderData class
-              style: TextStyle(
-                fontSize: 14,
-                // color: Colors.grey.shade600,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(
-              data.subscription,
-              style: TextStyle(
-                fontSize: 14,
-                // color: Colors.grey.shade600,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Text(
-              '\$${data.amount.toStringAsFixed(2)}', // Changed to display amount
-              style: TextStyle(
-                fontSize: 14,
-                // color: Colors.grey.shade600,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: InkWell(
-              onTap: () {},
-              child: Row(
-                children: [
-                  Text(
-                    'View',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF6366F1),
-                      fontWeight: FontWeight.w500,
                     ),
-                  ),
-                  SizedBox(width: 4),
-                  Icon(
-                    Icons.arrow_outward,
-                    size: 14,
-                    color: Color(0xFF6366F1),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildActivityContent(UserInfoDetailController controller) {
-    return Column(
-      children: [
-        // Activity Table
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.shade300),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            children: [
-              // Table Header
-              Container(
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  // color: Colors.grey.shade50,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    topRight: Radius.circular(12),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(flex: 3, child: _buildTableHeader('Date - Time')),
-                    Expanded(flex: 3, child: _buildTableHeader('Activity')),
-                    Expanded(flex: 2, child: _buildTableHeader('Platform')),
+                    // Pagination Controls
+                    Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                      decoration: BoxDecoration(
+                        color: isDark ? Color(0xFF1A1D23) : Colors.grey.shade50,
+                        border: Border(
+                          top: BorderSide(color: Colors.grey.shade300),
+                        ),
+                      ),
+                      child: Obx(() {
+                        const itemsPerPage = 10;
+                        final totalPages =
+                            (controller.orderList.value.length / itemsPerPage)
+                                .ceil();
+                        final currentPage = controller.currentPage.value;
+
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Showing ${startIndex + 1}-${endIndex} of ${controller.orderList.value.length} results',
+                              style: TextStyle(
+                                color: isDark
+                                    ? Colors.white70
+                                    : Colors.grey.shade600,
+                                fontSize: 14,
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                IconButton(
+                                  onPressed: currentPage > 0
+                                      ? () => controller.currentPage.value--
+                                      : null,
+                                  icon: Icon(
+                                    Icons.chevron_left,
+                                    color: currentPage > 0
+                                        ? (isDark
+                                            ? Colors.white
+                                            : Colors.grey.shade700)
+                                        : Colors.grey.shade400,
+                                  ),
+                                ),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? Color(0xFF23272F)
+                                        : Colors.white,
+                                    border:
+                                        Border.all(color: Colors.grey.shade300),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    '${currentPage + 1} of $totalPages',
+                                    style: TextStyle(
+                                      color: isDark
+                                          ? Colors.white
+                                          : Colors.grey.shade700,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  onPressed: currentPage < totalPages - 1
+                                      ? () => controller.currentPage.value++
+                                      : null,
+                                  icon: Icon(
+                                    Icons.chevron_right,
+                                    color: currentPage < totalPages - 1
+                                        ? (isDark
+                                            ? Colors.white
+                                            : Colors.grey.shade700)
+                                        : Colors.grey.shade400,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                      }),
+                    ),
                   ],
-                ),
-              ),
-              // Table Content
-              Container(
-                height: 400,
-                child: Obx(() {
-                  const itemsPerPage = 10;
-                  // final totalPages =
-                  //     (controller.getActivities.length / itemsPerPage).ceil();
-                  final currentPage = controller.currentPage.value;
-                  final startIndex = currentPage * itemsPerPage;
-                  final endIndex = (startIndex + itemsPerPage) >
-                          controller.getActivities.length
-                      ? controller.getActivities.length
-                      : (startIndex + itemsPerPage);
-                  final paginatedList =
-                      controller.getActivities.sublist(startIndex, endIndex);
-
-                  return ListView.builder(
-                    itemCount: paginatedList.length,
-                    itemBuilder: (context, index) =>
-                        _buildActivityRow(paginatedList[index]),
-                  );
-                }),
-              ),
-              Obx(() {
-                const itemsPerPage = 10;
-                final totalPages =
-                    (controller.getActivities.length / itemsPerPage).ceil();
-                final currentPage = controller.currentPage.value;
-
-                return Container(
-                  padding: EdgeInsets.only(top: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        onPressed: currentPage > 0
-                            ? () => controller.currentPage.value--
-                            : null,
-                        icon: Icon(
-                          Icons.chevron_left,
-                          color: currentPage > 0
-                              ? Colors.grey.shade700
-                              : Colors.grey.shade400,
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          'Page ${currentPage + 1} of $totalPages',
-                          style: TextStyle(
-                            color: Colors.grey.shade700,
-                            fontSize: 12,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: currentPage < totalPages - 1
-                            ? () => controller.currentPage.value++
-                            : null,
-                        icon: Icon(
-                          Icons.chevron_right,
-                          color: currentPage < totalPages - 1
-                              ? Colors.grey.shade700
-                              : Colors.grey.shade400,
-                        ),
-                      ),
-                    ],
-                  ),
                 );
               }),
-            ],
+            ),
           ),
         ),
-        // Pagination Controls
       ],
     );
   }
 
-// Updated _buildActivityRow to accept a single activity object
-  Widget _buildActivityRow(dynamic activity) {
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(color: Colors.grey.shade200),
-        ),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 3,
-            child: Text(
-              activity.dateTime ?? 'N/A', // Adjust based on your data structure
-              style: TextStyle(
-                fontSize: 14,
-                // color: Colors.grey.shade600,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Text(
-              activity.activity ?? 'N/A', // Adjust based on your data structure
-              style: TextStyle(
-                fontSize: 14,
-                // color: Colors.grey.shade600,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(
-              activity.platform ?? 'N/A', // Adjust based on your data structure
-              style: TextStyle(
-                fontSize: 14,
-                // color: Colors.grey.shade600,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTableHeader(String title) {
-    return Text(
-      title,
-      style: TextStyle(
-        fontWeight: FontWeight.bold,
-        // color: Colors.grey.shade800,
-      ),
-    );
-  }
-
-  Widget _buildModerationHistoryContent() {
+  Widget _buildModerationHistoryDataTable(
+      UserInfoDetailController userInfoController, bool isDark) {
+        
     return Column(
       children: [
-        // Moderation History Table
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.shade300),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            children: [
-              // Table Header
-              Container(
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  // color: Colors.grey.shade50,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    topRight: Radius.circular(12),
+        Expanded(
+          child: SizedBox(
+            width: double.infinity,
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey.shade300),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: DataTable(
+                  headingRowHeight: 60,
+                  columnSpacing: 32,
+                  horizontalMargin: 24,
+                  decoration: BoxDecoration(
+                    color: isDark ? Color(0xFF23272F) : Colors.white,
                   ),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(flex: 3, child: _buildTableHeader('Date - Time')),
-                    Expanded(flex: 2, child: _buildTableHeader('Action Taken')),
-                    Expanded(
-                        flex: 3, child: _buildTableHeader('Reason Provided')),
+                  headingRowColor: MaterialStateProperty.all(
+                    isDark ? Color(0xFF1A1D23) : Colors.grey.shade50,
+                  ),
+                  columns: [
+                    DataColumn(label: Text('Date - Time')),
+                    DataColumn(label: Text('Action Taken')),
+                    DataColumn(label: Text('Reason Provided')),
                   ],
+                  rows: userInfoController.moderationList.value.map((moderation) {
+                    return DataRow(cells: [
+                      DataCell(Text(moderation.performedAt.toIso8601String())),
+                      DataCell(Text(moderation.actionType,style:  TextStyle(color: _getStatusColor(moderation.actionType)),)),
+                      DataCell(Text(moderation.reason)),
+                    ]);
+                  }).toList(),
                 ),
               ),
-              // Table Rows
-              _buildModerationRow(
-                  'May 30, 2025 — 2:45 PM', 'Reactivated', '--'),
-              _buildModerationRow('May 30, 2025 — 2:45 PM', 'Block',
-                  'Repeated chargeback activity'),
-            ],
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildModerationRow(String dateTime, String action, String reason) {
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(color: Colors.grey.shade200),
-        ),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 3,
-            child: Text(
-              dateTime,
-              style: TextStyle(
-                fontSize: 14,
-                // color: Colors.grey.shade600,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(
-              action,
-              style: TextStyle(
-                fontSize: 14,
-                // color: Colors.grey.shade600,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Text(
-              reason,
-              style: TextStyle(
-                fontSize: 14,
-                // color: Colors.grey.shade600,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+  // Helper method to get status color
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'unblock':
+      case 's':
+        return Colors.green;
+      case 'pending':
+        return Colors.orange;
+      case 'failed':
+      case 'cancelled' || "deleted":
+        return Colors.red;
+      case 'processing':
+        return Colors.blue;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  // Helper method to get action color for moderation history
+  Color _getActionColor(String action) {
+    switch (action.toLowerCase()) {
+      case 'reactivated' || "unblocked":
+        return Colors.green;
+      case 'block':
+        return Colors.red;
+      case 'warning':
+        return Colors.orange;
+      case 'temporary suspension':
+        return Colors.purple;
+      default:
+        return Colors.grey;
+    }
   }
 }

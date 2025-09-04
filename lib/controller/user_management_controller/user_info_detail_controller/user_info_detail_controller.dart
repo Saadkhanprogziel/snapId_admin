@@ -1,149 +1,99 @@
-import 'package:admin/models/chartsTablesModel.dart';
-import 'package:admin/models/activityUserInfo/activity_user_info.dart';
+import 'package:admin/models/users/users_moderation_history.dart';
+import 'package:admin/models/users/users_order_data.dart';
+import 'package:admin/models/users/users_model.dart';
+import 'package:admin/repositories/users_repository/users_info_repository.dart';
+import 'package:admin/utils/utils.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class UserInfoDetailController extends GetxController {
+  final UsersInfoRepository usersInfoRepository = UsersInfoRepository();
+
   var currentPage = 0.obs;
-    final RxList<OrderData> orderList = <OrderData>[
-    OrderData(
-        orderId: 'ORD-1001',
-        userEmail: 'john.doe@example.com',
-        notes: 'Please deliver ASAP',
-        date: '2025-08-01',
-        subscription: 'Gold',
-        amount: 150.00,
-        status: 'Pending',
-      ),
-    OrderData(
-        orderId: 'ORD-1001',
-        userEmail: 'john.doe@example.com',
-        notes: 'Please deliver ASAP',
-        date: '2025-08-01',
-        subscription: 'Gold',
-        amount: 150.00,
-        status: 'Pending',
-      ),
-    OrderData(
-        orderId: 'ORD-1001',
-        userEmail: 'john.doe@example.com',
-        notes: 'Please deliver ASAP',
-        date: '2025-08-01',
-        subscription: 'Gold',
-        amount: 150.00,
-        status: 'Pending',
-      ),
-    OrderData(
-        orderId: 'ORD-1001',
-        userEmail: 'john.doe@example.com',
-        notes: 'Please deliver ASAP',
-        date: '2025-08-01',
-        subscription: 'Gold',
-        amount: 150.00,
-        status: 'Pending',
-      ),
-    OrderData(
-        orderId: 'ORD-1001',
-        userEmail: 'john.doe@example.com',
-        notes: 'Please deliver ASAP',
-        date: '2025-08-01',
-        subscription: 'Gold',
-        amount: 150.00,
-        status: 'Pending',
-      ),
-    OrderData(
-        orderId: 'ORD-1001',
-        userEmail: 'john.doe@example.com',
-        notes: 'Please deliver ASAP',
-        date: '2025-08-01',
-        subscription: 'Gold',
-        amount: 150.00,
-        status: 'Pending',
-      ),
-    OrderData(
-        orderId: 'ORD-1001',
-        userEmail: 'john.doe@example.com',
-        notes: 'Please deliver ASAP',
-        date: '2025-08-01',
-        subscription: 'Gold',
-        amount: 150.00,
-        status: 'Pending',
-      ),
-    OrderData(
-        orderId: 'ORD-1001',
-        userEmail: 'john.doe@example.com',
-        notes: 'Please deliver ASAP',
-        date: '2025-08-01',
-        subscription: 'Gold',
-        amount: 150.00,
-        status: 'Pending',
-      ),
-    OrderData(
-        orderId: 'ORD-1001',
-        userEmail: 'john.doe@example.com',
-        notes: 'Please deliver ASAP',
-        date: '2025-08-01',
-        subscription: 'Gold',
-        amount: 150.00,
-        status: 'Pending',
-      ),
-      OrderData(
-        orderId: 'ORD-1002',
-        userEmail: 'jane.smith@example.com',
-        notes: 'Gift item, handle with care',
-        date: '2025-08-02',
-        subscription: 'Silver',
-        amount: 89.99,
-        status: 'Completed',
-      ),
-      OrderData(
-        orderId: 'ORD-1003',
-        userEmail: 'mark.brown@example.com',
-        notes: 'Leave at doorstep',
-        date: '2025-08-03',
-        subscription: 'Platinum',
-        amount: 299.49,
-        status: 'Failed',
-      ),
-  ].obs;
+  var is_loading = true.obs;
 
+  UsersModel? userModel;
 
-   List<ActivityUserInfo> getActivities=  [
-      ActivityUserInfo(dateTime: 'May 30, 2025 — 2:45 PM', activity: 'Made a payment', platform: 'iOS'),
-      ActivityUserInfo(dateTime: 'June 15, 2025 — 4:15 AM', activity: 'Signed up (Google)', platform: 'Android'),
-      ActivityUserInfo(dateTime: 'June 09, 2025 — 1:25 AM', activity: 'Uploaded a photo', platform: 'Web app'),
-      ActivityUserInfo(dateTime: 'May 30, 2025 — 2:45 PM', activity: 'Made a payment', platform: 'iOS'),
-      ActivityUserInfo(dateTime: 'June 15, 2025 — 4:15 AM', activity: 'Signed up (Google)', platform: 'Android'),
-      ActivityUserInfo(dateTime: 'June 09, 2025 — 1:25 AM', activity: 'Uploaded a photo', platform: 'Web app'),
-      ActivityUserInfo(dateTime: 'June 09, 2025 — 1:25 AM', activity: 'Uploaded a photo', platform: 'Web app'),
-      ActivityUserInfo(dateTime: 'June 09, 2025 — 1:25 AM', activity: 'Uploaded a photo', platform: 'Web app'),
-      ActivityUserInfo(dateTime: 'June 09, 2025 — 1:25 AM', activity: 'Uploaded a photo', platform: 'Web app'),
-      ActivityUserInfo(dateTime: 'June 09, 2025 — 1:25 AM', activity: 'Uploaded a photo', platform: 'Web app'),
-      ActivityUserInfo(dateTime: 'June 09, 2025 — 1:25 AM', activity: 'Uploaded a photo', platform: 'Web app'),
-      ActivityUserInfo(dateTime: 'June 09, 2025 — 1:25 AM', activity: 'Uploaded a photo', platform: 'Web app'),
-      ActivityUserInfo(dateTime: 'June 09, 2025 — 1:25 AM', activity: 'Uploaded a photo', platform: 'Web app'),
-    ].obs;
-  
-   List<ActivityUserInfo> orders=  [
-      ActivityUserInfo(dateTime: 'May 30, 2025 — 2:45 PM', activity: 'Made a payment', platform: 'iOS'),
-      ActivityUserInfo(dateTime: 'June 15, 2025 — 4:15 AM', activity: 'Signed up (Google)', platform: 'Android'),
-      ActivityUserInfo(dateTime: 'June 09, 2025 — 1:25 AM', activity: 'Uploaded a photo', platform: 'Web app'),
-      ActivityUserInfo(dateTime: 'May 30, 2025 — 2:45 PM', activity: 'Made a payment', platform: 'iOS'),
-      ActivityUserInfo(dateTime: 'June 15, 2025 — 4:15 AM', activity: 'Signed up (Google)', platform: 'Android'),
-      ActivityUserInfo(dateTime: 'June 09, 2025 — 1:25 AM', activity: 'Uploaded a photo', platform: 'Web app'),
-      ActivityUserInfo(dateTime: 'June 09, 2025 — 1:25 AM', activity: 'Uploaded a photo', platform: 'Web app'),
-      ActivityUserInfo(dateTime: 'June 09, 2025 — 1:25 AM', activity: 'Uploaded a photo', platform: 'Web app'),
-      ActivityUserInfo(dateTime: 'June 09, 2025 — 1:25 AM', activity: 'Uploaded a photo', platform: 'Web app'),
-      ActivityUserInfo(dateTime: 'June 09, 2025 — 1:25 AM', activity: 'Uploaded a photo', platform: 'Web app'),
-      ActivityUserInfo(dateTime: 'June 09, 2025 — 1:25 AM', activity: 'Uploaded a photo', platform: 'Web app'),
-      ActivityUserInfo(dateTime: 'June 09, 2025 — 1:25 AM', activity: 'Uploaded a photo', platform: 'Web app'),
-      ActivityUserInfo(dateTime: 'June 09, 2025 — 1:25 AM', activity: 'Uploaded a photo', platform: 'Web app'),
-    ].obs;
-  
-  
-    var selectedScreen = 'Basic Info'.obs;
+  var orderList = <UsersOrderData>[].obs;
+  var moderationList = <UsersModerationHistory>[].obs;
+
+  UserInfoDetailController({this.userModel});
+
+  @override
+  void onInit() {
+    super.onInit();
+    if (userModel?.id != null) {
+      fetchUsersOrderData();
+      fetchUsersModerationData();
+    }
+  }
+
+  void setUserModel(UsersModel? user) {
+    userModel = user;
+    if (userModel?.id != null) {
+      fetchUsersOrderData();
+      fetchUsersModerationData();
+    }
+  }
+
+  void fetchUsersOrderData() {
+    if (userModel?.id == null) return;
+
+    is_loading.value = true;
+    usersInfoRepository.getUsersOrderData(userModel!.id!).then((response) {
+      response.fold((error) {
+        is_loading.value = false;
+      }, (success) {
+        orderList.value = success;
+        is_loading.value = false;
+      });
+    });
+  }
+
+  void blockUser(BuildContext context) {
+    if (userModel?.id == null) return;
+
+    is_loading.value = true;
+    usersInfoRepository.blockUser(userModel!.id!).then((response) {
+      response.fold((error) {
+        is_loading.value = false;
+        showCustomSnackbar(
+            context: context, message: error, type: SnackbarType.error);
+      }, (success) {
+        is_loading.value = false;
+      });
+    });
+  }
+
+  void unblockUser(BuildContext context) {
+    if (userModel?.id == null) return;
+
+    is_loading.value = true;
+    usersInfoRepository.unblockUser(userModel!.id!).then((response) {
+      response.fold((error) {
+        is_loading.value = false;
+        showCustomSnackbar(
+            context: context, message: error, type: SnackbarType.error);
+      }, (success) {
+        is_loading.value = false;
+      });
+    });
+  }
+
+  void fetchUsersModerationData() {
+    if (userModel?.id == null) return;
+
+    is_loading.value = true;
+    usersInfoRepository.getUsersModerationData(userModel!.id!).then((response) {
+      response.fold((error) {
+        is_loading.value = false;
+      }, (success) {
+        moderationList.value = success;
+        is_loading.value = false;
+      });
+    });
+  }
+
+  var selectedScreen = 'Basic Info'.obs;
   void changeScreen(String screen) => selectedScreen.value = screen;
-
-
-  // 'May 30, 2025 — 2:45 PM', 'Made a payment', 'iOS
-
 }

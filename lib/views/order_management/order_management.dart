@@ -1,7 +1,8 @@
-import 'package:admin/controller/orders_management_controller/order_management.dart';
+import 'package:admin/controller/orders_management_controller/order_management_controller.dart';
 import 'package:admin/views/order_management/orders_list_widget/orders_list_widget.dart';
 import 'package:admin/views/order_management/revenue_chart/order_revenue_chart.dart';
 import 'package:admin/views/order_management/subscription_chart/subscription_chart.dart';
+import 'package:admin/widgets/jumping_dots.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -21,55 +22,67 @@ class OrderManagement extends StatelessWidget {
         final isTablet = screenWidth > 600 && screenWidth <= 1200;
         final isMobile = screenWidth <= 600;
 
-        return SingleChildScrollView(
-          padding: EdgeInsets.all(isMobile
-              ? 16
-              : isTablet
-                  ? 20
-                  : 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-                Obx(() => _buildStatCardsSection(controller, isDesktop, isTablet, isMobile, isDark)),
-              SizedBox(
-                  height: isMobile
+         return Obx(() {
+            if (controller.isLoadingRevenue.value & controller.isLoadingSubscriberAnalytics.value) {
+              return Row(
+                children: [
+                  Spacer(),
+                  JumpingDots(numberOfDots: 3),
+                  Spacer(),
+                ],
+              );
+            }
+            return SingleChildScrollView(
+              padding: EdgeInsets.all(isMobile
+                  ? 16
+                  : isTablet
                       ? 20
-                      : isTablet
-                          ? 24
-                          : 30),
-              _buildChartsSection(
-                controller,
-                isDesktop,
-                isTablet,
-                isMobile,
-              ),
-              SizedBox(
-                  height: isMobile
-                      ? 20
-                      : isTablet
-                          ? 24
-                          : 30),
-              Container(
-                height: isMobile
-                    ? 600
-                    : isTablet
+                      : 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                    Obx(() => _buildStatCardsSection(controller, isDesktop, isTablet, isMobile, isDark)),
+                  SizedBox(
+                      height: isMobile
+                          ? 20
+                          : isTablet
+                              ? 24
+                              : 30),
+                  _buildChartsSection(
+                    controller,
+                    isDesktop,
+                    isTablet,
+                    isMobile,
+                  ),
+                  SizedBox(
+                      height: isMobile
+                          ? 20
+                          : isTablet
+                              ? 24
+                              : 30),
+                  Container(
+                    height: isMobile
                         ? 600
-                        : 700,
-                decoration: BoxDecoration(
-                  color: isDark ? Color(0xFF23272F) : Colors.white,
-                  border: Border.all(
-                      width: 0.4,
-                      color: isDark ? Colors.grey.shade600 : Colors.grey),
-                  borderRadius: BorderRadius.circular(isMobile ? 16 : 25),
-                ),
-                child: OrdersListWidget(
-                  controller: controller,
-                  isMobile: isMobile,
-                  isTablet: isTablet,
-                ),
+                        : isTablet
+                            ? 600
+                            : 700,
+                    decoration: BoxDecoration(
+                      color: isDark ? Color(0xFF23272F) : Colors.white,
+                      border: Border.all(
+                          width: 0.4,
+                          color: isDark ? Colors.grey.shade600 : Colors.grey),
+                      borderRadius: BorderRadius.circular(isMobile ? 16 : 25),
+                    ),
+                    child: OrdersListWidget(
+                      controller: controller,
+                      isMobile: isMobile,
+                      isTablet: isTablet,
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          }
         );
       },
     );

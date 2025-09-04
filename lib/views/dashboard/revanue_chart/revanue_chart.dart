@@ -1,6 +1,5 @@
 import 'package:admin/controller/dashboard_controller/dashboard_controller.dart';
 import 'package:admin/models/dashboard/dashboard_revenue_chart_model.dart';
-import 'package:admin/models/revanue_data.dart';
 import 'package:admin/theme/text_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

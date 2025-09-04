@@ -26,7 +26,7 @@ class OrdersData {
   final String email;
   final String planName;
   final double amount;
-  final String currency;
+   String currency;
   final String status;
   final String platform;
   final DateTime createdAt;

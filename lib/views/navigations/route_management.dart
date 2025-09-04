@@ -3,8 +3,7 @@ import 'package:admin/main.dart';
 import 'package:admin/views/navigations/app_navigation.dart';
 import 'package:go_router/go_router.dart';
 
-// Import views
-import 'package:admin/views/splash/splash_screen.dart';
+
 import 'package:admin/views/login/login.dart';
 import 'package:admin/views/layout/layout.dart';
 import 'package:admin/views/dashboard/dashboard.dart';
@@ -23,12 +22,12 @@ class AppRouter {
     routes: [
       GoRoute(
         path: AppRoutes.login,
-        name: 'login', // 👈 add this
+        name: 'login', 
         builder: (context, state) => SnapIdLoginScreen(),
         redirect: (context, state) {
           final token = localStorage.getString("token");
           if (token != null && token.isNotEmpty) return '/';
-          return null; // stay on login
+          return null; 
         },
       ),
       ShellRoute(
@@ -36,7 +35,7 @@ class AppRouter {
         routes: [
           GoRoute(
             path: '/',
-            name: 'dashboard', // 👈 add this
+            name: 'dashboard', 
             builder: (context, state) => DashboardContent(),
             redirect: (context, state) {
               final token = localStorage.getString("token");

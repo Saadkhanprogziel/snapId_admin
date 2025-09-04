@@ -1,7 +1,6 @@
 import 'package:admin/views/login/auth_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:go_router/go_router.dart';
 import '../../controller/auth_controller/auth_controller.dart';
 
 class SnapIdLoginScreen extends StatelessWidget {
@@ -35,7 +34,6 @@ class SnapIdLoginScreen extends StatelessWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            // ✅ LOGO
                             Container(
                               margin: const EdgeInsets.only(bottom: 60),
                               child: Column(
@@ -53,7 +51,6 @@ class SnapIdLoginScreen extends StatelessWidget {
                               ),
                             ),
 
-                            // ✅ LOGIN CARD
                             Container(
                               padding: const EdgeInsets.all(50),
                               decoration: BoxDecoration(
@@ -77,7 +74,6 @@ class SnapIdLoginScreen extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 40),
 
-                                  // ✅ EMAIL FIELD
                                   AuthTextField(
                                     hintText: 'Email',
                                     autovalidateMode:
@@ -96,7 +92,6 @@ class SnapIdLoginScreen extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 20),
 
-                                  // ✅ PASSWORD FIELD
                                   AuthTextField(
                                     hintText: 'Password',
                                     isPasswordField: true,
@@ -115,7 +110,6 @@ class SnapIdLoginScreen extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 32),
 
-                                  // ✅ LOGIN BUTTON
                                   SizedBox(
                                     width: double.infinity,
                                     height: 55,

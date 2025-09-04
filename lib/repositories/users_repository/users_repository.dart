@@ -10,25 +10,34 @@ class Failure {
 }
 
 class UserRepository {
- 
- 
   Future<Either<Failure, GetAllUsersResponse>> getAllUsers({
     required int page,
     required int pageSize,
     required String status,
+    required String startDate,
+    required String endDate,
+    required String sortBy,
+    required String subscription,
+    required String platform,
+    required String searchQuery,
   }) async {
     try {
+      final extraQuery = {
+        "page": page,
+        "pageSize": pageSize,
+        "status": status,
+        "startDate": startDate,
+        "endDate": endDate,
+        "sortBy": sortBy,
+        "platform": platform,
+        "searchQuery":searchQuery
+      };
       final response = await networkRepository.get(
-        url: "admin/users/get-all-users",
-        extraQuery: {
-          "page": page,
-          "pageSize": pageSize,
-          "status": status,
-        },
-      );
+          url: "admin/users/get-all-users", extraQuery: extraQuery);
 
       if (!response.failed) {
-        final usersResponse = GetAllUsersResponse.fromMap(response.data['data']);
+        final usersResponse =
+            GetAllUsersResponse.fromMap(response.data['data']);
         print("maheen ${usersResponse.users.length}");
         return Right(usersResponse);
       } else {
@@ -41,7 +50,7 @@ class UserRepository {
     }
   }
 
-  Future<Either<Failure, UserAnalytics >> getUserAlalytics({
+  Future<Either<Failure, UserAnalytics>> getUserAlalytics({
     required int page,
     required int pageSize,
     required String status,

@@ -94,13 +94,13 @@ class SideMenu extends StatelessWidget {
                     route: "/price-settings",
                     selected: currentRoute == '/price-settings',
                   ),
-                  _sideMenuItem(
-                    context,
-                    icon: "assets/icons/activity.svg",
-                    label: "User Activity",
-                    route: "/user-activity",
-                    selected: currentRoute == '/user-activity',
-                  ),
+                  // _sideMenuItem(
+                  //   context,
+                  //   icon: "assets/icons/activity.svg",
+                  //   label: "User Activity",
+                  //   route: "/user-activity",
+                  //   selected: currentRoute == '/user-activity',
+                  // ),
                   _sideMenuItem(
                     context,
                     icon: "assets/icons/analytics.svg",

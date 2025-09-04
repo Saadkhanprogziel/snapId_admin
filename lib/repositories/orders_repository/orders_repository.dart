@@ -32,7 +32,8 @@ class OrdersRepository {
     }
   }
 
-  Future<Either<String, SubscriptionAnalyticsData>> getSubscriberAnalyticsData(filter) async {
+  Future<Either<String, SubscriptionAnalyticsData>> getSubscriberAnalyticsData(
+      filter) async {
     final response = await networkRepository.get(
         url: "admin/orders/get-total-subscription-count?filterType=$filter");
     if (!response.failed) {
@@ -47,31 +48,43 @@ class OrdersRepository {
     }
   }
 
-Future<Either<String, OrdersResponse>> getAllOrders({
-  required int page,
-  required int pageSize,
-  required String status,
-}) async {
-  try {
-    final response = await networkRepository.get(
-      url: "admin/orders/get-all-orders",
-      extraQuery: {
+  Future<Either<String, OrdersResponse>> getAllOrders({
+    required int page,
+    required int pageSize,
+    required String status,
+    required String startDate,
+    required String endDate,
+    required String sortBy,
+    required String subscription,
+    required String platform,
+    required String searchQuery,
+  }) async {
+    try {
+      final extraQuery = {
         "page": page,
         "pageSize": pageSize,
         "status": status,
-      },
-    );
+        "startDate": startDate,
+        "endDate": endDate,
+        "sortBy": sortBy,
+        "platform": platform,
+        "searchQuery": searchQuery
+      };
+      print('getAllOrders extraQuery: $extraQuery');
+      final response = await networkRepository.get(
+        url: "admin/orders/get-all-orders",
+        extraQuery: extraQuery,
+      );
 
-    if (!response.failed && response.data != null) {
-      // Parse JSON into OrdersResponse
-      final ordersResponse = OrdersResponse.fromJson(response.data['data']);
-      return Right(ordersResponse);
-    } else {
-      return Left(response.message ?? "Unknown error");
+      if (!response.failed && response.data != null) {
+        final ordersResponse = OrdersResponse.fromJson(response.data['data']);
+
+        return Right(ordersResponse);
+      } else {
+        return Left(response.message);
+      }
+    } catch (e) {
+      return Left(e.toString());
     }
-  } catch (e) {
-    return Left(e.toString());
   }
-}
-
 }
