@@ -2,7 +2,7 @@ import 'package:admin/controller/app_controller.dart';
 import 'package:admin/controller/recent_activities_controller/recent_activites_contoller.dart';
 import 'package:admin/models/chartsTablesModel.dart';
 import 'package:admin/utils/custom_spaces.dart';
-import 'package:admin/views/user_management/user_detail_info_content/user_detail_info_content.dart';
+import 'package:admin/views/user_management/user_details/user_detail_info_content.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

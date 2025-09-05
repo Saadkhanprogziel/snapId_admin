@@ -19,12 +19,14 @@ class UsersModerationHistory {
 
   factory UsersModerationHistory.fromJson(Map<String, dynamic> json) {
     return UsersModerationHistory(
-      id: json['id'],
-      userId: json['userId'],
-      actionType: json['actionType'],
-      reason: json['reason'],
+      id: json['id'] ?? '',
+      userId: json['userId'] ?? '',
+      actionType: json['actionType'] ?? '',
+      reason: json['reason'] ?? '',
       performedBy: json['performedBy'],
-      performedAt: DateTime.parse(json['performedAt']),
+      performedAt: json['performedAt'] != null
+          ? DateTime.parse(json['performedAt'])
+          : DateTime.fromMillisecondsSinceEpoch(0),
     );
   }
 

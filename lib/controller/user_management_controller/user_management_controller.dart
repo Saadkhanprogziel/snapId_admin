@@ -9,7 +9,7 @@ import 'package:get/get_rx/src/rx_workers/utils/debouncer.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class UserManagementController extends GetxController {
-  // Filter variables
+  
   var selectedStatus = 'ALL'.obs;
   var selectedSort = 'Newest'.obs;
   var selectedSubscription = 'ALL'.obs;
@@ -19,7 +19,7 @@ class UserManagementController extends GetxController {
   var searchQuery = ''.obs;
   final debouncer = Debouncer(delay: Duration(milliseconds: 300));
 
-  // Filter options
+  
   final List<String> statusFilter = [
     'ALL',
     'ACTIVE',
@@ -42,7 +42,7 @@ class UserManagementController extends GetxController {
     'WEB_APP',
   ];
 
-  // Pagination and filtering functions
+  
   void applyFilters() {
     currentPage.value = 0;
     fetchUserStatsData();
@@ -77,7 +77,7 @@ class UserManagementController extends GetxController {
   var currentPage = 0.obs;
   var userStatsData = Rxn<UserStatsModel>();
   var usersData = <UsersModel>[].obs;
-  var pagination = Rxn<PaginationModel>(); // Add pagination observable
+  var pagination = Rxn<PaginationModel>(); 
   final userRepo = UserRepository();
   final userAnalytics = Rxn<UserAnalytics>();
   var isLoading = false.obs;
@@ -89,9 +89,33 @@ class UserManagementController extends GetxController {
     fetchUserAnalytics();
   }
 
+
+  void checkMethod(int index, UsersModel userModel) {
+  print("checkinggggg");
+  
+  
+  
+  if (index != -1 && index < usersData.length) {
+    usersData[index] = userModel; 
+
+    print(usersData[index].isActive);
+
+  }
+  
+  
+  int orderIndex = orderList.indexWhere((u) => u.id == userModel.id);
+  if (orderIndex != -1) {
+    orderList[orderIndex] = userModel; 
+  }
+  
+  
+  usersData.refresh();
+  orderList.refresh();
+}
+
   void searchOrders(String query) {
     searchQuery.value = query;
-    currentPage.value = 0; // Reset to first page
+    currentPage.value = 0; 
     debouncer.call(() {
       fetchUserStatsData();
     });
@@ -99,7 +123,7 @@ class UserManagementController extends GetxController {
 
   fetchUserStatsData() async {
     isLoading.value = true;
-    // Prepare filter parameters
+    
     String status = selectedStatus.value;
     String sortBy = selectedSort.value;
     String subscription = selectedSubscription.value;
@@ -130,8 +154,8 @@ class UserManagementController extends GetxController {
       (response) {
         usersData.value = response.users;
         orderList
-            .assignAll(response.users); // Use real data instead of mock data
-        pagination.value = response.pagination; // Store pagination info
+            .assignAll(response.users); 
+        pagination.value = response.pagination; 
         isLoading.value = false;
       },
     );
@@ -140,7 +164,7 @@ class UserManagementController extends GetxController {
   fetchUserAnalytics() async {
     isLoading.value = true;
     final result = await userRepo.getUserAlalytics(
-      page: currentPage.value + 1, // API pages usually start from 1
+      page: currentPage.value + 1, 
       pageSize: 10,
       status: "ALL",
     );
@@ -153,7 +177,7 @@ class UserManagementController extends GetxController {
         userAnalytics.value = response;
         isLoading.value = false;
 
-        // ✅ Update observables directly from API response
+        
 
         updatePlatformUsers(response.mobileUsers, response.webUsers);
         updateUserStatus(response.activeUsers, response.suspendedUsers);
@@ -164,10 +188,10 @@ class UserManagementController extends GetxController {
     );
   }
 
-  // This will now hold the filtered UsersModel data
+  
   final RxList<UsersModel> orderList = <UsersModel>[].obs;
 
-  // Observable variables for stats
+  
   final RxInt totalUsers = 12480.obs;
   final RxDouble growthPercentage = 28.4.obs;
   final RxString growthPeriod = 'Since Mar 2025'.obs;
@@ -199,13 +223,13 @@ class UserManagementController extends GetxController {
 
   final RxnInt touchedIndex = RxnInt();
 
-  // Computed getters
+  
   int get totalPlatformUsers => mobileUsers.value + webUsers.value;
   int get totalStatusUsers => activeUsers.value + suspendedUsers.value;
   int get totalSignupUsers =>
       googleSignups.value + appleSignups.value + emailSignups.value;
 
-  // Updated filtering method for UsersModel
+  
   void filterUsers(String query) {
     if (query.isEmpty) {
       orderList.assignAll(usersData);
@@ -219,7 +243,7 @@ class UserManagementController extends GetxController {
             user.phoneNo.toLowerCase().contains(lowerQuery);
       }));
     }
-    currentPage.value = 0; // Reset pagination
+    currentPage.value = 0; 
   }
 
   void updatePlatformUsers(int mobile, int web) {
@@ -246,6 +270,6 @@ class UserManagementController extends GetxController {
     touchedIndex.value = index;
   }
 
-  // Simulated API call for stats
+  
   Future<void> fetchUserData() async {}
 }

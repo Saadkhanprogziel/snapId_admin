@@ -257,7 +257,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   Widget _buildResponsiveOrderDetails(OrdersData? order, bool isDark) {
     final isMobile = _isMobile(context);
     
-    // Define all the detail items
     final List<Map<String, dynamic>> detailItems = [
       {
         'label': 'Order ID:',
@@ -302,16 +301,17 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             ? DateFormat('MMM dd, yyyy - hh:mm a').format(order.createdAt)
             : '-',
         'pair': {
-          'label': 'Invoice:',
-          'value': 'View',
-          'isLink': true,
+          'label': '',
+          'value': '',
         }
       },
     ];
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: detailItems.map((item) {
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
               padding: _getContentPadding(context),
@@ -332,6 +332,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
   Widget _buildMobileDetailRow(Map<String, dynamic> item, bool isDark) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // First item
         _buildDetailItem(
@@ -342,12 +343,13 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         ),
         const SizedBox(height: 16),
         // Second item (pair)
-        _buildDetailItem(
-          item['pair']['label'], 
-          item['pair']['value'],
-          link: item['pair']['isLink'] ?? false,
-          isDark: isDark,
-        ),
+        if ((item['pair']['label'] as String).isNotEmpty)
+          _buildDetailItem(
+            item['pair']['label'],
+            item['pair']['value'],
+            link: item['pair']['isLink'] ?? false,
+            isDark: isDark,
+          ),
       ],
     );
   }
@@ -363,14 +365,15 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             isDark: isDark,
           ),
         ),
-        Expanded(
-          child: _buildDetailItem(
-            item['pair']['label'], 
-            item['pair']['value'],
-            link: item['pair']['isLink'] ?? false,
-            isDark: isDark,
+        if ((item['pair']['label'] as String).isNotEmpty)
+          Expanded(
+            child: _buildDetailItem(
+              item['pair']['label'],
+              item['pair']['value'],
+              link: item['pair']['isLink'] ?? false,
+              isDark: isDark,
+            ),
           ),
-        ),
       ],
     );
   }
@@ -469,32 +472,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           ),
         ),
       );
-    } else if (link) {
-      return InkWell(
-        onTap: () {
-          // Implement invoice viewing logic here
-        },
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.visibility_outlined,
-              size: isMobile ? 14 : 16,
-              color: Color(0xFF6366F1),
-            ),
-            const SizedBox(width: 4),
-            Text(
-              value,
-              style: TextStyle(
-                color: Color(0xFF6366F1),
-                fontSize: fontSize,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      );
-    } else {
+    }  else {
       return Text(
         value,
         style: TextStyle(

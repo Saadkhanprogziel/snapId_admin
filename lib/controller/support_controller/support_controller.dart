@@ -1,19 +1,18 @@
 import 'package:admin/models/chartsTablesModel.dart';
+import 'package:admin/repositories/support_repository/support_repository.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class SupportController extends GetxController {
-  // Filter states
+  SupportRepository supportRepository = SupportRepository();
   var selectedStatus = 'All'.obs;
   var selectedSort = 'All'.obs;
   var selectedSubscription = 'All'.obs;
-  var showFilter = false.obs; // Moved showFilter to SupportController
   final List<String> status_filter = ['All','Open', 'Closed'];
   final List<String> sort_filter = ['All','Newest', 'Oldest'];
   final List<String> subscription_filter = ['All','photo 1', 'photo 3', 'photo 6'];
 
-  // Existing chart-related states
   var selectedQueriesPeriod = 'This Week'.obs;
   var selectedStatusPeriod = 'This Week'.obs;
   final List<String> periods = ['This Week', 'This Month', 'This Year'];
@@ -61,24 +60,19 @@ class SupportController extends GetxController {
         status: "Pending",
         emailAddress: "Tom@gmail.com",
         subscription: "Premium"),
-    // Add more varied data as needed
   ].obs;
 
-  // Original list to restore on reset
   final List<SupportDataModel> _originalTicketList = [];
 
   @override
   void onInit() {
     super.onInit();
-    // Store original list for resetting filters
     _originalTicketList.addAll(ticketList);
   }
 
-  // Filter and sort logic
   void applyFilters() {
     var filteredList = _originalTicketList.toList();
 
-    // Filter by status
     if (selectedStatus.value.isNotEmpty) {
       filteredList = filteredList
           .where((ticket) =>
@@ -86,7 +80,6 @@ class SupportController extends GetxController {
           .toList();
     }
 
-    // Filter by subscription
     if (selectedSubscription.value.isNotEmpty) {
       filteredList = filteredList
           .where((ticket) => ticket.subscription.toLowerCase() ==
@@ -94,7 +87,6 @@ class SupportController extends GetxController {
           .toList();
     }
 
-    // Sort
     if (selectedSort.value.isNotEmpty) {
       switch (selectedSort.value) {
         case 'Newest':
@@ -110,20 +102,19 @@ class SupportController extends GetxController {
     }
 
     ticketList.value = filteredList;
-    currentPage.value = 0; // Reset to first page
-    showFilter.value = false; // Close filter panel
   }
+
+  // void fetchAllTickets(){
+  //   supportRepository.getAllTickets(page: currentPage.value, pageSize: 10, status: selectedStatus.value, startDate: startDate, endDate: endDate, sortBy: sortBy, platform: platform, searchQuery: searchQuery).then(onValue)
+  // }
 
   void resetFilters() {
     selectedStatus.value = '';
     selectedSort.value = '';
     selectedSubscription.value = '';
     ticketList.value = _originalTicketList.toList();
-    currentPage.value = 0; // Reset to first page
-    showFilter.value = false; // Close filter panel
   }
 
-  // Existing chart-related code (unchanged)
   var totalQueries = 182.obs;
   var queriesChartTitle = 'Total Queries'.obs;
 

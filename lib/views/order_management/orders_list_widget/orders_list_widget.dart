@@ -87,7 +87,7 @@ class OrdersListWidget extends StatelessWidget {
                                 label: Text('Created Date'),
                                 size: ColumnSize.M),
                             DataColumn2(
-                                label: Text('Status'), size: ColumnSize.S),
+                                label: Text('Status'), size: ColumnSize.L),
                             DataColumn2(
                                 label: Text('Actions'), size: ColumnSize.S),
                           ],
@@ -98,7 +98,9 @@ class OrdersListWidget extends StatelessWidget {
                               DataCell(
                                   Text('\$${order.amount.toStringAsFixed(2)}')),
                               DataCell(Text(order.currency.toUpperCase())),
-                              DataCell(Text(order.platform)),
+                              DataCell(Text(order.platform == "MOBILE_APP"
+                                  ? "Mobile App"
+                                  : "Web App")),
                               DataCell(Text(_formatDate(order.createdAt))),
                               DataCell(_buildStatusChip(order.status)),
                               DataCell(
@@ -197,15 +199,13 @@ class OrdersListWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (!isMobile) ...[
-              Text(
-                "Filter",
-                style: TextStyle(
-                  fontSize: isTablet ? 12 : 14,
-                ),
+            Text(
+              "Filter",
+              style: TextStyle(
+                fontSize: isTablet ? 12 : 14,
               ),
-              const SizedBox(width: 6),
-            ],
+            ),
+            const SizedBox(width: 6),
             Icon(
               Icons.filter_list,
               size: isMobile ? 14 : 16,
@@ -465,74 +465,110 @@ class OrdersListWidget extends StatelessWidget {
   }
 
   Widget _buildHeaderSection(BuildContext context) {
-    if (isMobile) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 12),
-          Row(
+    return isMobile
+        ? Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(child: _buildFilterButton(context)),
-            ],
-          ),
-        ],
-      );
-    } else {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            "Orders",
-            style: CustomTextTheme.regular20,
-          ),
-          Row(
-            children: [
-              // Search Bar
-              SizedBox(
-                width: 250,
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.search, color: Colors.grey.shade600),
-                    hintText: 'Search orders...',
-                    hintStyle:
-                        TextStyle(fontSize: 12, color: Colors.grey.shade500),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(25),
-                      borderSide: BorderSide(
-                        color: Colors.grey.shade300,
-                        width: 1,
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  // Search Bar
+                  Expanded(
+                    child: SizedBox(
+                      height: 40,
+                      child: TextFormField(
+                        decoration: InputDecoration(
+                          prefixIcon: Icon(Icons.search, color: Colors.grey.shade600),
+                          hintText: 'Search orders...',
+                          hintStyle: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                          contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(25),
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade300,
+                              width: 1,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(25),
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade300,
+                              width: 1,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(25),
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade300,
+                              width: 1,
+                            ),
+                          ),
+                          isDense: true,
+                        ),
+                        onChanged: (value) {
+                          controller.searchOrders(value);
+                        },
                       ),
                     ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(25),
-                      borderSide: BorderSide(
-                        color: Colors.grey.shade300,
-                        width: 1,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(25),
-                      borderSide: BorderSide(
-                        color: Colors.grey.shade300,
-                        width: 1,
-                      ),
-                    ),
-                    isDense: true,
                   ),
-                  onChanged: (value) {
-                    
-                    controller.searchOrders(value);
-                  },
-                ),
+                  const SizedBox(width: 8),
+                  _buildFilterButton(context),
+                ],
               ),
-              const SizedBox(width: 12),
-              _buildFilterButton(context),
             ],
-          ),
-        ],
-      );
-    }
+          )
+        : Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Orders",
+                style: CustomTextTheme.regular20,
+              ),
+              Row(
+                children: [
+                  // Search Bar
+                  SizedBox(
+                    width: 250,
+                    child: TextFormField(
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(Icons.search, color: Colors.grey.shade600),
+                        hintText: 'Search orders...',
+                        hintStyle: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25),
+                          borderSide: BorderSide(
+                            color: Colors.grey.shade300,
+                            width: 1,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25),
+                          borderSide: BorderSide(
+                            color: Colors.grey.shade300,
+                            width: 1,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25),
+                          borderSide: BorderSide(
+                            color: Colors.grey.shade300,
+                            width: 1,
+                          ),
+                        ),
+                        isDense: true,
+                      ),
+                      onChanged: (value) {
+                        controller.searchOrders(value);
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  _buildFilterButton(context),
+                ],
+              ),
+            ],
+          );
   }
 
   // Helper method to format date
@@ -629,7 +665,7 @@ class OrdersListWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (label.isNotEmpty && !isMobile) ...[
+            if (label.isNotEmpty) ...[
               Text(
                 label,
                 style: TextStyle(

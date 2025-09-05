@@ -1,13 +1,12 @@
 import 'package:admin/controller/app_controller.dart';
 import 'package:admin/controller/support_controller/support_controller.dart';
-import 'package:admin/models/chartsTablesModel.dart';
 import 'package:admin/theme/text_theme.dart';
 import 'package:admin/views/support/filter_panel.dart';
+import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class SupportListWidget extends StatelessWidget {
-  
   final SupportController controller;
   final bool isMobile;
   final bool isTablet;
@@ -34,7 +33,7 @@ class SupportListWidget extends StatelessWidget {
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
           ),
           value: controller.selectedStatus.value,
-          items:controller.status_filter
+          items: controller.status_filter
               .map((status) => DropdownMenuItem(
                     value: status,
                     child: Text(status),
@@ -84,7 +83,6 @@ class SupportListWidget extends StatelessWidget {
               .toList(),
           onChanged: (value) {
             controller.selectedSubscription.value = value ?? '';
-          
           },
         ),
         const SizedBox(height: 24),
@@ -108,7 +106,6 @@ class SupportListWidget extends StatelessWidget {
               onPressed: () {
                 // Apply filter logic here
                 appController.showFilter.value = false;
-
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF4F46E5),
@@ -150,8 +147,7 @@ class SupportListWidget extends StatelessWidget {
                       : isTablet
                           ? 24
                           : 32),
-              _buildTableHeader(),
-              SizedBox(height: isMobile ? 8 : 12),
+              // DataTable replaces custom table
               Expanded(
                 child: Obx(() {
                   const itemsPerPage = 10;
@@ -164,10 +160,33 @@ class SupportListWidget extends StatelessWidget {
                   final paginatedList =
                       controller.ticketList.sublist(startIndex, endIndex);
 
-                  return ListView.builder(
-                    itemCount: paginatedList.length,
-                    itemBuilder: (context, index) =>
-                        _buildTableRow(paginatedList[index], isDark),
+                  return DataTable2(
+                    columnSpacing: 16,
+                    horizontalMargin: 12,
+                    minWidth: 900,
+                    dataRowHeight: 70,
+                    headingRowHeight: 56,
+                    columns: [
+                      DataColumn(label: Text('User ID')),
+                      DataColumn(label: Text('Name')),
+                      DataColumn(label: Text('Subject')),
+                      DataColumn(label: Text('Date')),
+                      DataColumn(label: Text('Status')),
+                      DataColumn(label: Text('Email Address')),
+                      DataColumn(label: Text('Actions')),
+                    ],
+                    rows: paginatedList.map((data) {
+                      return DataRow(cells: [
+                        DataCell(Text('${data.userId}')),
+                        DataCell(Text(data.name)),
+                        DataCell(Text(data.subject)),
+                        DataCell(Text(data.date)),
+                        DataCell(_buildStatusChip(data.status)),
+                        DataCell(Text(data.emailAddress)),
+                        DataCell(_buildFilterButton(
+                            Icons.visibility, "View", isDark)),
+                      ]);
+                    }).toList(),
                   );
                 }),
               ),
@@ -382,142 +401,6 @@ class SupportListWidget extends StatelessWidget {
     }
   }
 
-  Widget _buildTableHeader() {
-    if (isMobile) {
-      // Mobile: Show simplified header
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-        child: const Row(
-          children: [
-            Expanded(flex: 2, child: Text('Name', style: _headerStyle)),
-            Expanded(flex: 3, child: Text('Subject', style: _headerStyle)),
-            Expanded(flex: 2, child: Text('Status', style: _headerStyle)),
-            SizedBox(width: 60, child: Text('Actions', style: _headerStyle)),
-          ],
-        ),
-      );
-    } else if (isTablet) {
-      // Tablet: Show medium complexity header
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        child: const Row(children: [
-          Expanded(flex: 1, child: Text('User ID', style: _headerStyle)),
-          Expanded(flex: 2, child: Text('Name', style: _headerStyle)),
-          Expanded(flex: 2, child: Text('Subject', style: _headerStyle)),
-          Expanded(flex: 2, child: Text('Date', style: _headerStyle)),
-          Expanded(flex: 2, child: Text('Status', style: _headerStyle)),
-          SizedBox(width: 70, child: Text('Actions', style: _headerStyle)),
-        ]),
-      );
-    } else {
-      // Desktop: Show full header
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: const Row(children: [
-          Expanded(flex: 1, child: Text('User ID', style: _headerStyle)),
-          Expanded(flex: 2, child: Text('Name', style: _headerStyle)),
-          Expanded(flex: 2, child: Text('Subject', style: _headerStyle)),
-          Expanded(flex: 3, child: Text('Date', style: _headerStyle)),
-          Expanded(flex: 2, child: Text('Status', style: _headerStyle)),
-          Expanded(flex: 2, child: Text('Email Address', style: _headerStyle)),
-          SizedBox(width: 80, child: Text('Actions', style: _headerStyle)),
-        ]),
-      );
-    }
-  }
-
-  Widget _buildTableRow(
-    SupportDataModel data,
-    bool isDark,
-  ) {
-    final padding = isMobile
-        ? 8.0
-        : isTablet
-            ? 12.0
-            : 16.0;
-
-    if (isMobile) {
-      // Mobile: Simplified row
-      return Container(
-        padding: EdgeInsets.symmetric(horizontal: padding, vertical: 12),
-        decoration: BoxDecoration(
-          border: Border(
-              top: BorderSide(
-                  color: isDark ? Colors.grey.shade600 : Colors.grey,
-                  width: 0.5)),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-                flex: 2,
-                child: Text(data.name,
-                    style: _rowStyle, overflow: TextOverflow.ellipsis)),
-            Expanded(
-                flex: 3,
-                child: Text("${data.subject}",
-                    style: _rowStyle, overflow: TextOverflow.ellipsis)),
-            Expanded(flex: 2, child: _buildStatusChip(data.status)),
-            SizedBox(
-                width: 60,
-                child: _buildFilterButton(Icons.visibility, "", isDark)),
-          ],
-        ),
-      );
-    } else if (isTablet) {
-      // Tablet: Medium complexity row
-      return Container(
-        padding: EdgeInsets.symmetric(horizontal: padding, vertical: 14),
-        decoration: BoxDecoration(
-          border: Border(
-              top: BorderSide(
-                  color: isDark ? Colors.grey.shade600 : Colors.grey,
-                  width: 0.5)),
-        ),
-        child: Row(children: [
-          Expanded(flex: 1, child: Text('${data.userId}', style: _rowStyle)),
-          Expanded(
-              flex: 2,
-              child: Text(data.name,
-                  style: _rowStyle, overflow: TextOverflow.ellipsis)),
-          Expanded(flex: 2, child: Text(data.subject, style: _rowStyle)),
-          Expanded(flex: 2, child: Text('${data.date}', style: _rowStyle)),
-          Expanded(flex: 2, child: _buildStatusChip(data.status)),
-          SizedBox(
-              width: 70,
-              child: _buildFilterButton(Icons.visibility, "View", isDark)),
-        ]),
-      );
-    } else {
-      // Desktop: Full row
-      return Container(
-        padding: EdgeInsets.symmetric(horizontal: padding, vertical: 16),
-        decoration: BoxDecoration(
-          border: Border(
-              top: BorderSide(
-                  color: isDark ? Colors.grey.shade600 : Colors.grey,
-                  width: 0.5)),
-        ),
-        child: Row(children: [
-          Expanded(flex: 1, child: Text('${data.userId}', style: _rowStyle)),
-          Expanded(flex: 2, child: Text(data.name, style: _rowStyle)),
-          Expanded(flex: 2, child: Text(data.subject, style: _rowStyle)),
-          Expanded(
-              flex: 3,
-              child: Text(data.date,
-                  style: _rowStyle, overflow: TextOverflow.ellipsis)),
-          Expanded(flex: 2, child: _buildStatusChip(data.status)),
-          Expanded(
-              flex: 2,
-              child: Text(data.emailAddress,
-                  style: _rowStyle, overflow: TextOverflow.ellipsis)),
-          SizedBox(
-              width: 80,
-              child: _buildFilterButton(Icons.visibility, "View", isDark)),
-        ]),
-      );
-    }
-  }
-
   Widget _buildFilterButton(IconData icon, String label, bool isDark) {
     return GestureDetector(
       onTap: () {
@@ -559,15 +442,4 @@ class SupportListWidget extends StatelessWidget {
       ),
     );
   }
-
-  static const _headerStyle = TextStyle(
-    color: Colors.grey,
-    fontSize: 14,
-    fontWeight: FontWeight.w600,
-  );
-
-  static const _rowStyle = TextStyle(
-    fontSize: 14,
-    fontWeight: FontWeight.w500,
-  );
 }

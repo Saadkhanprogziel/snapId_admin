@@ -42,10 +42,6 @@ class SnapIDDashboard extends StatelessWidget {
   }
 }
 
-
-
-
-
 class AdminLayout extends StatelessWidget {
   final Widget child;
   const AdminLayout({required this.child, super.key});
@@ -55,6 +51,7 @@ class AdminLayout extends StatelessWidget {
     final drawerController = Get.find<AppController>();
     final screenWidth = MediaQuery.of(context).size.width;
     final isSmallScreen = screenWidth < 1000;
+    final isMobile = screenWidth < 600;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
@@ -63,8 +60,10 @@ class AdminLayout extends StatelessWidget {
       drawer: isSmallScreen ? Drawer(child: SideMenu()) : null,
       appBar: isSmallScreen
           ? AppBar(
-              backgroundColor:
-                  isDark ? Theme.of(context).scaffoldBackgroundColor : Colors.white,
+              surfaceTintColor: Colors.transparent,
+              backgroundColor: isDark
+                  ? Theme.of(context).scaffoldBackgroundColor
+                  : Colors.white,
               elevation: 0,
               leading: Builder(
                 builder: (context) => IconButton(
@@ -105,12 +104,9 @@ class AdminLayout extends StatelessWidget {
               ),
             ],
           ),
-
-          // Backdrop
           Obx(() => drawerController.isRightDrawerOpen
               ? GestureDetector(
                   onTap: drawerController.closeDrawer,
-                  
                   child: Container(
                     color: Colors.black.withOpacity(0.3),
                     width: double.infinity,
@@ -118,12 +114,15 @@ class AdminLayout extends StatelessWidget {
                   ),
                 )
               : const SizedBox.shrink()),
-
-          // Right Drawer with reactive width
           Obx(() {
-            final rightDrawerWidth = drawerController.isNotification.value
-                ? screenWidth * 0.25
-                : screenWidth * 0.70;
+            double rightDrawerWidth;
+            if (isMobile) {
+              rightDrawerWidth = screenWidth;
+            } else {
+              rightDrawerWidth = drawerController.isNotification.value
+                  ? screenWidth * 0.25
+                  : screenWidth * 0.70;
+            }
 
             return AnimatedPositioned(
               duration: const Duration(milliseconds: 400),

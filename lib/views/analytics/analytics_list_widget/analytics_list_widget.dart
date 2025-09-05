@@ -42,14 +42,12 @@ class AnalyticsListWidget extends StatelessWidget {
               final topCountries = controller.topCountries;
               final topBuyers = controller.topBuyers;
 
-              // ✅ Show loader while fetching data
            
               if (controller.isLoadingTopBuyers.value|| controller.isLoadingTopCountries.value) {
                 return const Center(child: CircularProgressIndicator());
               }
 
               if (controller.selectedTopTab.value == 0) {
-                // ✅ Top Countries
                 final showRank = topCountries.any((c) => c.rank != null);
 
                 if (topCountries.isEmpty) {
@@ -90,7 +88,6 @@ class AnalyticsListWidget extends StatelessWidget {
                   }).toList(),
                 );
               } else {
-                // ✅ Top Buyers
                 final showRank = topBuyers.any((b) => b.rank != null);
 
                 if (topBuyers.isEmpty) {
@@ -116,22 +113,28 @@ class AnalyticsListWidget extends StatelessWidget {
                         label: _headerText('Orders'), size: ColumnSize.M),
                     DataColumn2(
                         label: _headerText('Revenue'), size: ColumnSize.M),
-                    DataColumn2(
-                        label: _headerText('Action'), size: ColumnSize.M),
                   ],
                   rows: topBuyers.map((buyer) {
                     final cells = <DataCell>[];
                     if (showRank)
                       cells.add(DataCell(Text("${buyer.rank ?? ''}")));
                     cells.addAll([
-                      DataCell(Text("${buyer.firstName}")),
+                        DataCell(Row(
+                                    children: [
+                                      CircleAvatar(
+                                        radius: 18,
+                                        backgroundImage:
+                                            NetworkImage(buyer.profilePicture),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                          "${buyer.firstName} ${buyer.lastName}"),
+                                    ],
+                                  )),
                       DataCell(Text("${buyer.countryName}")),
                       DataCell(Text("${buyer.email}")),
                       DataCell(Text("${buyer.totalOrders}")),
                       DataCell(Text("${buyer.revenue}")),
-                      DataCell(_buildActionButton(
-                          Icons.remove_red_eye_outlined, "View",
-                          viewBtn: true, isDark: isDark)),
                     ]);
                     return DataRow(cells: cells);
                   }).toList(),
@@ -144,13 +147,10 @@ class AnalyticsListWidget extends StatelessWidget {
     );
   }
 
-  /// ✅ Helper for consistent header text style
   Text _headerText(String title) {
     return Text(
       title,
       style: const TextStyle(
-        fontWeight: FontWeight.w500, // medium-bold
-        color: Colors.grey, // grey color
       ),
     );
   }
@@ -242,7 +242,6 @@ class AnalyticsListWidget extends StatelessWidget {
     } else {
       return Row(
         children: [
-          // Bold Title on Left
           Obx(() => Text(
                 controller.selectedTopTab.value == 0
                     ? "Top Countries"
@@ -254,7 +253,6 @@ class AnalyticsListWidget extends StatelessWidget {
                 ),
               )),
           const Spacer(),
-          // Tabs on Right
           GestureDetector(
             onTap: () {
               controller.selectedTopTab.value = 0;

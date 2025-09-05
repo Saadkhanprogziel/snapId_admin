@@ -2,7 +2,7 @@ import 'package:admin/controller/app_controller.dart';
 import 'package:admin/controller/user_management_controller/user_management_controller.dart';
 import 'package:admin/models/users/users_model.dart';
 import 'package:admin/views/support/filter_panel.dart';
-import 'package:admin/views/user_management/user_detail_info_content/user_detail_info_content.dart';
+import 'package:admin/views/user_management/user_details/user_detail_info_content.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -12,7 +12,7 @@ class UsersListWidget extends StatelessWidget {
   final bool isMobile;
   final bool isTablet;
 
-   UsersListWidget({
+  UsersListWidget({
     Key? key,
     required this.controller,
     this.isMobile = false,
@@ -36,13 +36,12 @@ class UsersListWidget extends StatelessWidget {
             children: [
               _buildHeaderSection(context),
               const SizedBox(height: 20),
-        
               Expanded(
                 child: Obx(() {
                   if (controller.isLoading.value) {
                     return const Center(child: CircularProgressIndicator());
                   }
-        
+
                   if (controller.orderList.isEmpty) {
                     return const Center(
                       child: Text(
@@ -51,63 +50,78 @@ class UsersListWidget extends StatelessWidget {
                       ),
                     );
                   }
-        
+
                   return Column(
                     children: [
                       Expanded(
-                        child: DataTable2(
-                          columnSpacing: 12,
-                          horizontalMargin: 12,
-                          minWidth: 800,
-                          dataRowHeight: 70,
-                          headingRowHeight: 56,
-                          columns: [
-                            DataColumn2(
-                                label: const Text('Name'), size: ColumnSize.S),
-                            DataColumn2(
-                                label: const Text('Email'), size: ColumnSize.L),
-                            DataColumn2(
-                                label: const Text('Phone'), size: ColumnSize.L),
-                            DataColumn2(
-                                label: const Text('Created Date'),
-                                size: ColumnSize.M),
-                            DataColumn2(
-                                label: const Text('Credits'), size: ColumnSize.S),
-                            DataColumn2(
-                                label: const Text('Auth Provider'),
-                                size: ColumnSize.S),
-                            DataColumn2(
-                                label: const Text('Platform'), size: ColumnSize.S),
-                            DataColumn2(
-                                label: const Text('Status'), size: ColumnSize.S),
-                            DataColumn2(
-                                label: const Text('Actions'), size: ColumnSize.S),
-                          ],
-                          rows: controller.orderList.map((user) {
-                            return DataRow(cells: [
-                              DataCell(Text("${user.firstName} ${user.lastName}")),
-                              DataCell(Text(user.email)),
-                              DataCell(Text(user.phoneNo)),
-                              DataCell(Text(_formatDate(user.createdAt))),
-                              DataCell(Text('${user.credits}')),
-                              DataCell(Text(user.authProvider)),
-                              DataCell(Text(user.platform)),
-                              DataCell(_buildStatusChip(user.isActive)),
-                              DataCell(
-                                _buildActionButton(
-                                    Icons.visibility, "View", context,
-                                    userModel: user),
-                              ),
-                            ]);
-                          }).toList(),
-                        ),
+                        child: Obx(() {
+                          return DataTable2(
+                            columnSpacing: 16,
+                            horizontalMargin: 12,
+                            minWidth: 900,
+                            dataRowHeight: 70,
+                            headingRowHeight: 56,
+                            columns: const [
+                              DataColumn2(
+                                  label: Text('Name'), size: ColumnSize.L),
+                              DataColumn2(
+                                  label: Text('Email address'),
+                                  size: ColumnSize.L),
+                              DataColumn2(
+                                  label: Text('Signup Date'),
+                                  size: ColumnSize.M),
+                              DataColumn2(
+                                  label: Text('Platform'), size: ColumnSize.M),
+                              // DataColumn2(label: Text('Subscription'), size: ColumnSize.M),
+                              DataColumn2(
+                                  label: Text('Signup Method'),
+                                  size: ColumnSize.M),
+                              DataColumn2(
+                                  label: Text('Status'), size: ColumnSize.S),
+                              DataColumn2(
+                                  label: Text('Action'), size: ColumnSize.S),
+                            ],
+                            rows: controller.orderList.map((user) {
+                              return DataRow(
+                                cells: [
+                                  // Name with avatar
+                                  DataCell(Row(
+                                    children: [
+                                      CircleAvatar(
+                                        radius: 18,
+                                        backgroundImage:
+                                            NetworkImage(user.profilePicture),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                          "${user.firstName} ${user.lastName}"),
+                                    ],
+                                  )),
+                                  DataCell(Text(user.email)),
+                                  DataCell(Text(_formatDate(user.createdAt))),
+                                  DataCell(Text(user
+                                      .platform)), // Web app / Mobile app / Both
+                                  // DataCell(Text(user. ?? '-')), // e.g., Photo 1
+                                  DataCell(Text(user
+                                      .authProvider)), // Google / Apple / Email
+                                  DataCell(_buildStatusChip(user.isActive)),
+                                    DataCell(
+                                    _buildActionButton(
+                                        Icons.visibility, "View", context,
+                                        userModel: user),
+                                  ),
+                                ],
+                              );
+                            }).toList(),
+                          );
+                        }),
                       ),
-        
+
                       // 🔹 Pagination Controls
                       Obx(() {
                         final pagination = controller.pagination.value;
                         if (pagination == null) return const SizedBox();
-        
+
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           child: Row(
@@ -144,43 +158,40 @@ class UsersListWidget extends StatelessWidget {
                   );
                 }),
               ),
-             
             ],
           ),
         ),
-         Obx(() => appController.showFilter.value
-                  ? GestureDetector(
-                      onTap: () => appController.showFilter.value = false,
-                      child: AnimatedOpacity(
-                        duration: const Duration(milliseconds: 300),
-                        opacity: appController.showFilter.value ? 0.5 : 0.0,
-                        child: Container(
-                          color: Colors.transparent,
-                          width: double.infinity,
-                          height: double.infinity,
-                        ),
-                      ),
-                    )
-                  : const SizedBox.shrink()),
-        
-              // Filter Panel should always be topmost
-              CommonFilterPanel(
-                isDark: isDark,
-                filterContent: _buildFilterPanel(context, isDark, appController),
+        Obx(() => appController.showFilter.value
+            ? GestureDetector(
+                onTap: () => appController.showFilter.value = false,
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 300),
+                  opacity: appController.showFilter.value ? 0.5 : 0.0,
+                  child: Container(
+                    color: Colors.transparent,
+                    width: double.infinity,
+                    height: double.infinity,
+                  ),
+                ),
               )
+            : const SizedBox.shrink()),
+
+        // Filter Panel should always be topmost
+        CommonFilterPanel(
+          isDark: isDark,
+          filterContent: _buildFilterPanel(context, isDark, appController),
+        )
       ],
     );
   }
 
-
-    Widget _buildFilterPanel(
+  Widget _buildFilterPanel(
       BuildContext context, bool isDark, AppController appController) {
     return SingleChildScrollView(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
           Text('Status:',
               style: TextStyle(color: isDark ? Colors.white : Colors.black)),
           const SizedBox(height: 12),
@@ -421,7 +432,6 @@ class UsersListWidget extends StatelessWidget {
     }
   }
 
-
   /// 🔹 Header with Search + Filter
   Widget _buildHeaderSection(BuildContext context) {
     if (isMobile) {
@@ -497,7 +507,8 @@ class UsersListWidget extends StatelessWidget {
 
   /// 🔹 Responsive Status Chip
   Widget _buildStatusChip(String status) {
-    bool isBlocked = (status.toLowerCase()) == "block";
+    bool isBlocked = (status.toLowerCase()) == "blocked" ||
+        (status.toLowerCase()) == "deleted";
     bool isActive = (status.toLowerCase()) == "active";
 
     Color bgColor;
@@ -553,13 +564,12 @@ class UsersListWidget extends StatelessWidget {
     );
   }
 
-  /// 🔹 Responsive Action Button
   Widget _buildActionButton(IconData icon, String label, BuildContext context,
       {UsersModel? userModel}) {
     final drawerController = Get.find<AppController>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return GestureDetector(
+    return InkWell(
       onTap: () {
         if (label == "Filter") {
           final appController = Get.find<AppController>();
@@ -575,7 +585,7 @@ class UsersListWidget extends StatelessWidget {
         fit: BoxFit.scaleDown,
         child: Container(
           padding: EdgeInsets.symmetric(
-              horizontal: isMobile ? 8 : 10, vertical: isMobile ? 4 : 6),
+              horizontal: isMobile ? 8 : 10, vertical: isMobile ? 8 : 8),
           decoration: BoxDecoration(
             border: Border.all(color: Colors.grey.shade300),
             borderRadius: BorderRadius.circular(6),

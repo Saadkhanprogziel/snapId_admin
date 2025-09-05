@@ -1,20 +1,20 @@
 import 'dart:convert';
 
 class UsersModel {
-  final String id;
-  final String firstName;
-  final String lastName;
-  final String email;
-  final String profilePicture;
-  final String phoneNo;
-  final String country;
-  final String gender;
-  final String authProvider;
-  final int credits;
-  final String isActive;
-  final String platform;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  String id;
+  String firstName;
+  String lastName;
+  String email;
+  String profilePicture;
+  String phoneNo;
+  String country;
+  String gender;
+  String authProvider;
+  int credits;
+  String isActive;
+  String platform;
+  DateTime createdAt;
+  DateTime updatedAt;
 
   UsersModel({
     required this.id,
@@ -75,6 +75,41 @@ class UsersModel {
       UsersModel.fromMap(json.decode(source));
 
   String toJson() => json.encode(toMap());
+
+  /// ✅ Added copyWith
+  UsersModel copyWith({
+    String? id,
+    String? firstName,
+    String? lastName,
+    String? email,
+    String? profilePicture,
+    String? phoneNo,
+    String? country,
+    String? gender,
+    String? authProvider,
+    int? credits,
+    String? isActive,
+    String? platform,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return UsersModel(
+      id: id ?? this.id,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      email: email ?? this.email,
+      profilePicture: profilePicture ?? this.profilePicture,
+      phoneNo: phoneNo ?? this.phoneNo,
+      country: country ?? this.country,
+      gender: gender ?? this.gender,
+      authProvider: authProvider ?? this.authProvider,
+      credits: credits ?? this.credits,
+      isActive: isActive ?? this.isActive,
+      platform: platform ?? this.platform,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
 }
 
 class PaginationModel {

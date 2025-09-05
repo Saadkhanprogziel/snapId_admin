@@ -20,7 +20,7 @@ class UsersInfoRepository {
   Future<Either<String, List<UsersModerationHistory>>> getUsersModerationData(id) async {
     final response = await networkRepository.get(
         url:
-            "admin/users/get-moderation-history/0618b245-ba62-483e-b7d7-5fbd525d5d4f");
+            "admin/users/get-moderation-history/$id");
     final List<dynamic> moderations = response.data['data'];
     print(moderations);
     List<UsersModerationHistory> data =
@@ -31,8 +31,11 @@ class UsersInfoRepository {
     return Left(response.message);
   }
   
-  Future<Either<String, bool>> blockUser(id) async {
-    final response = await networkRepository.get(
+  Future<Either<String, bool>> blockUser(id,reason) async {
+    final response = await networkRepository.post(
+        data: {
+           "reason": reason
+          },
         url:
             "admin/users/block-user/$id");
   
@@ -44,7 +47,7 @@ class UsersInfoRepository {
   }
   
   Future<Either<String, bool>> unblockUser(id) async {
-    final response = await networkRepository.get(
+    final response = await networkRepository.post(
         url:
             "admin/users/unblock-user/$id");
   
