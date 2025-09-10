@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class SupportChatScreen extends StatelessWidget {
+  final FocusNode _messageFocusNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
   final TicketDetails ticket;
   SupportChatScreen({super.key, required this.ticket});
@@ -221,7 +222,7 @@ class SupportChatScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        controller.chatStatus.value,
+                        "Active",
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
@@ -319,6 +320,7 @@ class SupportChatScreen extends StatelessWidget {
                   ),
                   child: TextField(
                     controller: controller.messageTextController,
+                    focusNode: _messageFocusNode,
                     maxLines: 3,
                     minLines: 1,
                     textInputAction: TextInputAction.send,
@@ -340,6 +342,7 @@ class SupportChatScreen extends StatelessWidget {
                     onSubmitted: (value) {
                       if (value.trim().isNotEmpty) {
                         controller.sendMessage();
+                        _messageFocusNode.requestFocus();
                       }
                     },
                   ),
