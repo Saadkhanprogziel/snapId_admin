@@ -1,13 +1,12 @@
-import 'package:admin/models/orders/order_list_model.dart'; // Updated import
+import 'package:admin/models/orders/order_list_model.dart'; 
 import 'package:admin/theme/text_theme.dart';
-import 'package:admin/utils/custom_spaces.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:admin/controller/app_controller.dart';
-import 'package:intl/intl.dart'; // Added for date formatting
+import 'package:intl/intl.dart'; 
 
 class OrderDetailScreen extends StatefulWidget {
-  final OrdersData? orderData; // Changed from OrderData to OrdersData
+  final OrdersData? orderData; 
   const OrderDetailScreen({Key? key, this.orderData}) : super(key: key);
 
   @override
@@ -17,58 +16,6 @@ class OrderDetailScreen extends StatefulWidget {
 class _OrderDetailScreenState extends State<OrderDetailScreen> {
   final TextEditingController _noteController = TextEditingController();
 
-  // Helper method to determine if it's mobile layout
-  bool _isMobile(BuildContext context) {
-    return MediaQuery.of(context).size.width < 768;
-  }
-
-  // Helper method to determine if it's tablet layout
-  bool _isTablet(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    return width >= 768 && width < 1024;
-  }
-
-  // Get responsive padding
-  EdgeInsets _getResponsivePadding(BuildContext context) {
-    if (_isMobile(context)) {
-      return const EdgeInsets.symmetric(horizontal: 16, vertical: 20);
-    } else if (_isTablet(context)) {
-      return const EdgeInsets.symmetric(horizontal: 32, vertical: 30);
-    } else {
-      return const EdgeInsets.symmetric(horizontal: 60, vertical: 40);
-    }
-  }
-
-  // Get responsive content padding
-  EdgeInsets _getContentPadding(BuildContext context) {
-    if (_isMobile(context)) {
-      return const EdgeInsets.symmetric(horizontal: 16, vertical: 16);
-    } else {
-      return const EdgeInsets.symmetric(horizontal: 20, vertical: 20);
-    }
-  }
-
-  // Get responsive label width
-  double _getLabelWidth(BuildContext context) {
-    if (_isMobile(context)) {
-      return 100;
-    } else if (_isTablet(context)) {
-      return 120;
-    } else {
-      return 140;
-    }
-  }
-
-  // Get responsive header font size
-  double _getHeaderFontSize(BuildContext context) {
-    if (_isMobile(context)) {
-      return 20;
-    } else if (_isTablet(context)) {
-      return 22;
-    } else {
-      return 24;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +31,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header - Responsive
+            
             isMobile 
               ? _buildMobileHeader(isDark)
               : _buildDesktopHeader(isDark),
@@ -106,7 +53,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Order details - responsive layout
+                      
                       _buildResponsiveOrderDetails(order, isDark),
                     ],
                   ),
@@ -167,7 +114,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         const SizedBox(height: 12),
         TextButton.icon(
           onPressed: () {
-            // You can implement profile viewing logic here
+            
           },
           icon: Icon(
             Icons.person_outline,
@@ -231,7 +178,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         const Spacer(),
         TextButton.icon(
           onPressed: () {
-            // You can implement profile viewing logic here
+            
           },
           icon: Icon(
             Icons.person_outline,
@@ -334,7 +281,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // First item
+        
         _buildDetailItem(
           item['label'], 
           item['value'],
@@ -342,7 +289,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           isDark: isDark,
         ),
         const SizedBox(height: 16),
-        // Second item (pair)
+        
         if ((item['pair']['label'] as String).isNotEmpty)
           _buildDetailItem(
             item['pair']['label'],
@@ -485,6 +432,59 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       );
     }
   }
+    
+  bool _isMobile(BuildContext context) {
+    return MediaQuery.of(context).size.width < 768;
+  }
+
+  
+  bool _isTablet(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    return width >= 768 && width < 1024;
+  }
+
+  
+  EdgeInsets _getResponsivePadding(BuildContext context) {
+    if (_isMobile(context)) {
+      return const EdgeInsets.symmetric(horizontal: 16, vertical: 20);
+    } else if (_isTablet(context)) {
+      return const EdgeInsets.symmetric(horizontal: 32, vertical: 30);
+    } else {
+      return const EdgeInsets.symmetric(horizontal: 60, vertical: 40);
+    }
+  }
+
+  
+  EdgeInsets _getContentPadding(BuildContext context) {
+    if (_isMobile(context)) {
+      return const EdgeInsets.symmetric(horizontal: 16, vertical: 16);
+    } else {
+      return const EdgeInsets.symmetric(horizontal: 20, vertical: 20);
+    }
+  }
+
+  
+  double _getLabelWidth(BuildContext context) {
+    if (_isMobile(context)) {
+      return 100;
+    } else if (_isTablet(context)) {
+      return 120;
+    } else {
+      return 140;
+    }
+  }
+
+  
+  double _getHeaderFontSize(BuildContext context) {
+    if (_isMobile(context)) {
+      return 20;
+    } else if (_isTablet(context)) {
+      return 22;
+    } else {
+      return 24;
+    }
+  }
+
 
   @override
   void dispose() {

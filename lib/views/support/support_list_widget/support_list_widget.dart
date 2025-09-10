@@ -1,10 +1,13 @@
 import 'package:admin/controller/app_controller.dart';
 import 'package:admin/controller/support_controller/support_controller.dart';
+import 'package:admin/models/support_model/tickets_model.dart';
 import 'package:admin/theme/text_theme.dart';
-import 'package:admin/views/support/filter_panel.dart';
+import 'package:admin/views/support/support_list_widget/support_chat_screen.dart';
+import 'package:admin/widgets/filter_panel.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class SupportListWidget extends StatelessWidget {
   final SupportController controller;
@@ -64,34 +67,13 @@ class SupportListWidget extends StatelessWidget {
             controller.selectedSort.value = value ?? '';
           },
         ),
-        const SizedBox(height: 16),
-        Text('Subscription:',
-            style: TextStyle(color: isDark ? Colors.white : Colors.black)),
-        const SizedBox(height: 12),
-        DropdownButtonFormField<String>(
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: isDark ? const Color(0xFF23272F) : Colors.white,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-          value: controller.selectedSubscription.value,
-          items: controller.subscription_filter
-              .map((sub) => DropdownMenuItem(
-                    value: sub,
-                    child: Text(sub),
-                  ))
-              .toList(),
-          onChanged: (value) {
-            controller.selectedSubscription.value = value ?? '';
-          },
-        ),
         const SizedBox(height: 24),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             TextButton(
               onPressed: () {
-                // Reset filters logic here
+                controller.resetFilters();
                 appController.showFilter.value = false;
               },
               child: Row(
@@ -104,7 +86,7 @@ class SupportListWidget extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () {
-                // Apply filter logic here
+                controller.applyFilters();
                 appController.showFilter.value = false;
               },
               style: ElevatedButton.styleFrom(
@@ -130,7 +112,6 @@ class SupportListWidget extends StatelessWidget {
     final appController = Get.find<AppController>();
     return Stack(
       children: [
-        // Main content
         Container(
           padding: EdgeInsets.all(isMobile
               ? 16
@@ -147,18 +128,22 @@ class SupportListWidget extends StatelessWidget {
                       : isTablet
                           ? 24
                           : 32),
-              // DataTable replaces custom table
               Expanded(
                 child: Obx(() {
-                  const itemsPerPage = 10;
-                  final currentPage = controller.currentPage.value;
-                  final startIndex = currentPage * itemsPerPage;
-                  final endIndex =
-                      (startIndex + itemsPerPage) > controller.ticketList.length
-                          ? controller.ticketList.length
-                          : (startIndex + itemsPerPage);
-                  final paginatedList =
-                      controller.ticketList.sublist(startIndex, endIndex);
+                  if (controller.ticketListData.value == null) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+
+                  final ticketsData = controller.ticketListData.value!;
+                  final tickets = ticketsData.tickets;
+
+                  if (tickets.isEmpty) {
+                    return const Center(
+                      child: Text('No support tickets found'),
+                    );
+                  }
 
                   return DataTable2(
                     columnSpacing: 16,
@@ -167,7 +152,7 @@ class SupportListWidget extends StatelessWidget {
                     dataRowHeight: 70,
                     headingRowHeight: 56,
                     columns: [
-                      DataColumn(label: Text('User ID')),
+                      DataColumn(label: Text('Ticket ID')),
                       DataColumn(label: Text('Name')),
                       DataColumn(label: Text('Subject')),
                       DataColumn(label: Text('Date')),
@@ -175,26 +160,39 @@ class SupportListWidget extends StatelessWidget {
                       DataColumn(label: Text('Email Address')),
                       DataColumn(label: Text('Actions')),
                     ],
-                    rows: paginatedList.map((data) {
+                    rows: tickets.map((ticket) {
                       return DataRow(cells: [
-                        DataCell(Text('${data.userId}')),
-                        DataCell(Text(data.name)),
-                        DataCell(Text(data.subject)),
-                        DataCell(Text(data.date)),
-                        DataCell(_buildStatusChip(data.status)),
-                        DataCell(Text(data.emailAddress)),
-                        DataCell(_buildFilterButton(
-                            Icons.visibility, "View", isDark)),
+                        DataCell(Text('#${ticket.id.substring(0, 8)}')),
+                        DataCell(Text(
+                            '${ticket.user.firstName} ${ticket.user.lastName}')),
+                        DataCell(
+                          Container(
+                            width: 200,
+                            child: Text(
+                              ticket.title,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                            ),
+                          ),
+                        ),
+                        DataCell(Text(_formatDate(ticket.createdAt))),
+                        DataCell(_buildStatusChip(ticket.status)),
+                        DataCell(Text(ticket.user.email)),
+                        DataCell(_buildActionButton(ticket,
+                            Icons.visibility, "View", isDark, context)),
                       ]);
                     }).toList(),
                   );
                 }),
               ),
               Obx(() {
-                const itemsPerPage = 10;
-                final totalPages =
-                    (controller.ticketList.length / itemsPerPage).ceil();
-                final currentPage = controller.currentPage.value;
+                if (controller.ticketListData.value == null) {
+                  return const SizedBox.shrink();
+                }
+
+                final pagination = controller.ticketListData.value!.pagination;
+                final currentPage = pagination.currentPage;
+                final totalPages = pagination.totalPages;
 
                 return Container(
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -202,19 +200,19 @@ class SupportListWidget extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
-                        onPressed: currentPage > 0
-                            ? () => controller.currentPage.value--
+                        onPressed: currentPage > 1
+                            ? () => controller.loadPage(currentPage - 1)
                             : null,
                         icon: Icon(
                           Icons.chevron_left,
-                          color: currentPage > 0
+                          color: currentPage > 1
                               ? Colors.grey.shade700
                               : Colors.grey.shade400,
                         ),
                       ),
                       Expanded(
                         child: Text(
-                          'Page ${currentPage + 1} of $totalPages',
+                          'Page $currentPage of $totalPages (${pagination.totalTickets} total)',
                           style: TextStyle(
                             color: Colors.grey.shade700,
                             fontSize: isMobile ? 12 : 14,
@@ -223,12 +221,12 @@ class SupportListWidget extends StatelessWidget {
                         ),
                       ),
                       IconButton(
-                        onPressed: currentPage < totalPages - 1
-                            ? () => controller.currentPage.value++
+                        onPressed: currentPage < totalPages
+                            ? () => controller.loadPage(currentPage + 1)
                             : null,
                         icon: Icon(
                           Icons.chevron_right,
-                          color: currentPage < totalPages - 1
+                          color: currentPage < totalPages
                               ? Colors.grey.shade700
                               : Colors.grey.shade400,
                         ),
@@ -240,8 +238,6 @@ class SupportListWidget extends StatelessWidget {
             ],
           ),
         ),
-
-        // 👇 Move the overlay BELOW the filter panel
         Obx(() => appController.showFilter.value
             ? GestureDetector(
                 onTap: () => appController.showFilter.value = false,
@@ -256,8 +252,6 @@ class SupportListWidget extends StatelessWidget {
                 ),
               )
             : const SizedBox.shrink()),
-
-        // Filter Panel should always be topmost
         CommonFilterPanel(
           isDark: isDark,
           filterContent: _buildFilterPanel(isDark, appController),
@@ -266,11 +260,14 @@ class SupportListWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusChip(String? status) {
-    bool isBlocked = (status ?? "").toLowerCase() == "close" ||
-        (status ?? "").toLowerCase() == "closed";
-    bool isActive = (status ?? "").toLowerCase() == "open" ||
-        (status ?? "").toLowerCase() == "completed";
+  String _formatDate(DateTime date) {
+    return DateFormat('MMM d, yyyy').format(date);
+  }
+
+  Widget _buildStatusChip(String status) {
+    bool isBlocked = status.toLowerCase() == "closed";
+    bool isActive = status.toLowerCase() == "open";
+    bool isPending = status.toLowerCase() == "pending";
 
     Color bgColor;
     Color dotColor;
@@ -284,45 +281,45 @@ class SupportListWidget extends StatelessWidget {
       bgColor = Colors.green.withOpacity(0.1);
       dotColor = Colors.green;
       textColor = Colors.green.shade800;
-    } else {
+    } else if (isPending) {
       bgColor = Colors.orange.withOpacity(0.1);
       dotColor = Colors.orange;
       textColor = Colors.orange.shade700;
+    } else {
+      bgColor = Colors.grey.withOpacity(0.1);
+      dotColor = Colors.grey;
+      textColor = Colors.grey.shade700;
     }
 
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: bgColor,
-            borderRadius: BorderRadius.circular(8),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(
+              color: dotColor,
+              shape: BoxShape.circle,
+            ),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  color: dotColor,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 6),
-              Text(
-                status ?? "",
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: textColor,
-                ),
-              ),
-            ],
+          const SizedBox(width: 6),
+          Text(
+            status.toUpperCase(),
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: textColor,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -351,7 +348,6 @@ class SupportListWidget extends StatelessWidget {
           ),
           Row(
             children: [
-              // 🔍 Search Bar
               SizedBox(
                 width: 400,
                 child: TextField(
@@ -366,32 +362,30 @@ class SupportListWidget extends StatelessWidget {
                       borderRadius: BorderRadius.circular(25),
                       borderSide: BorderSide(
                         color: Colors.grey.shade300,
-                        width: 1, // thin border
+                        width: 1,
                       ),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(25),
                       borderSide: BorderSide(
                         color: Colors.grey.shade300,
-                        width: 1, // thin border
+                        width: 1,
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(25),
                       borderSide: BorderSide(
-                        color: Colors
-                            .grey.shade300, // same thin grey border on focus
+                        color: Colors.grey.shade300,
                         width: 1,
                       ),
                     ),
                     isDense: true,
                   ),
                   onChanged: (value) {
-                    // controller.filterUsers(value);
+                    controller.searchTickets(value);
                   },
                 ),
               ),
-
               const SizedBox(width: 8),
               _buildFilterButton(Icons.filter_list, "Filter", isDark),
             ],
@@ -406,8 +400,6 @@ class SupportListWidget extends StatelessWidget {
       onTap: () {
         final appController = Get.find<AppController>();
         appController.showFilter.value = !appController.showFilter.value;
-
-        print(appController.showFilter.value);
       },
       child: Container(
         padding: EdgeInsets.symmetric(
@@ -435,6 +427,56 @@ class SupportListWidget extends StatelessWidget {
             Icon(
               icon,
               color: isDark ? Colors.white : Colors.grey.shade600,
+              size: isMobile ? 14 : 16,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionButton(
+    TicketDetails ticket,
+    IconData icon,
+    String label,
+    bool isDark,
+    BuildContext context,
+  ) {
+    final drawerController = Get.find<AppController>();
+
+    return InkWell(
+      onTap: () {
+        drawerController.setDrawerContent(SupportChatScreen(ticket: ticket,));
+        drawerController.toggleDrawer();
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: isMobile ? 6 : 8,
+          vertical: isMobile ? 6 : 8,
+        ),
+        decoration: BoxDecoration(
+          border: Border.all(
+              color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+          color: isDark ? const Color(0xFF23272F) : Colors.white,
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (label.isNotEmpty) ...[
+              Text(
+                label,
+                style: TextStyle(
+                  color: isDark ? Colors.white : Colors.grey.shade700,
+                  fontSize: isTablet ? 12 : 14,
+                ),
+              ),
+              const SizedBox(width: 6),
+            ],
+            Icon(
+              icon,
+              color: isDark ? Colors.white : Colors.grey.shade700,
               size: isMobile ? 14 : 16,
             ),
           ],

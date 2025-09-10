@@ -39,13 +39,13 @@ class SupportStatusChart extends StatelessWidget {
             children: [
               Flexible(
                 child: Obx(() => Text(
-                  controller.statusChartTitle.value,
-                  style: TextStyle(
-                    fontSize: _getTitleFontSize(),
-                    fontWeight: FontWeight.w600,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                )),
+                      controller.statusChartTitle.value,
+                      style: TextStyle(
+                        fontSize: _getTitleFontSize(),
+                        fontWeight: FontWeight.w600,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    )),
               ),
               const SizedBox(width: 12),
               _buildDropdown(isDark),
@@ -102,37 +102,52 @@ class SupportStatusChart extends StatelessWidget {
         ),
       ),
       child: Obx(() => DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: controller.selectedStatusPeriod.value,
-          isDense: true,
-          style: TextStyle(
-            fontSize: deviceType == DeviceType.mobile ? 11 : 12,
-            color: isDark ? Colors.white  : Colors.grey[600],
-          ),
-          icon: Icon(
-            Icons.keyboard_arrow_down,
-            size: 16,
-            color: isDark ? Colors.white  : Colors.grey[600],
-          ),
-          items: controller.periods.map((String period) {
-            return DropdownMenuItem<String>(
-              value: period,
-              child: Text(period),
-            );
-          }).toList(),
-          onChanged: (String? newValue) {
-            if (newValue != null) {
-              controller.changeStatusPeriod(newValue);
-              controller.fetchStatusData(newValue);
-            }
-          },
-        ),
-      )),
+            child: DropdownButton<String>(
+              value: controller.selectedStatusPeriod.value,
+              isDense: true,
+              style: TextStyle(
+                fontSize: deviceType == DeviceType.mobile ? 11 : 12,
+                color: isDark ? Colors.white : Colors.grey[600],
+              ),
+              icon: Icon(
+                Icons.keyboard_arrow_down,
+                size: 16,
+                color: isDark ? Colors.white : Colors.grey[600],
+              ),
+              items: const [
+                DropdownMenuItem(
+                  value: 'all_time',
+                  child: Text('All Time', style: TextStyle(fontSize: 14)),
+                ),
+                DropdownMenuItem(
+                  value: 'this_week',
+                  child: Text('This Week', style: TextStyle(fontSize: 14)),
+                ),
+                DropdownMenuItem(
+                  value: 'last_month',
+                  child: Text('Last Month', style: TextStyle(fontSize: 14)),
+                ),
+                DropdownMenuItem(
+                  value: 'this_month',
+                  child: Text('This Month', style: TextStyle(fontSize: 14)),
+                ),
+                DropdownMenuItem(
+                  value: 'this_year',
+                  child: Text('This Year', style: TextStyle(fontSize: 14)),
+                ),
+              ],
+              onChanged: (String? newValue) {
+                if (newValue != null) {
+                  controller.changeStatusPeriod(newValue);
+                }
+              },
+            ),
+          )),
     );
   }
 
   Widget _statusLegend() {
-    return Obx(() => deviceType == DeviceType.mobile 
+    return Obx(() => deviceType == DeviceType.mobile
         ? Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Row(
@@ -140,17 +155,17 @@ class SupportStatusChart extends StatelessWidget {
               children: [
                 _buildCompactStatusItem(
                   controller.statusLabels['open']!,
-                  controller.openCount.value,
+                  controller.supportStatusesData.value?.openCount ?? 0,
                   controller.statusColors['open']!,
                 ),
                 _buildCompactStatusItem(
                   controller.statusLabels['pending']!,
-                  controller.pendingCount.value,
+                  controller.supportStatusesData.value?.pendingCount ?? 0,
                   controller.statusColors['pending']!,
                 ),
                 _buildCompactStatusItem(
                   controller.statusLabels['closed']!,
-                  controller.closedCount.value,
+                  controller.supportStatusesData.value?.closeCount ?? 0,
                   controller.statusColors['closed']!,
                 ),
               ],
@@ -161,54 +176,64 @@ class SupportStatusChart extends StatelessWidget {
             children: [
               _buildStatusItem(
                 controller.statusLabels['open']!,
-                controller.openCount.value,
+                controller.supportStatusesData.value?.openCount ?? 0,
                 controller.statusColors['open']!,
               ),
               SizedBox(height: _getItemSpacing()),
               _buildStatusItem(
                 controller.statusLabels['pending']!,
-                controller.pendingCount.value,
+                controller.supportStatusesData.value?.pendingCount ?? 0,
                 controller.statusColors['pending']!,
               ),
               SizedBox(height: _getItemSpacing()),
               _buildStatusItem(
                 controller.statusLabels['closed']!,
-                controller.closedCount.value,
+                controller.supportStatusesData.value?.closeCount ?? 0,
                 controller.statusColors['closed']!,
               ),
             ],
-          )
-    );
+          ));
   }
 
   Widget _statusPie() {
-    final centerRadius = deviceType == DeviceType.mobile ? 35.0 : 
-                        deviceType == DeviceType.tablet ? 45.0 : 60.0;
-    final totalFontSize = deviceType == DeviceType.mobile ? 16.0 : 
-                          deviceType == DeviceType.tablet ? 18.0 : 24.0;
-    final labelFontSize = deviceType == DeviceType.mobile ? 9.0 : 
-                          deviceType == DeviceType.tablet ? 10.0 : 12.0;
+    final centerRadius = deviceType == DeviceType.mobile
+        ? 35.0
+        : deviceType == DeviceType.tablet
+            ? 45.0
+            : 60.0;
+    final totalFontSize = deviceType == DeviceType.mobile
+        ? 16.0
+        : deviceType == DeviceType.tablet
+            ? 18.0
+            : 24.0;
+    final labelFontSize = deviceType == DeviceType.mobile
+        ? 9.0
+        : deviceType == DeviceType.tablet
+            ? 10.0
+            : 12.0;
     return Stack(
       children: [
         Obx(() => PieChart(
-          PieChartData(
-            sectionsSpace: 2,
-            centerSpaceRadius: centerRadius,
-            sections: controller.getPieChartSections(),
-            startDegreeOffset: -90,
-          ),
-        )),
+              PieChartData(
+                sectionsSpace: 2,
+                centerSpaceRadius: centerRadius,
+                sections: controller.getPieChartSections(),
+                startDegreeOffset: -90,
+              ),
+            )),
         Positioned.fill(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Obx(() => Text(
-                controller.computedTotal.toString(),
-                style: TextStyle(
-                  fontSize: totalFontSize,
-                  fontWeight: FontWeight.bold,
-                ),
-              )),
+                    controller.supportStatusesData.value?.totalCount
+                            .toString() ??
+                        "",
+                    style: TextStyle(
+                      fontSize: totalFontSize,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )),
               Text(
                 'Total Status',
                 style: TextStyle(

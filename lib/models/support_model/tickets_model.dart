@@ -1,5 +1,5 @@
 class TicketsData {
-  final List<Ticket> tickets;
+  final List<TicketDetails> tickets;
   final Pagination pagination;
 
   TicketsData({
@@ -10,7 +10,7 @@ class TicketsData {
   factory TicketsData.fromJson(Map<String, dynamic> json) {
     return TicketsData(
       tickets: (json['tickets'] as List<dynamic>)
-          .map((item) => Ticket.fromJson(item))
+          .map((item) => TicketDetails.fromJson(item))
           .toList(),
       pagination: Pagination.fromJson(json['pagination']),
     );
@@ -24,7 +24,7 @@ class TicketsData {
   }
 }
 
-class Ticket {
+class TicketDetails {
   final String id;
   final String title;
   final String description;
@@ -32,7 +32,7 @@ class Ticket {
   final DateTime createdAt;
   final User user;
 
-  Ticket({
+  TicketDetails({
     required this.id,
     required this.title,
     required this.description,
@@ -41,8 +41,8 @@ class Ticket {
     required this.user,
   });
 
-  factory Ticket.fromJson(Map<String, dynamic> json) {
-    return Ticket(
+  factory TicketDetails.fromJson(Map<String, dynamic> json) {
+    return TicketDetails(
       id: json['id'],
       title: json['title'],
       description: json['description'],

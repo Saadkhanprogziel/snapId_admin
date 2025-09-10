@@ -56,11 +56,17 @@ class _AuthTextFieldState extends State<AuthTextField> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final fieldTextColor = isDark ? Colors.white : const Color(0xFF374151);
+    final fillColor = isDark ? const Color(0xFF23272F) : const Color(0xFFF9FAFB);
+    final hintColor = isDark ? Colors.grey[400] : const Color(0xFF9CA3AF);
+    final borderColor = isDark ? Colors.grey.shade700 : const Color(0xFFE5E7EB);
+    final focusColor = const Color(0xFF6366F1);
     return ValueListenableBuilder<bool>(
       valueListenable: _obscureTextNotifier,
       builder: (context, isObscured, _) {
         return TextFormField(
-          autovalidateMode: widget.autovalidateMode, // 👈 use it here
+          autovalidateMode: widget.autovalidateMode,
           controller: widget.controller,
           focusNode: widget.focusNode,
           obscureText: isObscured,
@@ -72,16 +78,16 @@ class _AuthTextFieldState extends State<AuthTextField> {
           onChanged: widget.onChanged,
           validator: widget.validator,
           onFieldSubmitted: widget.onFieldSubmitted,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 15,
-            color: Color(0xFF374151),
+            color: fieldTextColor,
           ),
           decoration: InputDecoration(
             filled: true,
-            fillColor: const Color(0xFFF9FAFB),
+            fillColor: fillColor,
             hintText: widget.hintText,
-            hintStyle: const TextStyle(
-              color: Color(0xFF9CA3AF),
+            hintStyle: TextStyle(
+              color: hintColor,
               fontSize: 15,
             ),
             prefixIcon: widget.prefixIcon,
@@ -94,27 +100,26 @@ class _AuthTextFieldState extends State<AuthTextField> {
                       isObscured
                           ? Icons.visibility_off_outlined
                           : Icons.visibility_outlined,
-                      color: const Color(0xFF9CA3AF),
+                      color: hintColor,
                       size: 20,
                     ),
                   )
                 : null,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
-              vertical: 26, // ⬆️ was 18 → increase for taller field
+              vertical: 26,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
+              borderSide: BorderSide(color: borderColor, width: 1),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
+              borderSide: BorderSide(color: borderColor, width: 1),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide:
-                  const BorderSide(color: Color(0xFF6366F1), width: 1.5),
+              borderSide: BorderSide(color: focusColor, width: 1.5),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),

@@ -1,5 +1,4 @@
 import 'package:admin/controller/analytics_controller/analytics_controller.dart';
-import 'package:admin/theme/text_theme.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -155,44 +154,44 @@ class AnalyticsListWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(IconData icon, String label,
-      {bool viewBtn = false, bool isDark = false}) {
-    return GestureDetector(
-      onTap: () {
-        print('$label clicked');
-      },
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: isMobile ? 6 : 8,
-          vertical: isMobile ? 6 : 8,
-        ),
-        decoration: BoxDecoration(
-          color: Colors.transparent,
-          border: Border.all(color: Colors.grey.shade300),
-          borderRadius: BorderRadius.circular(6),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (label.isNotEmpty && !isMobile) ...[
-              Text(label,
-                  style: CustomTextTheme.regular12.copyWith(
-                    fontSize: isTablet ? 12 : 14,
-                    color: isDark ? Colors.white : Colors.grey.shade700,
-                  )),
-              const SizedBox(width: 6),
-            ],
-            Icon(
-              icon,
-              color: isDark ? Colors.white : Colors.grey.shade700,
-              size: isMobile ? 14 : 16,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // Widget _buildActionButton(IconData icon, String label,
+  //     {bool viewBtn = false, bool isDark = false}) {
+  //   return GestureDetector(
+  //     onTap: () {
+  //       print('$label clicked');
+  //     },
+  //     child: Container(
+  //       padding: EdgeInsets.symmetric(
+  //         horizontal: isMobile ? 6 : 8,
+  //         vertical: isMobile ? 6 : 8,
+  //       ),
+  //       decoration: BoxDecoration(
+  //         color: Colors.transparent,
+  //         border: Border.all(color: Colors.grey.shade300),
+  //         borderRadius: BorderRadius.circular(6),
+  //       ),
+  //       child: Row(
+  //         mainAxisSize: MainAxisSize.min,
+  //         mainAxisAlignment: MainAxisAlignment.center,
+  //         children: [
+  //           if (label.isNotEmpty && !isMobile) ...[
+  //             Text(label,
+  //                 style: CustomTextTheme.regular12.copyWith(
+  //                   fontSize: isTablet ? 12 : 14,
+  //                   color: isDark ? Colors.white : Colors.grey.shade700,
+  //                 )),
+  //             const SizedBox(width: 6),
+  //           ],
+  //           Icon(
+  //             icon,
+  //             color: isDark ? Colors.white : Colors.grey.shade700,
+  //             size: isMobile ? 14 : 16,
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _buildHeaderSection(bool isDark) {
     if (isMobile) {

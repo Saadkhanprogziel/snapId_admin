@@ -35,70 +35,90 @@ class QueriesLineChart extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Title & Filters
           _buildHeader(isDark, isMobile, isTablet),
           SizedBox(height: _getSpacing()),
-
-          // Chart
           Expanded(
-            child: Obx(() => LineChart(
-              LineChartData(
-                gridData: FlGridData(
-                  show: true,
-                  drawVerticalLine: false,
-                  horizontalInterval: 50,
-                  getDrawingHorizontalLine: (value) {
-                    return FlLine(
-                      color: isDark ? Colors.grey[700]! : Colors.grey[200]!,
-                      strokeWidth: 1,
-                    );
-                  },
-                ),
-                titlesData: _getTitlesData(),
-                borderData: FlBorderData(show: false),
-                minX: 0,
-                maxX: 5,
-                minY: 0,
-                maxY: 250,
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: controller.aiAssistantData,
-                    isCurved: true,
-                    gradient: LinearGradient(
-                      colors: [
-                        controller.chartColors['aiAssistant']!,
-                        controller.chartColors['aiAssistant']!
-                      ],
-                    ),
-                    barWidth: deviceType == DeviceType.mobile ? 2 : 3,
-                    isStrokeCapRound: true,
-                    dotData: FlDotData(
-                      show: true,
-                      getDotPainter: (spot, percent, barData, index) =>
-                          FlDotCirclePainter(
-                        radius: deviceType == DeviceType.mobile ? 3 : 4,
-                        color: controller.chartColors['aiAssistant']!,
-                        strokeWidth: 2,
-                        strokeColor: Colors.white,
-                      ),
-                    ),
-                  ),
-                  LineChartBarData(
-                    spots: controller.manualSupportData,
-                    isCurved: true,
-                    gradient: LinearGradient(
-                      colors: [
-                        controller.chartColors['manualSupport']!,
-                        controller.chartColors['manualSupport']!
-                      ],
-                    ),
-                    barWidth: deviceType == DeviceType.mobile ? 2 : 3,
-                    isStrokeCapRound: true,
-                    dotData: const FlDotData(show: false),
-                  ),
-                ],
+            child: Obx(() => _buildChart(isDark)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildChart(bool isDark) {
+    
+    if (controller.manualSupportData.isEmpty) {
+      return Center(
+        child: Text(
+          'Data for this period is not available',
+          style: TextStyle(
+            color: isDark ? Colors.white70 : Colors.grey[700],
+            fontSize: deviceType == DeviceType.mobile ? 13 : 15,
+            fontWeight: FontWeight.w500,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      );
+    }
+
+    
+    double maxY = controller.manualSupportData.isNotEmpty
+        ? controller.manualSupportData
+            .map((spot) => spot.y)
+            .reduce((a, b) => a > b ? a : b)
+        : 100;
+    
+    
+    maxY = (maxY * 1.2).ceilToDouble();
+    if (maxY < 50) maxY = 50; 
+
+    
+    double maxX = controller.manualSupportData.isNotEmpty
+        ? controller.manualSupportData.length.toDouble() - 1
+        : 5;
+    if (maxX < 5) maxX = 5; 
+
+    return LineChart(
+      LineChartData(
+        gridData: FlGridData(
+          show: true,
+          drawVerticalLine: false,
+          horizontalInterval: maxY / 5, 
+          getDrawingHorizontalLine: (value) {
+            return FlLine(
+              color: isDark ? Colors.grey[700]! : Colors.grey[200]!,
+              strokeWidth: 1,
+            );
+          },
+        ),
+        titlesData: _getTitlesData(maxY),
+        borderData: FlBorderData(show: false),
+        minX: 0,
+        maxX: maxX,
+        minY: 0,
+        maxY: maxY,
+        lineBarsData: [
+          LineChartBarData(
+            spots: controller.manualSupportData,
+            isCurved: true,
+            gradient: LinearGradient(
+              colors: [
+                Color(0xFFD8B4FE),
+                Color(0xFFD8B4FE)
+              ],
+            ),
+            barWidth: deviceType == DeviceType.mobile ? 2 : 3,
+            isStrokeCapRound: true,
+            dotData: FlDotData(
+              show: true,
+              getDotPainter: (spot, percent, barData, index) =>
+                  FlDotCirclePainter(
+                radius: deviceType == DeviceType.mobile ? 3 : 4,
+                color: Color(0xFFD8B4FE),
+                strokeWidth: 2,
+                strokeColor: Colors.white,
               ),
-            )),
+            ),
           ),
         ],
       ),
@@ -143,20 +163,20 @@ class QueriesLineChart extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Obx(() => Text(
-          controller.queriesChartTitle.value,
-          style: TextStyle(
-            fontSize: _getTitleFontSize(),
-            fontWeight: FontWeight.w500,
-          ),
-        )),
+              controller.queriesChartTitle.value,
+              style: TextStyle(
+                fontSize: _getTitleFontSize(),
+                fontWeight: FontWeight.w500,
+              ),
+            )),
         const SizedBox(height: 4),
         Obx(() => Text(
-          controller.totalQueries.value.toString(),
-          style: TextStyle(
-            fontSize: _getValueFontSize(),
-            fontWeight: FontWeight.bold,
-          ),
-        )),
+              controller.totalQueries.value.toString(),
+              style: TextStyle(
+                fontSize: _getValueFontSize(),
+                fontWeight: FontWeight.bold,
+              ),
+            )),
       ],
     );
   }
@@ -164,14 +184,10 @@ class QueriesLineChart extends StatelessWidget {
   Widget _buildLegend() {
     return Row(
       children: [
-        _buildLegendItem(
-          color: controller.chartColors['aiAssistant']!,
-          label: controller.legendLabels['aiAssistant']!,
-        ),
         SizedBox(width: deviceType == DeviceType.mobile ? 12 : 16),
         _buildLegendItem(
-          color: controller.chartColors['manualSupport']!,
-          label: controller.legendLabels['manualSupport']!,
+          color:Color(0xFFD8B4FE),
+          label: "Manual Support",
         ),
       ],
     );
@@ -189,36 +205,54 @@ class QueriesLineChart extends StatelessWidget {
         ),
       ),
       child: Obx(() => DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: controller.selectedQueriesPeriod.value,
-          isDense: true,
-          style: TextStyle(
-            fontSize: deviceType == DeviceType.mobile ? 11 : 12,
-            color: isDark ? Colors.white  : Colors.grey[600],
-          ),
-          icon: Icon(
-            Icons.keyboard_arrow_down,
-            size: 16,
-            color: isDark ? Colors.white  : Colors.grey[600],
-          ),
-          items: controller.periods.map((String period) {
-            return DropdownMenuItem<String>(
-              value: period,
-              child: Text(period),
-            );
-          }).toList(),
-          onChanged: (String? newValue) {
-            if (newValue != null) {
-              controller.changeQueriesPeriod(newValue);
-              controller.fetchQueriesData(newValue);
-            }
-          },
-        ),
-      )),
+            child: DropdownButton<String>(
+              value: controller.selectedQueriesPeriod.value,
+              isDense: true,
+              style: TextStyle(
+                fontSize: deviceType == DeviceType.mobile ? 11 : 12,
+                color: isDark ? Colors.white : Colors.grey[600],
+              ),
+              icon: Icon(
+                Icons.keyboard_arrow_down,
+                size: 16,
+                color: isDark ? Colors.white : Colors.grey[600],
+              ),
+              items: const [
+                      DropdownMenuItem(
+                        value: 'all_time',
+                        child: Text('All Time', style: TextStyle(fontSize: 14)),
+                      ),
+                      DropdownMenuItem(
+                        value: 'this_week',
+                        child: Text('This Week', style: TextStyle(fontSize: 14)),
+                      ),
+                      DropdownMenuItem(
+                        value: 'last_month',
+                        child:
+                            Text('Last Month', style: TextStyle(fontSize: 14)),
+                      ),
+                      DropdownMenuItem(
+                        value: 'this_month',
+                        child:
+                            Text('This Month', style: TextStyle(fontSize: 14)),
+                      ),
+                      DropdownMenuItem(
+                        value: 'this_year',
+                        child:
+                            Text('This Year', style: TextStyle(fontSize: 14)),
+                      ),
+                    ],
+              onChanged: (String? newValue) {
+                if (newValue != null) {
+                  controller.changeQuriesPeriod(newValue);
+                }
+              },
+            ),
+          )),
     );
   }
 
-  FlTitlesData _getTitlesData() {
+  FlTitlesData _getTitlesData(double maxY) {
     return FlTitlesData(
       rightTitles: const AxisTitles(
         sideTitles: SideTitles(showTitles: false),
@@ -237,17 +271,20 @@ class QueriesLineChart extends StatelessWidget {
               fontWeight: FontWeight.w400,
               fontSize: deviceType == DeviceType.mobile ? 10 : 12,
             );
-            if (value.toInt() >= 0 && value.toInt() < controller.monthLabels.length) {
-              return Text(controller.monthLabels[value.toInt()], style: style);
+            
+            
+            int index = value.toInt();
+            if (index >= 0 && index < controller.monthLabels.length) {
+              return Text(controller.monthLabels[index], style: style);
             }
-            return  Text('', style: style);
+            return Text('', style: style);
           },
         ),
       ),
       leftTitles: AxisTitles(
         sideTitles: SideTitles(
           showTitles: true,
-          interval: 100,
+          interval: maxY / 5, 
           getTitlesWidget: (double value, TitleMeta meta) {
             return Text(
               value.toInt().toString(),

@@ -1,7 +1,7 @@
 import 'package:admin/controller/app_controller.dart';
 import 'package:admin/controller/user_management_controller/user_management_controller.dart';
 import 'package:admin/models/users/users_model.dart';
-import 'package:admin/views/support/filter_panel.dart';
+import 'package:admin/widgets/filter_panel.dart';
 import 'package:admin/views/user_management/user_details/user_detail_info_content.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';

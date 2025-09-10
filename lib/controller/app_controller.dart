@@ -6,31 +6,54 @@ class AppController extends GetxController {
   final GetStorage _storage = GetStorage();
 
   
-
-  // Start with Light theme
+  late final Rx<ThemeMode> themeMode;
+  
+  
   final RxBool showFilter = false.obs;
   final Rx<Widget?> _filterContent = Rx<Widget?>(null);
-
   final RxBool isNotification = false.obs;
-  final Rx<ThemeMode> themeMode = ThemeMode.light.obs;
-
-  // Toggle based on switch value
-  void toggleTheme(bool darkModeEnabled) {
-    themeMode.value = darkModeEnabled ? ThemeMode.dark : ThemeMode.light;
-    _storage.write(
-        'themeMode', themeMode.value == ThemeMode.dark ? 'dark' : 'light');
-  }
-
   var sidebarCollapsed = false.obs;
-  final RxBool isThemeToggleOn = false.obs; // you can remove if unused
+  final RxBool isThemeToggleOn = false.obs; 
 
   final RxBool _isRightDrawerOpen = false.obs;
   final Rx<Widget?> _drawerContent = Rx<Widget?>(null);
 
+  
+  AppController() {
+    _loadTheme();
+  }
+
+  
+  void _loadTheme() {
+    String? storedTheme = _storage.read('themeMode');
+    ThemeMode initialTheme = storedTheme == 'dark' ? ThemeMode.dark : ThemeMode.light;
+    themeMode = initialTheme.obs;
+  }
+
+  
   bool get isRightDrawerOpen => _isRightDrawerOpen.value;
   Widget? get drawerContent => _drawerContent.value;
   Widget? get filterContent => _filterContent.value;
 
+  
+  void toggleTheme(bool darkModeEnabled) {
+    themeMode.value = darkModeEnabled ? ThemeMode.dark : ThemeMode.light;
+    _saveTheme();
+  }
+
+  void setThemeMode(ThemeMode mode) {
+    themeMode.value = mode;
+    _saveTheme();
+  }
+
+  
+  void _saveTheme() {
+    _storage.write('themeMode', themeMode.value == ThemeMode.dark ? 'dark' : 'light');
+    
+    
+  }
+
+  
   void toggleDrawer({Widget? content}) {
     _isRightDrawerOpen.value = !_isRightDrawerOpen.value;
     if (content != null) {
@@ -52,8 +75,7 @@ class AppController extends GetxController {
   void closeDrawer() {
     _isRightDrawerOpen.value = false;
     _drawerContent.value = null;
-    isNotification.value =
-        false; // Reset notification state when drawer is closed
+    isNotification.value = false;
   }
 
   void toggleSidebar() {
@@ -63,16 +85,12 @@ class AppController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    String? storedTheme = _storage.read('themeMode');
-    if (storedTheme == 'dark') {
-      themeMode.value = ThemeMode.dark;
-    } else {
-      themeMode.value = ThemeMode.light;
-    }
+    
   }
 
-  void setThemeMode(ThemeMode mode) {
-    themeMode.value = mode;
-    _storage.write('themeMode', mode == ThemeMode.dark ? 'dark' : 'light');
+  @override
+  void onClose() {
+    super.onClose();
+    
   }
 }

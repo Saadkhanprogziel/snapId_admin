@@ -10,16 +10,22 @@ class SnapIdLoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? const Color(0xFF181A20) : Colors.white;
+    final cardColor = isDark ? const Color(0xFF23272F) : Colors.transparent;
+    final textColor = isDark ? Colors.white : const Color(0xFF1F2937);
+    final borderColor = isDark ? Colors.grey.shade700 : const Color.fromARGB(149, 117, 99, 210);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: bgColor,
       body: Stack(
         children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/shade.png',
-              fit: BoxFit.cover,
+          if (!isDark)
+            Positioned.fill(
+              child: Image.asset(
+                'assets/images/shade.png',
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
@@ -56,20 +62,20 @@ class SnapIdLoginScreen extends StatelessWidget {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(40),
                                 border: Border.all(
-                                  color:
-                                      const Color.fromARGB(149, 117, 99, 210),
+                                  color: borderColor,
                                   width: 0.5,
                                 ),
+                                color: cardColor,
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  const Text(
+                                  Text(
                                     'Sign In',
                                     style: TextStyle(
                                       fontSize: 28,
                                       fontWeight: FontWeight.w700,
-                                      color: Color(0xFF1F2937),
+                                      color: textColor,
                                     ),
                                   ),
                                   const SizedBox(height: 40),
@@ -87,8 +93,8 @@ class SnapIdLoginScreen extends StatelessWidget {
                                     },
                                     controller: controller.emailController,
                                     keyboardType: TextInputType.emailAddress,
-                                    prefixIcon: const Icon(Icons.email_outlined,
-                                        color: Color(0xFF9CA3AF), size: 20),
+                                    prefixIcon: Icon(Icons.email_outlined,
+                                        color: isDark ? Colors.grey[400] : const Color(0xFF9CA3AF), size: 20),
                                   ),
                                   const SizedBox(height: 20),
 
@@ -105,8 +111,8 @@ class SnapIdLoginScreen extends StatelessWidget {
                                       return null;
                                     },
                                     controller: controller.passwordController,
-                                    prefixIcon: const Icon(Icons.lock,
-                                        color: Color(0xFF9CA3AF), size: 20),
+                                    prefixIcon: Icon(Icons.lock,
+                                        color: isDark ? Colors.grey[400] : const Color(0xFF9CA3AF), size: 20),
                                   ),
                                   const SizedBox(height: 32),
 
@@ -115,7 +121,7 @@ class SnapIdLoginScreen extends StatelessWidget {
                                     height: 55,
                                     child: ElevatedButton(
                                       onPressed: controller.isLoading
-                                          ? null // disable while loading
+                                          ? null 
                                           : () {
                                               if (_formKey.currentState!
                                                   .validate()) {
@@ -140,7 +146,7 @@ class SnapIdLoginScreen extends StatelessWidget {
                                               child: CircularProgressIndicator(
                                                 strokeWidth: 2.5,
                                                 color: Colors
-                                                    .white, // makes it visible on purple bg
+                                                    .white, 
                                               ),
                                             )
                                           : const Text(

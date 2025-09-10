@@ -3,7 +3,7 @@ import 'package:admin/controller/orders_management_controller/order_management_c
 import 'package:admin/models/orders/order_list_model.dart';
 import 'package:admin/theme/text_theme.dart';
 import 'package:admin/views/order_management/order_info_content/order_info_content.dart';
-import 'package:admin/views/support/filter_panel.dart';
+import 'package:admin/widgets/filter_panel.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
