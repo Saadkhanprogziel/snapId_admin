@@ -2,7 +2,7 @@ import 'package:admin/constants/colors.dart';
 import 'package:admin/controller/app_controller.dart';
 import 'package:admin/theme/text_theme.dart';
 import 'package:admin/views/notification/notification.dart';
-import 'package:admin/views/settings/settings.dart';
+import 'package:admin/views/settings/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';

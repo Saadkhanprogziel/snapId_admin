@@ -1,4 +1,3 @@
-import 'package:admin/models/chartsTablesModel.dart';
 import 'package:admin/models/support_model/support_status.dart';
 import 'package:admin/models/support_model/ticket_graph.dart';
 import 'package:admin/models/support_model/tickets_model.dart';
@@ -24,11 +23,15 @@ class SupportController extends GetxController {
   var ticketListData = Rxn<TicketsData>();
 
   var searchQuery = ''.obs;
-  var isLoading = false.obs;
+
+  // 🔹 Separate loaders
+  var isTicketsLoading = false.obs;
+  var isGraphLoading = false.obs;
+  var isStatusLoading = false.obs;
 
   var selectedQueriesPeriod = 'this_year'.obs;
   var selectedStatusPeriod = 'this_year'.obs;
-  
+
   var chatStatus = 'Open'.obs;
   final List<String> statuses = ['Open', 'Pending', 'Closed'];
 
@@ -39,8 +42,6 @@ class SupportController extends GetxController {
   var queriesChartTitle = 'Total Queries'.obs;
   var manualSupportData = <FlSpot>[].obs;
   var statusChartTitle = 'Support by Status'.obs;
- 
-
 
   var statusLabels = {
     'open': 'Open',
@@ -49,7 +50,6 @@ class SupportController extends GetxController {
   };
 
   var monthLabels = <String>[].obs;
-
 
   @override
   void onInit() {
@@ -60,21 +60,23 @@ class SupportController extends GetxController {
   }
 
   void fetchTicketList({int page = 1, int pageSize = 10}) {
-    isLoading.value = true;
+    isTicketsLoading.value = true;
 
     supportRepository
         .getAllTickets(
-            page: page,
-            pageSize: pageSize,
-            status: selectedStatus.value,
-            searchQuery: searchQuery.value)
+      page: page,
+      pageSize: pageSize,
+      status: selectedStatus.value,
+      searchQuery: searchQuery.value,
+    )
         .then((response) {
-      isLoading.value = false;
       response.fold((error) {
         print('Error fetching tickets: $error');
       }, (success) {
         ticketListData.value = success;
       });
+    }).whenComplete(() {
+      isTicketsLoading.value = false;
     });
   }
 
@@ -114,23 +116,32 @@ class SupportController extends GetxController {
   }
 
   void fetchQuriesData() {
+    isGraphLoading.value = true;
+
     supportRepository
         .getTicketGraphData(filterType: selectedQueriesPeriod.value)
         .then((response) {
       response.fold((error) {}, (success) {
         queriesGraphData.value = success;
         totalQueries.value = success.totalTickets;
+        isGraphLoading.value = false;
+        update();
         _updateManualSupportData(success.allTickets);
       });
     });
   }
+
   void fetchSupportStatusData() {
+    isStatusLoading.value = true;
+
     supportRepository
         .getSupportStatus(filterType: selectedStatusPeriod.value)
         .then((response) {
       response.fold((error) {}, (success) {
         supportStatusesData.value = success;
       });
+    }).whenComplete(() {
+      isStatusLoading.value = false;
     });
   }
 
@@ -161,7 +172,6 @@ class SupportController extends GetxController {
     selectedQueriesPeriod.value = period;
     fetchQuriesData();
   }
-
 
   List<PieChartSectionData> getPieChartSections() {
     const fontSize = 12.0;
@@ -204,13 +214,12 @@ class SupportController extends GetxController {
     ];
   }
 
-
   @override
   void onClose() {
     if (_debounceTimer != null) {}
     super.onClose();
   }
-  
+
   var statusColors = {
     'open': const Color(0xFF4ADE80),
     'pending': const Color(0xFFFBBF24),

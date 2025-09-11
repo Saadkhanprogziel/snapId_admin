@@ -13,7 +13,7 @@ import 'package:admin/views/user_management/user_management.dart';
 import 'package:admin/views/support/support.dart';
 import 'package:admin/views/activity/activity.dart';
 import 'package:admin/views/price_setting/pricing_setting.dart';
-import 'package:admin/views/settings/settings.dart';
+import 'package:admin/views/settings/settings_screen.dart';
 
 class AppRouter {
   static final router = GoRouter(

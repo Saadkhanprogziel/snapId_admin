@@ -1,6 +1,6 @@
 import 'package:admin/network/network_repository.dart';
 import 'package:admin/services/local_storage_service.dart';
-import 'package:admin/services/socket_service.dart';
+// import 'package:admin/services/socket_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
@@ -14,10 +14,10 @@ final localStorage = LocalStorageService.instance;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  late SocketService appSocket;
+  // late SocketService appSocket;
   await GetStorage.init();
   setUrlStrategy(PathUrlStrategy());
-  final appController = Get.put(AppController());
+  Get.put(AppController());
   runApp(
     ScreenUtilInit(
       designSize: Size(375, 812),

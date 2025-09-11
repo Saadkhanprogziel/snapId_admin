@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:get/get.dart';
-// Import your AuthController
 
 class SideMenu extends StatelessWidget {
   const SideMenu({super.key});
@@ -32,7 +31,6 @@ class SideMenu extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 20),
             child: CustomScrollView(
                 slivers: [
-                // Fixed header section
                 SliverToBoxAdapter(
                   child: Column(
                   children: [
@@ -49,7 +47,6 @@ class SideMenu extends StatelessWidget {
                   ],
                   ),
                 ),
-                // Scrollable menu items
                 SliverList(
                   delegate: SliverChildListDelegate([
                   _sideMenuItem(
@@ -94,13 +91,6 @@ class SideMenu extends StatelessWidget {
                     route: "/price-settings",
                     selected: currentRoute == '/price-settings',
                   ),
-                  // _sideMenuItem(
-                  //   context,
-                  //   icon: "assets/icons/activity.svg",
-                  //   label: "User Activity",
-                  //   route: "/user-activity",
-                  //   selected: currentRoute == '/user-activity',
-                  // ),
                   _sideMenuItem(
                     context,
                     icon: "assets/icons/analytics.svg",
@@ -108,11 +98,9 @@ class SideMenu extends StatelessWidget {
                     route: "/settings",
                     selected: currentRoute == '/settings',
                   ),
-                  // Add some space before the sign out button
                   const SizedBox(height: 40),
                   ]),
                 ),
-                // Fixed Sign Out button at the bottom
                 SliverFillRemaining(
                   hasScrollBody: false,
                   child: Align(
@@ -139,12 +127,9 @@ class SideMenu extends StatelessWidget {
                       alignment: Alignment.centerLeft,
                       ),
                       onPressed: () async {
-                        // Show confirmation dialog before logout
                         final bool shouldLogout = await _showLogoutDialog(context);
                         if (shouldLogout) {
-                          // Call the logout method from AuthController
                           authController.logout(context);
-                          // Navigate to login page after logout
                           if (context.mounted) {
                             context.go('/login');
                           }
@@ -178,7 +163,6 @@ class SideMenu extends StatelessWidget {
     );
   }
 
-  // Add confirmation dialog for logout
   Future<bool> _showLogoutDialog(BuildContext context) async {
     return await showDialog<bool>(
       context: context,
