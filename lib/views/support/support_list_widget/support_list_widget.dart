@@ -178,8 +178,8 @@ class SupportListWidget extends StatelessWidget {
                         DataCell(Text(_formatDate(ticket.createdAt))),
                         DataCell(_buildStatusChip(ticket.status)),
                         DataCell(Text(ticket.user.email)),
-                        DataCell(_buildActionButton(ticket,
-                            Icons.visibility, "View", isDark, context)),
+                        DataCell(_buildActionButton(
+                            ticket, Icons.visibility, "View", isDark, context)),
                       ]);
                     }).toList(),
                   );
@@ -446,7 +446,9 @@ class SupportListWidget extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        drawerController.setDrawerContent(SupportChatScreen(ticket: ticket,));
+        drawerController.setDrawerContent(SupportChatScreen(
+          ticket: ticket, key: ValueKey(ticket.id), // unique per ticket
+        ));
         drawerController.toggleDrawer();
       },
       child: Container(

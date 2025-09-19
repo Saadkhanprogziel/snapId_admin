@@ -1,91 +1,68 @@
-class Message {
+class ChatMessage {
   final String id;
+  final String chatId;
+  final String senderId;
   final String content;
-  final bool isCustomer;
-  final String timestamp;
-  final String senderName;
-  final String? senderAvatar;
+  final String status;
   final DateTime createdAt;
+  final Sender sender;
 
-  Message({
+  ChatMessage({
     required this.id,
+    required this.chatId,
+    required this.senderId,
     required this.content,
-    required this.isCustomer,
-    required this.timestamp,
-    required this.senderName,
-    this.senderAvatar,
+    required this.status,
     required this.createdAt,
+    required this.sender,
   });
 
-  // Factory constructor to create a Message from JSON
-  factory Message.fromJson(Map<String, dynamic> json) {
-    return Message(
-      id: json['id'] ?? '',
-      content: json['content'] ?? '',
-      isCustomer: json['isCustomer'] ?? false,
-      timestamp: json['timestamp'] ?? '',
-      senderName: json['senderName'] ?? '',
-      senderAvatar: json['senderAvatar'],
-      createdAt: DateTime.parse(json['createdAt']),
-    );
-  }
+  factory ChatMessage.fromJson(Map<String, dynamic> json) => ChatMessage(
+        id: json['id'],
+        chatId: json['chatId'],
+        senderId: json['senderId'],
+        content: json['content'],
+        status: json['status'],
+        createdAt: DateTime.parse(json['createdAt']),
+        sender: Sender.fromJson(json['sender']),
+      );
 
-  // Method to convert Message to JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'content': content,
-      'isCustomer': isCustomer,
-      'timestamp': timestamp,
-      'senderName': senderName,
-      'senderAvatar': senderAvatar,
-      'createdAt': createdAt.toIso8601String(),
-    };
-  }
-
-  // Helper method to get sender initial
-  String get senderInitial {
-    return senderName.isNotEmpty ? senderName[0].toUpperCase() : '?';
-  }
-
-  // Helper method to format timestamp for display
-  String get formattedTime {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final messageDate = DateTime(createdAt.year, createdAt.month, createdAt.day);
-    
-    if (messageDate == today) {
-      // Today - show time only
-      final hour = createdAt.hour > 12 ? createdAt.hour - 12 : createdAt.hour == 0 ? 12 : createdAt.hour;
-      final minute = createdAt.minute.toString().padLeft(2, '0');
-      final period = createdAt.hour >= 12 ? 'PM' : 'AM';
-      return '$hour:$minute $period';
-    } else {
-      // Other days - show date and time
-      final month = createdAt.month.toString().padLeft(2, '0');
-      final day = createdAt.day.toString().padLeft(2, '0');
-      return '$month/$day/${createdAt.year}';
-    }
-  }
-
-  // Copy with method for immutable updates
-  Message copyWith({
-    String? id,
-    String? content,
-    bool? isCustomer,
-    String? timestamp,
-    String? senderName,
-    String? senderAvatar,
-    DateTime? createdAt,
-  }) {
-    return Message(
-      id: id ?? this.id,
-      content: content ?? this.content,
-      isCustomer: isCustomer ?? this.isCustomer,
-      timestamp: timestamp ?? this.timestamp,
-      senderName: senderName ?? this.senderName,
-      senderAvatar: senderAvatar ?? this.senderAvatar,
-      createdAt: createdAt ?? this.createdAt,
-    );
-  }
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'chatId': chatId,
+        'senderId': senderId,
+        'content': content,
+        'status': status,
+        'createdAt': createdAt.toIso8601String(),
+        'sender': sender.toJson(),
+      };
 }
+
+class Sender {
+  final String id;
+  final String firstName;
+  final String lastName;
+  final String role;
+
+  Sender({
+    required this.id,
+    required this.firstName,
+    required this.lastName,
+    required this.role,
+  });
+
+  factory Sender.fromJson(Map<String, dynamic> json) => Sender(
+        id: json['id'],
+        firstName: json['firstName'],
+        lastName: json['lastName'],
+        role: json['role'],
+      );
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'firstName': firstName,
+        'lastName': lastName,
+        'role': role,
+      };
+}
+

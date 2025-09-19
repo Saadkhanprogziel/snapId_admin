@@ -20,7 +20,7 @@ class ChatSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1F2937) : Colors.white,
+        color:  isDark ? Color(0xFF23272F) : Colors.transparent,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           width: 0.5,
@@ -113,23 +113,23 @@ class ChatHeader extends StatelessWidget {
                   color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
                 ),
               )),
-          const Spacer(),
-          Obx(() => Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: _getStatusColor(controller.chatStatus.value)
-                      .withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  "Active",
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: _getStatusColor("active"),
-                  ),
-                ),
-              )),
+          // const Spacer(),
+          // Obx(() => Container(
+          //       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          //       decoration: BoxDecoration(
+          //         color: _getStatusColor(controller.chatStatus.value)
+          //             .withOpacity(0.1),
+          //         borderRadius: BorderRadius.circular(12),
+          //       ),
+          //       child: Text(
+          //         "Active",
+          //         style: TextStyle(
+          //           fontSize: 12,
+          //           fontWeight: FontWeight.w500,
+          //           color: _getStatusColor("active"),
+          //         ),
+          //       ),
+          //     )),
         ],
       ),
     );

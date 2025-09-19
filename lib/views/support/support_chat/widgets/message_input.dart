@@ -21,7 +21,7 @@ class MessageInput extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border(
           top: BorderSide(
-            color: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
+            color:  isDark! ? Color(0xFF23272F) : Colors.transparent,
             width: 0.5,
           ),
         ),
@@ -30,7 +30,7 @@ class MessageInput extends StatelessWidget {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF374151) : Colors.grey.shade50,
+              color:  isDark! ? Color.fromARGB(255, 40, 46, 58) : Colors.transparent,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: isDark ? Colors.grey.shade600 : Colors.grey.shade300,

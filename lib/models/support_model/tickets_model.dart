@@ -23,13 +23,13 @@ class TicketsData {
     };
   }
 }
-
 class TicketDetails {
   final String id;
   final String title;
   final String description;
   final String status;
   final DateTime createdAt;
+  final String chatId; // <-- add this
   final User user;
 
   TicketDetails({
@@ -38,6 +38,7 @@ class TicketDetails {
     required this.description,
     required this.status,
     required this.createdAt,
+    required this.chatId, // <-- add this
     required this.user,
   });
 
@@ -48,6 +49,7 @@ class TicketDetails {
       description: json['description'],
       status: json['status'],
       createdAt: DateTime.parse(json['createdAt']),
+      chatId: json['chat']?['id'], // <-- safely extract chat id
       user: User.fromJson(json['user']),
     );
   }
@@ -59,6 +61,7 @@ class TicketDetails {
       'description': description,
       'status': status,
       'createdAt': createdAt.toIso8601String(),
+      'chat': {'id': chatId}, // <-- keep structure same as API
       'user': user.toJson(),
     };
   }

@@ -1,4 +1,5 @@
 import 'dart:developer';
+
 import 'package:admin/constants/constants.dart';
 import 'package:admin/main.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
@@ -12,11 +13,11 @@ class SocketService {
 
   void _initializeSocketService() {
     _socket = IO.io(
-        baseUrl,
+        baseUrl ,
         IO.OptionBuilder()
             .setTransports(['websocket'])
             .enableAutoConnect()
-            .setAuth({'token': localStorage.getString("token")})
+            .setAuth({'token':  localStorage.getString("token")})
             .build());
     _socket.connect();
 
@@ -42,18 +43,29 @@ class SocketService {
       }
     });
   }
-
-  void listenToRecieveMessageEvent(void Function(dynamic data) dataCallBack) {
-    _socket.off("receive_message");
-    _socket.on('receive_message', (data) {
+void listenToRecieveMessageEvent(void Function(dynamic data) dataCallBack) {
+    _socket.off("new_message");
+    _socket.on('new_message', (data) {
       log("Recieved data in sockets: $data");
       if (data != null) {
         dataCallBack.call(data);
       }
     });
 
-    log("Is reciever initialized: ${_socket.hasListeners("receive_message")}");
+    log("Is reciever initialized: ${_socket.hasListeners("new_message")}");
   }
+
+  // void listenToRecieveMessageEvent(void Function(dynamic data) dataCallBack) {
+  //   _socket.off("receive_message");
+  //   _socket.on('receive_message', (data) {
+  //     log("Recieved data in sockets: $data");
+  //     if (data != null) {
+  //       dataCallBack.call(data);
+  //     }
+  //   });
+
+  //   log("Is reciever initialized: ${_socket.hasListeners("receive_message")}");
+  // }
 
   void listenToEvent(String event, dynamic Function(dynamic) callBackData) {
     _socket.on(event, callBackData);

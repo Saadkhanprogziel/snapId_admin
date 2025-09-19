@@ -1,25 +1,60 @@
+import 'dart:developer';
+
+import 'package:admin/main.dart';
 import 'package:admin/models/support_model/message.dart';
 import 'package:admin/models/support_model/tickets_model.dart';
+import 'package:admin/repositories/chat_repository/chat_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 class SupportChatController extends GetxController {
+  final chatRepository = ChatRepository();
+
   var chatStatus = 'Open'.obs;
   final List<String> statuses = ['Open', 'Pending', 'Closed'];
   var ticketDetails = Rxn<TicketDetails>();
 
   var isLoading = false.obs;
   var isSendingMessage = false.obs;
+  var isTyping = false.obs;
 
   final messageTextController = TextEditingController();
+  final ScrollController scrollController = ScrollController();
 
-  var messages = <Message>[].obs;
+  var messages = <ChatMessage>[].obs;
+  var currentChatId = ''.obs;
+  var isInitialized = false.obs;
 
-  void setTicketModel(TicketDetails? ticket) {
+  void setTicketModel(TicketDetails? ticket) async {
     ticketDetails.value = ticket;
     if (ticketDetails.value?.id != null) {
-      loadMessages();
+      currentChatId.value = ticketDetails.value?.chatId ?? "";
+      
+      // Initialize chat after setting the chatId
+      await _initializeChat();
+    }
+  }
+
+  // Private method to initialize chat with proper sequence
+  Future<void> _initializeChat() async {
+    if (currentChatId.value.isEmpty || isInitialized.value) return;
+    
+    log("[_initializeChat] Initializing chat with ID: ${currentChatId.value}");
+    
+    try {
+      // 1. First join the room
+      joinRoom();
+      
+      // 2. Then load messages
+      await loadMessages();
+      
+      // 3. Mark as initialized
+      isInitialized.value = true;
+      
+      log("[_initializeChat] Chat initialization completed");
+    } catch (e) {
+      log("[_initializeChat] Error during initialization: $e");
     }
   }
 
@@ -30,127 +65,64 @@ class SupportChatController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-
-    loadMessages();
+    // Don't initialize chat here since we don't have chatId yet
+    // log("[onInit] Controller initialized, waiting for ticket data");
   }
 
   @override
   void onClose() {
     messageTextController.dispose();
+    scrollController.dispose();
+    
+    leaveRoom();
     super.onClose();
   }
 
   void updateTicketStatus(String value) {
     chatStatus.value = value;
+    
+    _updateTicketStatusOnServer(value);
   }
 
   Future<void> loadMessages() async {
-    if (ticketDetails.value?.id == null) return;
+    if (currentChatId.value.isEmpty) {
+      log("[loadMessages] No chat ID available");
+      return;
+    }
 
     try {
       isLoading.value = true;
+      log("[loadMessages] Loading messages for chat: ${currentChatId.value}");
+      
+      await chatRepository
+          .fetchAllMessages(chatId: currentChatId.value, limit: 20)
+          .then((response) {
+        response.fold((error) {
+          log("[loadMessages] Error from repository: $error");
+          Get.snackbar(
+            'Error',
+            'Failed to load messages: $error',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+          );
+        }, (success) {
+          messages.value = success;
+          
+          
+          // Scroll to bottom after loading messages
+          _scrollToBottom();
+        });
+      });
 
-      await Future.delayed(const Duration(milliseconds: 500));
-
-      final List<Map<String, dynamic>> sampleData = [
-        {
-          'id': '1',
-          'content':
-              "Hi, I'm having trouble with my payment. It keeps getting declined even though my card is valid.",
-          'isCustomer': true,
-          'timestamp': '2:30 PM',
-          'senderName': ticketDetails.value!.user.firstName,
-          'createdAt': DateTime.now()
-              .subtract(const Duration(hours: 2, minutes: 30))
-              .toIso8601String(),
-        },
-        {
-          'id': '2',
-          'content':
-              "Hello ${ticketDetails.value!.user.firstName}! I'm sorry to hear about the payment issue. Let me help you with that. Can you please tell me which payment method you're trying to use?",
-          'isCustomer': false,
-          'timestamp': '2:32 PM',
-          'senderName': 'Support',
-          'createdAt': DateTime.now()
-              .subtract(const Duration(hours: 2, minutes: 28))
-              .toIso8601String(),
-        },
-        {
-          'id': '3',
-          'content':
-              "I'm using my Visa card ending in 1234. It worked fine last month.",
-          'isCustomer': true,
-          'timestamp': '2:35 PM',
-          'senderName': ticketDetails.value!.user.firstName,
-          'createdAt': DateTime.now()
-              .subtract(const Duration(hours: 2, minutes: 25))
-              .toIso8601String(),
-        },
-        {
-          'id': '4',
-          'content':
-              "Thank you for that information. Let me check your payment method on our end. Can you please verify the billing address associated with this card?",
-          'isCustomer': false,
-          'timestamp': '2:38 PM',
-          'senderName': 'Support',
-          'createdAt': DateTime.now()
-              .subtract(const Duration(hours: 2, minutes: 22))
-              .toIso8601String(),
-        },
-        {
-          'id': '5',
-          'content':
-              "Sure! The billing address is 123 Main Street, New York, NY 10001",
-          'isCustomer': true,
-          'timestamp': '2:40 PM',
-          'senderName': ticketDetails.value!.user.firstName,
-          'createdAt': DateTime.now()
-              .subtract(const Duration(hours: 2, minutes: 20))
-              .toIso8601String(),
-        },
-        {
-          'id': '6',
-          'content':
-              "I can see the issue now. There seems to be a mismatch in the ZIP code. Please try updating your payment method with the correct ZIP code and try again.",
-          'isCustomer': false,
-          'timestamp': '2:42 PM',
-          'senderName': 'Support',
-          'createdAt': DateTime.now()
-              .subtract(const Duration(hours: 2, minutes: 18))
-              .toIso8601String(),
-        },
-        {
-          'id': '7',
-          'content':
-              "Oh, I see! Let me update that right now. Thank you for your help!",
-          'isCustomer': true,
-          'timestamp': '2:45 PM',
-          'senderName': ticketDetails.value!.user.firstName,
-          'createdAt': DateTime.now()
-              .subtract(const Duration(hours: 2, minutes: 15))
-              .toIso8601String(),
-        },
-        {
-          'id': '8',
-          'content':
-              "You're welcome! Please let me know if you need any further assistance. I'll keep this ticket open until you confirm the payment is working.",
-          'isCustomer': false,
-          'timestamp': '2:47 PM',
-          'senderName': 'Support',
-          'createdAt': DateTime.now()
-              .subtract(const Duration(hours: 2, minutes: 13))
-              .toIso8601String(),
-        },
-      ];
-
-      messages.value =
-          sampleData.map((data) => Message.fromJson(data)).toList();
     } catch (e) {
-      print('Error loading messages: $e');
+      log("[loadMessages] Error loading messages: $e");
       Get.snackbar(
         'Error',
-        'Failed to load messages',
+        'Failed to load messages: ${e.toString()}',
         snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
       );
     } finally {
       isLoading.value = false;
@@ -159,59 +131,192 @@ class SupportChatController extends GetxController {
 
   Future<void> sendMessage() async {
     final messageContent = messageTextController.text.trim();
-    if (messageContent.isEmpty) return;
+
+    if (messageContent.isEmpty) {
+      log("[sendMessage] Message content is empty");
+      return;
+    }
+
+    if (currentChatId.value.isEmpty) {
+      log("[sendMessage] No chat ID available");
+      Get.snackbar(
+        'Error',
+        'No active chat session',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
 
     try {
       isSendingMessage.value = true;
+      log("[sendMessage] Sending message: $messageContent");
 
-      final newMessage = Message(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        content: messageContent,
-        isCustomer: false,
-        timestamp: _formatCurrentTime(),
-        senderName: 'Support',
-        createdAt: DateTime.now(),
-      );
+      
+      appSocket.fireEvent('send_message', {
+        'chatID': currentChatId.value,
+        'content': messageContent,
+      });
 
       messageTextController.clear();
 
-      messages.add(newMessage);
-
-      await Future.delayed(const Duration(milliseconds: 300));
+      
+      _scrollToBottom();
     } catch (e) {
-      print('Error sending message: $e');
+      log("[sendMessage] Error sending message: $e");
       Get.snackbar(
         'Error',
-        'Failed to send message',
+        'Failed to send message: ${e.toString()}',
         snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
       );
     } finally {
       isSendingMessage.value = false;
     }
   }
 
-  void addMessage(Message message) {
-    messages.add(message);
+  void listenEvents() {
+    log("[listenEvents] Setting up socket event listeners");
+
+    
+    appSocket.listenToRecieveMessageEvent((data) {
+      log("[listenEvents] Message received: $data");
+      try {
+        final message = ChatMessage.fromJson(data);
+        addNewMessage(message);
+      } catch (e) {
+        log("[listenEvents] Error parsing received message: $e");
+      }
+    });
+
+    
+    appSocket.listenToEvent('user_typing', (data) {
+      log("[listenEvents] User typing event: $data");
+      if (data['chatID'] == currentChatId.value) {
+        isTyping.value = data['isTyping'] ?? false;
+      }
+    });
+
+    
+    appSocket.listenToEvent('status_updated', (data) {
+      log("[listenEvents] Status updated: $data");
+      if (data['chatID'] == currentChatId.value) {
+        chatStatus.value = data['status'] ?? 'Open';
+      }
+    });
+
+    
+    appSocket.listenToEvent('connect', (data) {
+      log("[listenEvents] Socket connected");
+    });
+
+    appSocket.listenToEvent('disconnect', (data) {
+      log("[listenEvents] Socket disconnected");
+    });
   }
 
-  void removeMessage(String messageId) {
-    messages.removeWhere((message) => message.id == messageId);
-  }
+  void addNewMessage(ChatMessage message) {
+    log("[addNewMessage] Adding new message: ${message.content}");
 
-  void updateMessage(String messageId, String newContent) {
-    final index = messages.indexWhere((message) => message.id == messageId);
-    if (index != -1) {
-      messages[index] = messages[index].copyWith(content: newContent);
+    
+    bool messageExists = messages.any((msg) => msg.id == message.id);
+
+    if (!messageExists) {
+      messages.add(message);
+
+      
+      messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+
+      
+      _scrollToBottom();
+
+      log("[addNewMessage] Message added successfully. Total messages: ${messages.length}");
+    } else {
+      log("[addNewMessage] Message already exists, skipping duplicate");
     }
   }
 
+  void joinRoom() {
+    if (currentChatId.value.isEmpty) {
+      log("[joinRoom] No chat ID available");
+      return;
+    }
+
+    log("[joinRoom] Joining room with chatId: ${currentChatId.value}");
+
+    try {
+      appSocket.fireEvent('join_chat', {
+        'chatID': currentChatId.value,
+      });
+
+      
+      listenEvents();
+      
+      log("[joinRoom] Successfully joined room and set up listeners");
+    } catch (e) {
+      log("[joinRoom] Error joining room: $e");
+    }
+  }
+
+  void leaveRoom() {
+    if (currentChatId.value.isEmpty) return;
+
+    log("[leaveRoom] Leaving room with chatId: ${currentChatId.value}");
+
+    try {
+      appSocket.fireEvent('leave_chat', {
+        'chatID': currentChatId.value,
+      });
+    } catch (e) {
+      log("[leaveRoom] Error leaving room: $e");
+    }
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (scrollController.hasClients) {
+        Future.delayed(const Duration(milliseconds: 100), () {
+          if (scrollController.hasClients) {
+            scrollController.animateTo(
+              scrollController.position.maxScrollExtent,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOut,
+            );
+          }
+        });
+      }
+    });
+  }
+
+  Future<void> _updateTicketStatusOnServer(String status) async {
+    try {
+
+      appSocket.fireEvent('update_status', {
+        'chatID': currentChatId.value,
+        'status': status,
+      });
+    } catch (e) {
+      log("[_updateTicketStatusOnServer] Error updating status: $e");
+      Get.snackbar(
+        'Error',
+        'Failed to update ticket status: ${e.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  
   int get messageCount => messages.length;
 
-  int get customerMessageCount => messages.where((m) => m.isCustomer).length;
+  int get customerMessageCount =>
+      messages.where((m) => m.sender.role.toLowerCase() == 'user').length;
 
-  int get supportMessageCount => messages.where((m) => !m.isCustomer).length;
+  int get supportMessageCount =>
+      messages.where((m) => m.sender.role.toLowerCase() != 'user').length;
 
-  String _formatCurrentTime() {
+  String formatCurrentTime() {
     final now = DateTime.now();
     final hour = now.hour > 12
         ? now.hour - 12
@@ -224,8 +329,46 @@ class SupportChatController extends GetxController {
   }
 
   Future<void> refreshMessages() async {
+    messages.clear();
     await loadMessages();
   }
 
-  void markAsRead() {}
+  void markAsRead() {
+    try {
+      appSocket.fireEvent('mark_as_read', {
+        'chatID': currentChatId.value,
+      });
+      log("[markAsRead] Marked messages as read for chat: ${currentChatId.value}");
+    } catch (e) {
+      log("[markAsRead] Error marking messages as read: $e");
+    }
+  }
+
+  void sendTypingIndicator(bool isTyping) {
+    try {
+      appSocket.fireEvent('typing', {
+        'chatID': currentChatId.value,
+        'isTyping': isTyping,
+      });
+    } catch (e) {
+      log("[sendTypingIndicator] Error sending typing indicator: $e");
+    }
+  }
+
+  
+  void cleanup() {
+    messages.clear();
+    messageTextController.clear();
+    isLoading.value = false;
+    isSendingMessage.value = false;
+    isTyping.value = false;
+    isInitialized.value = false;
+  }
+
+  // Method to manually trigger initialization if needed
+  Future<void> initializeChatIfNeeded() async {
+    if (!isInitialized.value && currentChatId.value.isNotEmpty) {
+      await _initializeChat();
+    }
+  }
 }

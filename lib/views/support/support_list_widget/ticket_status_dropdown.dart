@@ -36,7 +36,7 @@ class StatusDropdown extends StatelessWidget {
             fontWeight: FontWeight.w500,
           ),
           borderRadius: BorderRadius.circular(12),
-          dropdownColor: isDark ? const Color(0xFF374151) : Colors.white,
+          dropdownColor:  isDark ? Color(0xFF23272F) : Colors.transparent,
           items: controller.statuses.map((String value) {
             return DropdownMenuItem<String>(
               value: value,

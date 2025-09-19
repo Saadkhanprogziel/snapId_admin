@@ -18,7 +18,7 @@ class TicketDetailsCard extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1F2937) : Colors.white,
+            color:  isDark! ? Color(0xFF23272F) : Colors.transparent,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               width: 0.5,
