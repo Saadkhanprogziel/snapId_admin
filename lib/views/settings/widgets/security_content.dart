@@ -69,7 +69,10 @@ class SecurityContent extends StatelessWidget {
         ],
         const SizedBox(height: 40),
         SettingsButtons(
-          onSave: controller.savePasswordChanges,
+          onSave:(){
+
+          controller.savePasswordChanges(context);
+          } ,
           onCancel: controller.cancelPasswordChanges,
           isMobile: isMobile,
         ),

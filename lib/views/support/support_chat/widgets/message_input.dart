@@ -1,3 +1,4 @@
+import 'package:admin/constants/colors.dart';
 import 'package:admin/controller/support_controller/support_chat_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -30,7 +31,7 @@ class MessageInput extends StatelessWidget {
         children: [
           Container(
             decoration: BoxDecoration(
-              color:  isDark! ? Color.fromARGB(255, 40, 46, 58) : Colors.transparent,
+              color:   !isDark ? Colors.grey.shade50 : Colors.transparent,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: isDark ? Colors.grey.shade600 : Colors.grey.shade300,
@@ -70,7 +71,7 @@ class MessageInput extends StatelessWidget {
               const Spacer(),
               Obx(() => ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF3B82F6),
+                      backgroundColor: AppColors.primaryColor,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),

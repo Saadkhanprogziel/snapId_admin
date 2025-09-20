@@ -20,19 +20,12 @@ class ChatSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color:  isDark ? Color(0xFF23272F) : Colors.transparent,
+        color: isDark ? Color(0xFF23272F) : Colors.transparent,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           width: 0.5,
           color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: Column(
         children: [
@@ -79,58 +72,61 @@ class ChatHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
-            width: 0.5,
-          ),
-        ),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            Icons.chat_bubble_outline,
-            size: 20,
-            color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
-          ),
-          const SizedBox(width: 12),
-          Text(
-            "Conversation",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: isDark ? Colors.white : const Color(0xFF111827),
+    return ClipRRect(
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: !isDark ? Colors.grey.shade50 : Colors.transparent,
+          border: Border(
+            bottom: BorderSide(
+              color: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
+              width: 0.5,
             ),
           ),
-          const SizedBox(width: 8),
-          Obx(() => Text(
-                "(${controller.messageCount})",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
-                ),
-              )),
-          // const Spacer(),
-          // Obx(() => Container(
-          //       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          //       decoration: BoxDecoration(
-          //         color: _getStatusColor(controller.chatStatus.value)
-          //             .withOpacity(0.1),
-          //         borderRadius: BorderRadius.circular(12),
-          //       ),
-          //       child: Text(
-          //         "Active",
-          //         style: TextStyle(
-          //           fontSize: 12,
-          //           fontWeight: FontWeight.w500,
-          //           color: _getStatusColor("active"),
-          //         ),
-          //       ),
-          //     )),
-        ],
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.chat_bubble_outline,
+              size: 20,
+              color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+            ),
+            const SizedBox(width: 12),
+            Text(
+              "Conversation",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: isDark ? Colors.white : const Color(0xFF111827),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Obx(() => Text(
+                  "(${controller.messageCount})",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                  ),
+                )),
+            // const Spacer(),
+            // Obx(() => Container(
+            //       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            //       decoration: BoxDecoration(
+            //         color: _getStatusColor(controller.chatStatus.value)
+            //             .withOpacity(0.1),
+            //         borderRadius: BorderRadius.circular(12),
+            //       ),
+            //       child: Text(
+            //         "Active",
+            //         style: TextStyle(
+            //           fontSize: 12,
+            //           fontWeight: FontWeight.w500,
+            //           color: _getStatusColor("active"),
+            //         ),
+            //       ),
+            //     )),
+          ],
+        ),
       ),
     );
   }

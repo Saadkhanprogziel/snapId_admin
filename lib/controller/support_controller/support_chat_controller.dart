@@ -11,8 +11,8 @@ import 'package:intl/intl.dart';
 class SupportChatController extends GetxController {
   final chatRepository = ChatRepository();
 
-  var chatStatus = 'Open'.obs;
-  final List<String> statuses = ['Open', 'Pending', 'Closed'];
+  var chatStatus = 'OPEN'.obs;
+  final List<String> statuses = ['OPEN', 'PENDING', 'CLOSED'];
   var ticketDetails = Rxn<TicketDetails>();
 
   var isLoading = false.obs;
@@ -24,13 +24,16 @@ class SupportChatController extends GetxController {
 
   var messages = <ChatMessage>[].obs;
   var currentChatId = ''.obs;
+  var currentTicketId = ''.obs;
   var isInitialized = false.obs;
 
   void setTicketModel(TicketDetails? ticket) async {
     ticketDetails.value = ticket;
     if (ticketDetails.value?.id != null) {
+      chatStatus.value = ticket!.status;
       currentChatId.value = ticketDetails.value?.chatId ?? "";
-      
+      currentTicketId.value = ticketDetails.value?.id ?? "";
+
       // Initialize chat after setting the chatId
       await _initializeChat();
     }
@@ -39,20 +42,18 @@ class SupportChatController extends GetxController {
   // Private method to initialize chat with proper sequence
   Future<void> _initializeChat() async {
     if (currentChatId.value.isEmpty || isInitialized.value) return;
-    
+
     log("[_initializeChat] Initializing chat with ID: ${currentChatId.value}");
-    
+
     try {
       // 1. First join the room
       joinRoom();
-      
+
       // 2. Then load messages
       await loadMessages();
-      
+
       // 3. Mark as initialized
       isInitialized.value = true;
-      
-      log("[_initializeChat] Chat initialization completed");
     } catch (e) {
       log("[_initializeChat] Error during initialization: $e");
     }
@@ -73,15 +74,46 @@ class SupportChatController extends GetxController {
   void onClose() {
     messageTextController.dispose();
     scrollController.dispose();
-    
+
     leaveRoom();
     super.onClose();
   }
 
   void updateTicketStatus(String value) {
+    print("Updating ticket ${currentTicketId.value} to $value");
     chatStatus.value = value;
-    
+
     _updateTicketStatusOnServer(value);
+  }
+
+  Future<void> _updateTicketStatusOnServer(String status) async {
+    try {
+      String eventName;
+
+      // Determine the correct event based on status
+      switch (status.toUpperCase()) {
+        case 'OPEN':
+          eventName = 'admin_open_ticket';
+          break;
+        case 'PENDING':
+          eventName = 'admin_pending_ticket';
+          break;
+        case 'CLOSED':
+          eventName = 'admin_close_ticket';
+          break;
+        default:
+          eventName = 'admin_update_ticket_status';
+          break;
+      }
+
+      appSocket.fireEvent(eventName, {
+        'ticketId': currentTicketId.value,
+      });
+
+      log("[_updateTicketStatusOnServer] Fired event: $eventName with status: $status");
+    } catch (e) {
+      log("[_updateTicketStatusOnServer] Error updating status: $e");
+    }
   }
 
   Future<void> loadMessages() async {
@@ -93,9 +125,9 @@ class SupportChatController extends GetxController {
     try {
       isLoading.value = true;
       log("[loadMessages] Loading messages for chat: ${currentChatId.value}");
-      
+
       await chatRepository
-          .fetchAllMessages(chatId: currentChatId.value, limit: 20)
+          .fetchAllMessages(chatId: currentChatId.value, limit: 50)
           .then((response) {
         response.fold((error) {
           log("[loadMessages] Error from repository: $error");
@@ -108,13 +140,11 @@ class SupportChatController extends GetxController {
           );
         }, (success) {
           messages.value = success;
-          
-          
+
           // Scroll to bottom after loading messages
           _scrollToBottom();
         });
       });
-
     } catch (e) {
       log("[loadMessages] Error loading messages: $e");
       Get.snackbar(
@@ -151,7 +181,6 @@ class SupportChatController extends GetxController {
       isSendingMessage.value = true;
       log("[sendMessage] Sending message: $messageContent");
 
-      
       appSocket.fireEvent('send_message', {
         'chatID': currentChatId.value,
         'content': messageContent,
@@ -159,7 +188,6 @@ class SupportChatController extends GetxController {
 
       messageTextController.clear();
 
-      
       _scrollToBottom();
     } catch (e) {
       log("[sendMessage] Error sending message: $e");
@@ -178,7 +206,6 @@ class SupportChatController extends GetxController {
   void listenEvents() {
     log("[listenEvents] Setting up socket event listeners");
 
-    
     appSocket.listenToRecieveMessageEvent((data) {
       log("[listenEvents] Message received: $data");
       try {
@@ -189,7 +216,6 @@ class SupportChatController extends GetxController {
       }
     });
 
-    
     appSocket.listenToEvent('user_typing', (data) {
       log("[listenEvents] User typing event: $data");
       if (data['chatID'] == currentChatId.value) {
@@ -197,7 +223,6 @@ class SupportChatController extends GetxController {
       }
     });
 
-    
     appSocket.listenToEvent('status_updated', (data) {
       log("[listenEvents] Status updated: $data");
       if (data['chatID'] == currentChatId.value) {
@@ -205,29 +230,19 @@ class SupportChatController extends GetxController {
       }
     });
 
-    
-    appSocket.listenToEvent('connect', (data) {
-      log("[listenEvents] Socket connected");
-    });
-
-    appSocket.listenToEvent('disconnect', (data) {
-      log("[listenEvents] Socket disconnected");
-    });
+  
   }
 
   void addNewMessage(ChatMessage message) {
     log("[addNewMessage] Adding new message: ${message.content}");
 
-    
     bool messageExists = messages.any((msg) => msg.id == message.id);
 
     if (!messageExists) {
       messages.add(message);
 
-      
       messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
-      
       _scrollToBottom();
 
       log("[addNewMessage] Message added successfully. Total messages: ${messages.length}");
@@ -249,9 +264,8 @@ class SupportChatController extends GetxController {
         'chatID': currentChatId.value,
       });
 
-      
       listenEvents();
-      
+
       log("[joinRoom] Successfully joined room and set up listeners");
     } catch (e) {
       log("[joinRoom] Error joining room: $e");
@@ -288,26 +302,6 @@ class SupportChatController extends GetxController {
     });
   }
 
-  Future<void> _updateTicketStatusOnServer(String status) async {
-    try {
-
-      appSocket.fireEvent('update_status', {
-        'chatID': currentChatId.value,
-        'status': status,
-      });
-    } catch (e) {
-      log("[_updateTicketStatusOnServer] Error updating status: $e");
-      Get.snackbar(
-        'Error',
-        'Failed to update ticket status: ${e.toString()}',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-    }
-  }
-
-  
   int get messageCount => messages.length;
 
   int get customerMessageCount =>
@@ -333,29 +327,7 @@ class SupportChatController extends GetxController {
     await loadMessages();
   }
 
-  void markAsRead() {
-    try {
-      appSocket.fireEvent('mark_as_read', {
-        'chatID': currentChatId.value,
-      });
-      log("[markAsRead] Marked messages as read for chat: ${currentChatId.value}");
-    } catch (e) {
-      log("[markAsRead] Error marking messages as read: $e");
-    }
-  }
 
-  void sendTypingIndicator(bool isTyping) {
-    try {
-      appSocket.fireEvent('typing', {
-        'chatID': currentChatId.value,
-        'isTyping': isTyping,
-      });
-    } catch (e) {
-      log("[sendTypingIndicator] Error sending typing indicator: $e");
-    }
-  }
-
-  
   void cleanup() {
     messages.clear();
     messageTextController.clear();

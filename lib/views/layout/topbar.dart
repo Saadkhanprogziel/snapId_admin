@@ -1,11 +1,13 @@
 import 'package:admin/constants/colors.dart';
 import 'package:admin/controller/app_controller.dart';
+import 'package:admin/main.dart';
 import 'package:admin/theme/text_theme.dart';
 import 'package:admin/views/notification/notification.dart';
 import 'package:admin/views/settings/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:convert';
 
 class TopBar extends StatelessWidget {
     final VoidCallback? onSettingsPressed;
@@ -35,8 +37,19 @@ class TopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-        final drawerController = Get.find<AppController>();
-
+    final drawerController = Get.find<AppController>();
+    final userJson = localStorage.getString("user");
+    String userName = "";
+    String userRole = "";
+    String? profilePicUrl;
+    if (userJson != null) {
+      try {
+        final userMap = Map<String, dynamic>.from(jsonDecode(userJson));
+        userName = (userMap['firstName'] ?? "") + " " + (userMap['lastName'] ?? "");
+        userRole = userMap['role'] ?? "Admin";
+        profilePicUrl = userMap['profilePicture'] ?? userMap['profilePicLocalPath'];
+      } catch (_) {}
+    }
     final currentLocation = GoRouterState.of(context).uri.path;
     final title = _getTitle(currentLocation);
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -52,7 +65,7 @@ class TopBar extends StatelessWidget {
                 Text("Welcome",
                     style: CustomTextTheme.regular20
                         .copyWith(color: isDark ? Colors.white : AppColors.grey)),
-                Text("Marco Kasper!",
+                Text(userName.isNotEmpty ? userName : "!",
                     style: CustomTextTheme.regular24
                         .copyWith(color: isDark ? Colors.white : AppColors.blackColor)),
               ],
@@ -82,20 +95,25 @@ class TopBar extends StatelessWidget {
               GestureDetector(
                 onTap: (){
                   drawerController.toggleDrawer(
-                content:Settings()
-              );
+                    content:Settings()
+                  );
                 },
                 child: CircleAvatar(
-                    backgroundImage: NetworkImage(
-                        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")),
+                  backgroundImage: profilePicUrl != null && profilePicUrl.isNotEmpty
+                      ? NetworkImage(profilePicUrl)
+                      : null,
+                  child: profilePicUrl == null || profilePicUrl.isEmpty
+                      ? Icon(Icons.person)
+                      : null,
+                ),
               ),
               SizedBox(width: 8),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Marco Kasper",
+                  Text(userName.isNotEmpty ? userName : "User",
                       style: TextStyle(fontWeight: FontWeight.bold)),
-                  Text("Admin", style: TextStyle(fontSize: 12)),
+                  Text(userRole.isNotEmpty ? userRole : "Admin", style: TextStyle(fontSize: 12)),
                 ],
               )
             ],

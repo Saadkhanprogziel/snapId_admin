@@ -1,4 +1,4 @@
-class UserModel {
+class AdminUserModel {
   final String id;
   final String firstName;
   final String lastName;
@@ -10,7 +10,7 @@ class UserModel {
   final String gender;
   final String isActive;
 
-  UserModel({
+  AdminUserModel({
     required this.id,
     required this.firstName,
     required this.lastName,
@@ -23,9 +23,9 @@ class UserModel {
     required this.isActive,
   });
 
-  /// Create a UserModel from JSON
-  factory UserModel.fromJson(Map<String, dynamic> json) {
-    return UserModel(
+  /// Create a AdminUserModel from JSON
+  factory AdminUserModel.fromJson(Map<String, dynamic> json) {
+    return AdminUserModel(
       id: json['id'] ?? '',
       firstName: json['firstName'] ?? '',
       lastName: json['lastName'] ?? '',
@@ -39,7 +39,7 @@ class UserModel {
     );
   }
 
-  /// Convert UserModel to JSON
+  /// Convert AdminUserModel to JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,

@@ -1,28 +1,232 @@
+import 'dart:io';
+
+import 'package:admin/main.dart';
+import 'package:admin/repositories/auth_repository/auth_repository.dart';
+import 'package:admin/utils/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart'; // Added for kIsWeb
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
-import 'dart:typed_data'; // Added for Uint8List
+import 'dart:typed_data';
+import 'package:admin/models/admin_model/admin_model.dart';
+import 'package:image_picker/image_picker.dart';
 
 class SettingsController extends GetxController {
+  @override
+  void onInit() {
+    super.onInit();
+    fetchUserProfile();
+  }
+
+  // -------------------- Dependencies --------------------
+  final AuthRepository _authRepository = AuthRepository();
+
   // -------------------- Reactive States --------------------
   final selectedScreen = 'Profile Info'.obs;
-  final profileImagePath = ''.obs;
-  final profileImageBytes = Uint8List(0).obs; // Added for web support
+  final profileImageName = ''.obs;
+  final isLoading = false.obs;
+  final isUpdatingProfile = false.obs;
+  final isChangingPassword = false.obs;
 
+  // Notification settings
   final ticketNotifications = true.obs;
   final newOrderNotifications = false.obs;
   final isLightTheme = true.obs;
 
+  // Current user data
+  final currentUser = Rxn<AdminUserModel>();
+
   final Map<String, RxBool> obscureMap = {};
 
   // -------------------- Text Controllers --------------------
-  final nameController = TextEditingController(text: 'Marco Kasper');
-  final emailController = TextEditingController(text: 'admin@SnapID.app');
-  final phoneController = TextEditingController(text: '+1 789 937 5988');
+  final firstName = TextEditingController();
+  final lastName = TextEditingController();
+  final phoneController = TextEditingController();
 
   final currentPasswordController = TextEditingController();
   final newPasswordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
+
+  final selectedPhoto = Rxn<ImageProvider>();
+  final capturedPhoto = Rxn<XFile>();
+  final ImagePicker _picker = ImagePicker();
+  final isCapturingPhotos = false.obs;
+
+  Future<void> pickImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      capturedPhoto.value = pickedFile;
+      if (kIsWeb) {
+        Uint8List bytes = await pickedFile.readAsBytes();
+        selectedPhoto.value = MemoryImage(bytes);
+      } else {
+        selectedPhoto.value = Image.file(
+          File(pickedFile.path),
+        ).image;
+      }
+    }
+  }
+
+  Future<void> fetchUserProfile() async {
+    try {
+      isLoading.value = true;
+      final result = await _authRepository.getProfile();
+      result.fold(
+        (error) {
+          Get.snackbar(
+            'Error',
+            'Failed to fetch profile: $error',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+          );
+        },
+        (user) {
+          print("yesss ${localStorage.getString("user")}");
+          currentUser.value = user;
+          firstName.text = user.firstName;
+          lastName.text = user.lastName;
+          phoneController.text = user.phoneNo;
+        },
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> updateProfile() async {
+    try {
+      isUpdatingProfile.value = true;
+
+      Uint8List? imageBytes;
+      String? imageName;
+      if (capturedPhoto.value != null) {
+        imageBytes = await capturedPhoto.value!.readAsBytes();
+        imageName = capturedPhoto.value!.name;
+      }
+
+      final result = await _authRepository.updateProfile(
+        firstName: firstName.text.trim(),
+        lastName: lastName.text.trim(),
+        phoneNumber: phoneController.text.trim(),
+        profileImageBytes: imageBytes,
+        profileImageName: imageName,
+      );
+
+      result.fold(
+        (error) {
+          Get.snackbar(
+            'Error',
+            error,
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+          );
+        },
+        (updatedUser) {
+          currentUser.value = updatedUser;
+          fetchUserProfile();
+          Get.snackbar(
+            'Success',
+            'Profile updated successfully',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+          );
+        },
+      );
+    } finally {
+      isUpdatingProfile.value = false;
+    }
+  }
+
+  // -------------------- Password Management --------------------
+  Future<void> savePasswordChanges(BuildContext context) async {
+    if (isChangingPassword.value) return;
+
+    // Validation
+    if (currentPasswordController.text.isEmpty) {
+      showCustomSnackbar(
+        context: context,
+        message: 'Please enter your current password',
+        type: SnackbarType.error,
+      );
+      return;
+    }
+
+    if (newPasswordController.text.isEmpty) {
+      showCustomSnackbar(
+        context: context,
+        message: 'Please enter a new password',
+        type: SnackbarType.error,
+      );
+      return;
+    }
+
+    if (newPasswordController.text != confirmPasswordController.text) {
+      showCustomSnackbar(
+        context: context,
+        message: 'Password does not match',
+        type: SnackbarType.error,
+      );
+      return;
+    }
+
+    if (confirmPasswordController.text.length < 6) {
+      showCustomSnackbar(
+          context: context,
+          message: 'Password must be at least 6 characters long',
+          type: SnackbarType.success);
+      return;
+    }
+
+    try {
+      isChangingPassword.value = true;
+
+      final result = await _authRepository.changePassword(
+        currentPassword: currentPasswordController.text,
+        newPassword: newPasswordController.text,
+        confirmNewPassword: confirmPasswordController.text,
+      );
+
+      result.fold(
+        (error) {
+          Get.snackbar(
+            'Error',
+            error,
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+          );
+          showCustomSnackbar(
+              context: context, message: error, type: SnackbarType.success);
+        },
+        (success) {
+          clearPasswordFields();
+          showCustomSnackbar(
+              context: context,
+              message: " Successfully changed password.",
+              type: SnackbarType.success);
+        },
+      );
+    } finally {
+      isChangingPassword.value = false;
+    }
+  }
+
+  void clearPasswordFields() {
+    currentPasswordController.clear();
+    newPasswordController.clear();
+    confirmPasswordController.clear();
+  }
+
+  void cancelPasswordChanges() {
+    clearPasswordFields();
+    Get.snackbar(
+      'Cancelled',
+      'Password changes cancelled',
+      snackPosition: SnackPosition.BOTTOM,
+    );
+  }
 
   // -------------------- Obscure Text Handlers --------------------
   void initObscure(String key) {
@@ -49,101 +253,14 @@ class SettingsController extends GetxController {
 
   void toggleTheme(bool value) => isLightTheme.value = value;
 
-  // -------------------- Profile Image --------------------
-  void setProfileImage(String imagePath) {
-    profileImagePath.value = imagePath;
-    // Clear bytes when using file path
-    profileImageBytes.value = Uint8List(0);
-    Get.snackbar(
-      'Success',
-      'Profile picture updated successfully',
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.green,
-      colorText: Colors.white,
-    );
-  }
-
-  // Added for web support
-  void setProfileImageBytes(Uint8List imageBytes) {
-    profileImageBytes.value = imageBytes;
-
-    print("manzarrrrr $imageBytes");
-    // Clear file path when using bytes
-    profileImagePath.value = '';
-    Get.snackbar(
-      'Success',
-      'Profile picture updated successfully',
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.green,
-      colorText: Colors.white,
-    );
-  }
-
-  void removeProfileImage() {
-    profileImagePath.value = '';
-    profileImageBytes.value = Uint8List(0); // Clear bytes as well
-    Get.snackbar(
-      'Success',
-      'Profile picture removed successfully',
-      snackPosition: SnackPosition.BOTTOM,
-    );
-  }
-
-  // Helper method to check if profile image exists
-  bool get hasProfileImage {
-    if (kIsWeb) {
-      return profileImageBytes.value.isNotEmpty;
-    } else {
-      return profileImagePath.value.isNotEmpty;
-    }
-  }
-
-  // -------------------- Password --------------------
-  void savePasswordChanges() {
-    if (newPasswordController.text != confirmPasswordController.text) {
-      Get.snackbar('Error', 'Passwords do not match');
-      return;
-    }
-
-    Get.snackbar('Success', 'Password updated successfully');
-  }
-
-  void cancelPasswordChanges() {
-    currentPasswordController.clear();
-    newPasswordController.clear();
-    confirmPasswordController.clear();
-  }
-
-  // -------------------- General Settings --------------------
-  void saveSettings() {
-    Get.snackbar(
-      'Success',
-      'Settings saved successfully',
-      snackPosition: SnackPosition.BOTTOM,
-    );
-  }
-
-  void cancelChanges() {
-    nameController.text = 'Marco Kasper';
-    emailController.text = 'admin@SnapID.app';
-    phoneController.text = '+1 789 937 5988';
-    ticketNotifications.value = true;
-    newOrderNotifications.value = false;
-    profileImagePath.value = '';
-    profileImageBytes.value = Uint8List(0); // Clear bytes as well
-
-    Get.snackbar(
-      'Cancelled',
-      'Changes discarded',
-      snackPosition: SnackPosition.BOTTOM,
-    );
-  }
+  // -------------------- Reset Functions --------------------
+  void cancelChanges() {}
 
   // -------------------- Lifecycle --------------------
   @override
   void onClose() {
-    nameController.dispose();
-    emailController.dispose();
+    firstName.dispose();
+    lastName.dispose();
     phoneController.dispose();
     currentPasswordController.dispose();
     newPasswordController.dispose();

@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:admin/main.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:http/http.dart' as http;
@@ -17,7 +20,7 @@ class NetworkRepository {
   Future<NetworkResponse> request({
     required String method,
     required String url,
-    Map<String, dynamic>? data,
+    dynamic data,
     Map<String, dynamic>? queryParameters,
   }) async {
     if (!await networkMonitor.checkConnection()) {
@@ -110,6 +113,59 @@ class NetworkRepository {
         data: data,
       );
 
+  Future<NetworkResponse> postMultipart({
+    required String url,
+    required FormData formData,
+    Map<String, String>? headers,
+  }) =>
+      request(
+        method: 'POST',
+        url: url,
+        data: formData,
+      );
+
+  Future<FormData> createFormData({
+    Map<String, dynamic>? fields,
+    String? fileField,
+    File? file,
+    Uint8List? fileBytes,
+    String? fileName,
+  }) async {
+    final formData = FormData();
+
+    // Add text fields
+    if (fields != null) {
+      fields.forEach((key, value) {
+        formData.fields.add(MapEntry(key, value.toString()));
+      });
+    }
+
+    // Add single file (from File)
+    if (file != null && fileField != null) {
+      formData.files.add(
+        MapEntry(
+          fileField,
+          await MultipartFile.fromFile(
+            file.path,
+            filename: fileName ?? file.path.split('/').last,
+          ),
+        ),
+      );
+    }
+
+    // Add single file (from bytes)
+    if (fileBytes != null && fileField != null && fileName != null) {
+      formData.files.add(
+        MapEntry(
+          fileField,
+          MultipartFile.fromBytes(fileBytes, filename: fileName),
+        ),
+      );
+    }
+
+    return formData;
+  }
+
   Future<NetworkResponse> patch({
     required String url,
     Map<String, dynamic>? data,
@@ -164,16 +220,15 @@ class NetworkRepository {
   }
 }
 
- NetworkResponse _handleResponse(Response response) {
-    final body = response.data;
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      return NetworkResponse(
-        data: body,
-        success: body is Map && body["success"] == true,
-        message: body is Map && body.containsKey("message")
-            ? body["message"]
-            : "",
-      );
-    }
-    throw NetworkResponse(success: false, data: body);
+NetworkResponse _handleResponse(Response response) {
+  final body = response.data;
+  if (response.statusCode == 200 || response.statusCode == 201) {
+    return NetworkResponse(
+      data: body,
+      success: body is Map && body["success"] == true,
+      message:
+          body is Map && body.containsKey("message") ? body["message"] : "",
+    );
   }
+  throw NetworkResponse(success: false, data: body);
+}

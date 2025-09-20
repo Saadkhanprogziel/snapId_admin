@@ -39,7 +39,7 @@ class AuthController extends GetxController {
                 (success) {
                   isLoading = false;
                   update();
-                  print("ye to latest news hai");
+                  
 
                   AppNavigation.pushReplacementNamed("dashboard");
                 },

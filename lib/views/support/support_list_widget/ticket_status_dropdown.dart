@@ -36,7 +36,7 @@ class StatusDropdown extends StatelessWidget {
             fontWeight: FontWeight.w500,
           ),
           borderRadius: BorderRadius.circular(12),
-          dropdownColor:  isDark ? Color(0xFF23272F) : Colors.transparent,
+          dropdownColor:  isDark ? Color(0xFF23272F) : Colors.white,
           items: controller.statuses.map((String value) {
             return DropdownMenuItem<String>(
               value: value,
@@ -48,9 +48,9 @@ class StatusDropdown extends StatelessWidget {
                     height: 8,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: value == 'Open'
+                      color: value == 'OPEN'
                           ? Colors.green
-                          : value == 'Pending'
+                          : value == 'PENDING'
                               ? Colors.orange
                               : Colors.red,
                     ),
@@ -65,9 +65,9 @@ class StatusDropdown extends StatelessWidget {
             );
           }).toList(),
           onChanged: (String? newValue) {
-            if (newValue != null) {
-              controller.updateTicketStatus(newValue);
-            }
+           
+              controller.updateTicketStatus(newValue.toString());
+           
           },
         ),
       ),

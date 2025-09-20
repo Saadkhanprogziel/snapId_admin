@@ -24,13 +24,7 @@ class TicketDetailsCard extends StatelessWidget {
               width: 0.5,
               color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 2),
-              ),
-            ],
+        
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
