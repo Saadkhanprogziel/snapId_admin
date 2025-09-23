@@ -120,7 +120,7 @@ class SnapIdLoginScreen extends StatelessWidget {
                                     width: double.infinity,
                                     height: 55,
                                     child: ElevatedButton(
-                                      onPressed: controller.isLoading
+                                      onPressed: controller.isLoading.value
                                           ? null 
                                           : () {
                                               if (_formKey.currentState!
@@ -139,7 +139,7 @@ class SnapIdLoginScreen extends StatelessWidget {
                                               BorderRadius.circular(14),
                                         ),
                                       ),
-                                      child: controller.isLoading
+                                      child: controller.isLoading.value
                                           ? const SizedBox(
                                               height: 24,
                                               width: 24,

@@ -57,15 +57,15 @@ class SocketService {
 
   /// Listen for incoming messages (switch to `new_message` if your backend uses that)
   void listenToRecieveMessageEvent(void Function(dynamic data) dataCallBack) {
-    _socket.off("receive_message"); // prevent duplicate listeners
-    _socket.on("receive_message", (data) {
+    _socket.off("new_message"); // prevent duplicate listeners
+    _socket.on("new_message", (data) {
       log("📩 Received message data: $data");
       if (data != null) {
         dataCallBack.call(data);
       }
     });
 
-    log("🔍 Listener initialized: ${_socket.hasListeners("receive_message")}");
+    log("🔍 Listener initialized: ${_socket.hasListeners("new_message")}");
   }
 
   /// Generic event listener
@@ -137,15 +137,15 @@ class SocketService {
 
 //   /// Listen for incoming messages (switch to `new_message` if your backend uses that)
 //   void listenToRecieveMessageEvent(void Function(dynamic data) dataCallBack) {
-//     _socket.off("receive_message"); // prevent duplicate listeners
-//     _socket.on("receive_message", (data) {
+//     _socket.off("new_message"); // prevent duplicate listeners
+//     _socket.on("new_message", (data) {
 //       log("📩 Received message data: $data");
 //       if (data != null) {
 //         dataCallBack.call(data);
 //       }
 //     });
 
-//     log("🔍 Listener initialized: ${_socket.hasListeners("receive_message")}");
+//     log("🔍 Listener initialized: ${_socket.hasListeners("new_message")}");
 //   }
 
 //   /// Generic event listener

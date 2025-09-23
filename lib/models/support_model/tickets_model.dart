@@ -24,13 +24,13 @@ class TicketsData {
   }
 }
 class TicketDetails {
-  final String id;
-  final String title;
-  final String description;
-  final String status;
-  final DateTime createdAt;
-  final String chatId; // <-- add this
-  final User user;
+   String id;
+   String title;
+   String description;
+   String status;
+   DateTime createdAt;
+   String chatId; // <-- add this
+   User user;
 
   TicketDetails({
     required this.id,

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:admin/controller/auth_controller/auth_controller.dart';
 import 'package:admin/main.dart';
 import 'package:admin/repositories/auth_repository/auth_repository.dart';
 import 'package:admin/utils/utils.dart';
@@ -123,8 +124,11 @@ class SettingsController extends GetxController {
           );
         },
         (updatedUser) {
+          AuthController authController = Get.find<AuthController>();
           currentUser.value = updatedUser;
           fetchUserProfile();
+                   authController.fetchUserProfile();
+
           Get.snackbar(
             'Success',
             'Profile updated successfully',

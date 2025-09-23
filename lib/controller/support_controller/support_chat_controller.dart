@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:admin/controller/support_controller/support_controller.dart';
 import 'package:admin/main.dart';
 import 'package:admin/models/support_model/message.dart';
 import 'package:admin/models/support_model/tickets_model.dart';
@@ -10,6 +11,7 @@ import 'package:intl/intl.dart';
 
 class SupportChatController extends GetxController {
   final chatRepository = ChatRepository();
+  final supportController = Get.find<SupportController>();
 
   var chatStatus = 'OPEN'.obs;
   final List<String> statuses = ['OPEN', 'PENDING', 'CLOSED'];
@@ -34,25 +36,24 @@ class SupportChatController extends GetxController {
       currentChatId.value = ticketDetails.value?.chatId ?? "";
       currentTicketId.value = ticketDetails.value?.id ?? "";
 
-      // Initialize chat after setting the chatId
       await _initializeChat();
     }
   }
 
-  // Private method to initialize chat with proper sequence
+  
   Future<void> _initializeChat() async {
     if (currentChatId.value.isEmpty || isInitialized.value) return;
 
     log("[_initializeChat] Initializing chat with ID: ${currentChatId.value}");
 
     try {
-      // 1. First join the room
+      
       joinRoom();
 
-      // 2. Then load messages
+      
       await loadMessages();
 
-      // 3. Mark as initialized
+      
       isInitialized.value = true;
     } catch (e) {
       log("[_initializeChat] Error during initialization: $e");
@@ -66,8 +67,8 @@ class SupportChatController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Don't initialize chat here since we don't have chatId yet
-    // log("[onInit] Controller initialized, waiting for ticket data");
+    
+    
   }
 
   @override
@@ -90,7 +91,7 @@ class SupportChatController extends GetxController {
     try {
       String eventName;
 
-      // Determine the correct event based on status
+      
       switch (status.toUpperCase()) {
         case 'OPEN':
           eventName = 'admin_open_ticket';
@@ -108,7 +109,11 @@ class SupportChatController extends GetxController {
 
       appSocket.fireEvent(eventName, {
         'ticketId': currentTicketId.value,
+
+        
       });
+
+      
 
       log("[_updateTicketStatusOnServer] Fired event: $eventName with status: $status");
     } catch (e) {
@@ -141,7 +146,7 @@ class SupportChatController extends GetxController {
         }, (success) {
           messages.value = success;
 
-          // Scroll to bottom after loading messages
+          
           _scrollToBottom();
         });
       });
@@ -229,8 +234,54 @@ class SupportChatController extends GetxController {
         chatStatus.value = data['status'] ?? 'Open';
       }
     });
+    appSocket.listenToEvent('ticket_error', (data) {
+      log("[listenEvents] Status updated: $data");
+     
+    });
 
-  
+    
+    appSocket.listenToEvent('ticket_opened_success', (data) {
+      log("[listenEvents] Ticket opened successfully: ${data['ticket']['id']}");
+
+      final ticketData = data['ticket'];
+      if (ticketData == null) return;
+
+      final ticketId = ticketData['id'];
+
+      if (ticketId == currentTicketId.value) {
+        final tickets = supportController.ticketListData.value?.tickets;
+        if (tickets != null) {
+          for (var t in tickets) {
+            if (t.id == ticketId) {
+              t.status = 'OPEN'; 
+              break;
+            }
+          }
+          supportController.ticketListData.refresh(); 
+        }
+      }
+    });
+    appSocket.listenToEvent('ticket_closed_success', (data) {
+      log("[listenEvents] Ticket closeed successfully: ${data['ticket']['id']}");
+
+      final ticketData = data['ticket'];
+      if (ticketData == null) return;
+
+      final ticketId = ticketData['id'];
+
+      if (ticketId == currentTicketId.value) {
+        final tickets = supportController.ticketListData.value?.tickets;
+        if (tickets != null) {
+          for (var t in tickets) {
+            if (t.id == ticketId) {
+              t.status = 'CLOSED'; 
+              break;
+            }
+          }
+          supportController.ticketListData.refresh(); 
+        }
+      }
+    });
   }
 
   void addNewMessage(ChatMessage message) {
@@ -327,7 +378,6 @@ class SupportChatController extends GetxController {
     await loadMessages();
   }
 
-
   void cleanup() {
     messages.clear();
     messageTextController.clear();
@@ -337,7 +387,7 @@ class SupportChatController extends GetxController {
     isInitialized.value = false;
   }
 
-  // Method to manually trigger initialization if needed
+  
   Future<void> initializeChatIfNeeded() async {
     if (!isInitialized.value && currentChatId.value.isNotEmpty) {
       await _initializeChat();
