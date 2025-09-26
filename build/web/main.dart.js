@@ -8590,7 +8590,7 @@ _.e=e
 _.f=f
 _.r=g
 _.w=h},
-b35(){var s=A.b2b("http://192.168.18.46:5000/api/",B.rl,A.a_(["Content-Type","application/json"],t.N,t.z),B.rn),r=new A.H0(A.a([B.pN],t.i6))
+b35(){var s=A.b2b("http://159.65.161.106/v1/api/",B.rl,A.a_(["Content-Type","application/json"],t.N,t.z),B.rn),r=new A.H0(A.a([B.pN],t.i6))
 r.H(r,B.tM)
 r=new A.TX($,r,$,new A.Vd(51200),!1)
 r.NK$=s
@@ -8636,7 +8636,7 @@ this.b=null},
 auF:function auF(a){this.a=a},
 auG:function auG(a){this.a=a},
 auH:function auH(a){this.a=a},
-biU(){var s=A.b2b("http://192.168.18.46:5000/api/",B.rl,A.a_(["Content-Type","application/json"],t.N,t.z),B.rn),r=new A.H0(A.a([B.pN],t.i6))
+biU(){var s=A.b2b("http://159.65.161.106/v1/api/",B.rl,A.a_(["Content-Type","application/json"],t.N,t.z),B.rn),r=new A.H0(A.a([B.pN],t.i6))
 r.H(r,B.tM)
 r=new A.TX($,r,$,new A.Vd(51200),!1)
 r.NK$=s
@@ -51147,7 +51147,7 @@ c.eB(d.d_$)
 l=A.cQ(J.am(d.fC$,"token"))
 k=l!=null?A.a_(["Authorization","Bearer "+A.h(l)],g,g):null
 s=8
-return A.O(f.vf(0,m,"POST","http://192.168.18.46:5000/api/admin/auth/update-admin-profile"),$async$A7)
+return A.O(f.vf(0,m,"POST","http://159.65.161.106/v1/api/admin/auth/update-admin-profile"),$async$A7)
 case 8:j=a6
 if(j.a&&j.c!=null){i=A.aY9(J.am(j.c,"data"))
 e.pm(0,"user",B.b1.uh(i.ap(),null))
@@ -51207,7 +51207,7 @@ vD(){var s=0,r=A.I(t.La),q,p=2,o,n,m,l,k,j,i
 var $async$vD=A.J(function(a,b){if(a===1){o=b
 s=p}while(true)switch(s){case 0:p=4
 s=7
-return A.O($.f6().fj(0,"GET",null,"http://192.168.18.46:5000/api/admin/auth/get-profile-data"),$async$vD)
+return A.O($.f6().fj(0,"GET",null,"http://159.65.161.106/v1/api/admin/auth/get-profile-data"),$async$vD)
 case 7:n=b
 if(n.a){m=A.aY9(J.am(n.c,"data"))
 $.lK().a.pm(0,"user",B.b1.uh(m.ap(),null))
@@ -51238,7 +51238,7 @@ ay_(a,b,c){var s=0,r=A.I(t._9),q,p=2,o,n,m,l,k,j
 var $async$DI=A.J(function(d,e){if(d===1){o=e
 s=p}while(true)switch(s){case 0:p=4
 s=7
-return A.O($.f6().vf(0,A.a_(["currentPassword",b,"newPassword",c,"confirmNewPassword",a],t.N,t.z),"POST","http://192.168.18.46:5000/api/admin/auth/change-admin-password"),$async$DI)
+return A.O($.f6().vf(0,A.a_(["currentPassword",b,"newPassword",c,"confirmNewPassword",a],t.N,t.z),"POST","http://159.65.161.106/v1/api/admin/auth/change-admin-password"),$async$DI)
 case 7:n=e
 if(n.a){q=new A.c_(!0,t.Bo)
 s=1
@@ -51688,7 +51688,7 @@ case 2:return A.F(o,r)}})
 return A.H($async$Ax,r)}}
 A.aqq.prototype={}
 A.aDC.prototype={
-aoM(){var s,r,q,p,o,n,m,l,k,j,i,h=this,g="http://192.168.18.46:5000",f=null,e="query",d=t.N,c=t.z,b=A.r(d,c)
+aoM(){var s,r,q,p,o,n,m,l,k,j,i,h=this,g="http://159.65.161.106/v1",f=null,e="query",d=t.N,c=t.z,b=A.r(d,c)
 b.n(0,"transports",A.a(["websocket"],t.s))
 b.G(0,"autoConnect")
 s=$.lK().a.c
@@ -51704,7 +51704,7 @@ o=q.gct(q)
 n=$.aW9.aa(0,p)&&$.aW9.h(0,p).d.aa(0,o)
 m=J.d(b.h(0,"forceNew"),!0)||J.d(b.h(0,"force new connection"),!0)||!1===b.h(0,"multiplex")||n
 l=A.bY("io")
-if(m){$.bde().aY(B.A,"ignoring socket cache for http://192.168.18.46:5000",f,f)
+if(m){$.bde().aY(B.A,"ignoring socket cache for http://159.65.161.106/v1",f,f)
 l.b=A.b4Z(b,g)}else{s=$.aW9.h(0,p)
 if(s==null){s=A.b4Z(b,g)
 $.aW9.n(0,p,s)}l.b=s}if(q.gmn(q).length!==0&&b.h(0,e)==null)b.n(0,e,q.gmn(q))
