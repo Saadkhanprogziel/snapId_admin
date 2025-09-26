@@ -19,7 +19,7 @@ void main() async {
   await GetStorage.init();
   setUrlStrategy(PathUrlStrategy());
 
-  
+
   Get.put(AppController());
   runApp(
     ScreenUtilInit(
@@ -27,6 +27,7 @@ void main() async {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) => SnapIDDashboard(),
+      
     ),
   );
 }
