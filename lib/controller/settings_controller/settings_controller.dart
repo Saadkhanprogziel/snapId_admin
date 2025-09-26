@@ -131,7 +131,7 @@ class SettingsController extends GetxController {
 
           Get.snackbar(
             'Success',
-            'Profile updated successfully',
+            'Profile updated successfully', 
             snackPosition: SnackPosition.BOTTOM,
             backgroundColor: Colors.green,
             colorText: Colors.white,

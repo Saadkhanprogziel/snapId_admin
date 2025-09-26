@@ -14,8 +14,7 @@ class DashboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DashboardController _dashboardController =
-        Get.put(DashboardController());
+  
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return LayoutBuilder(
@@ -25,57 +24,65 @@ class DashboardContent extends StatelessWidget {
         final isTablet = screenWidth > 600 && screenWidth <= 1200;
         final isMobile = screenWidth <= 600;
 
-        // Wrap the loading check in Obx to observe state changes
-        return Obx(() {
-          if (_dashboardController.isLoading.value) {
-            return Row(
-              children: [
-                Spacer(),
-                JumpingDots(numberOfDots: 3),
-                Spacer(),
-              ],
-            );
-          }
-
-          return SingleChildScrollView(
-            padding: EdgeInsets.all(isMobile
-                ? 16
-                : isTablet
-                    ? 20
-                    : 24),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
-              child: IntrinsicHeight(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Top Section: Stat Cards + Request Analytics Chart
-                    _buildTopSection(_dashboardController, isDesktop,
-                        isTablet, isMobile, isDark),
-
-                    SizedBox(
-                        height: isMobile
-                            ? 20
-                            : isTablet
-                                ? 25
-                                : 30),
-
-                    // Charts Section: Revenue & Subscriber Charts
-                    _buildChartsSection(_dashboardController, isDesktop,
-                        isTablet, isMobile, isDark),
-
-                    SizedBox(
-                        height: isMobile
-                            ? 16
-                            : isTablet
-                                ? 18
-                                : 20),
+        return GetBuilder<DashboardController>(
+          init: DashboardController(),
+          builder: (_dashboardController) {
+            return Obx(() {
+              if (_dashboardController.isLoading.value) {
+                return Row(
+                  children:  [
+                    Spacer(),
+                    JumpingDots(numberOfDots: 3),
+                    Spacer(),
                   ],
+                );
+              }
+
+              return SingleChildScrollView(
+                padding: EdgeInsets.all(
+                  isMobile
+                      ? 16
+                      : isTablet
+                          ? 20
+                          : 24,
                 ),
-              ),
-            ),
-          );
-        });
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Top Section: Stat Cards + Request Analytics Chart
+                        _buildTopSection(_dashboardController, isDesktop,
+                            isTablet, isMobile, isDark),
+
+                        SizedBox(
+                          height: isMobile
+                              ? 20
+                              : isTablet
+                                  ? 25
+                                  : 30,
+                        ),
+
+                        // Charts Section: Revenue & Subscriber Charts
+                        _buildChartsSection(_dashboardController, isDesktop,
+                            isTablet, isMobile, isDark),
+
+                        SizedBox(
+                          height: isMobile
+                              ? 16
+                              : isTablet
+                                  ? 18
+                                  : 20,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            });
+          },
+        );
       },
     );
   }
@@ -134,7 +141,9 @@ class DashboardContent extends StatelessWidget {
               Expanded(
                 child: statCard(
                   "Total Revenue",
-                  "${stats?.totalRevenue ?? ""}",
+                  stats?.totalRevenue != null
+                      ? stats!.totalRevenue.toStringAsFixed(2)
+                      : "",
                   'assets/icons/revanue.svg',
                   Colors.deepPurple,
                   isDark: isDark,
@@ -268,7 +277,7 @@ class DashboardContent extends StatelessWidget {
               ? 340
               : 370,
       decoration: BoxDecoration(
-        color: isDark ? Color(0xFF23272F) : Colors.transparent,
+        color: isDark ? const Color(0xFF23272F) : Colors.transparent,
         border: Border.all(width: 0.4, color: Colors.grey),
         borderRadius: BorderRadius.circular(isMobile ? 16 : 25),
       ),
@@ -288,11 +297,12 @@ class DashboardContent extends StatelessWidget {
             child: Container(
               height: 420,
               decoration: BoxDecoration(
-                color: isDark ? Color(0xFF23272F) : Colors.transparent,
+                color: isDark ? const Color(0xFF23272F) : Colors.transparent,
                 border: Border.all(width: 0.4, color: Colors.grey),
                 borderRadius: BorderRadius.circular(25),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
               child: RevanueChart(
                 controller: controller,
               ),
@@ -303,11 +313,12 @@ class DashboardContent extends StatelessWidget {
             child: Container(
               height: 420,
               decoration: BoxDecoration(
-                color: isDark ? Color(0xFF23272F) : Colors.transparent,
+                color: isDark ? const Color(0xFF23272F) : Colors.transparent,
                 border: Border.all(width: 0.4, color: Colors.grey),
                 borderRadius: BorderRadius.circular(25),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
               child: SubscriberChart(
                 controller: controller,
               ),
@@ -323,7 +334,7 @@ class DashboardContent extends StatelessWidget {
             height: isMobile ? 320 : 360,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: isDark ? Color(0xFF23272F) : Colors.transparent,
+              color: isDark ? const Color(0xFF23272F) : Colors.transparent,
               border: Border.all(width: 0.4, color: Colors.grey),
               borderRadius: BorderRadius.circular(isMobile ? 16 : 20),
             ),
@@ -340,7 +351,7 @@ class DashboardContent extends StatelessWidget {
             height: isMobile ? 320 : 360,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: isDark ? Color(0xFF23272F) : Colors.transparent,
+              color: isDark ? const Color(0xFF23272F) : Colors.transparent,
               border: Border.all(width: 0.4, color: Colors.grey),
               borderRadius: BorderRadius.circular(isMobile ? 16 : 20),
             ),

@@ -24,7 +24,7 @@ class DashboardController extends GetxController {
   // Filter observables
   final selectedRevenueFilter = 'this_year'.obs;
   final selectedRequestFilter = 'this_year'.obs;
-  final selectedSubscriberFilter = 'this_year'.obs;
+  final selectedSubscriberFilter = 'last_month'.obs;
 
   @override
   void onInit() {

@@ -1,5 +1,7 @@
+import 'package:admin/main.dart';
 import 'package:admin/models/admin_model/admin_model.dart';
 import 'package:admin/repositories/auth_repository/auth_repository.dart';
+import 'package:admin/services/socket_service.dart';
 import 'package:admin/utils/utils.dart';
 import 'package:admin/views/navigations/app_navigation.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +32,7 @@ class AuthController extends GetxController {
 
   void login(BuildContext context) {
     isLoading.value = true;
+    update(); // Add this line to notify GetBuilder
     
     try {
       authRepository
@@ -37,6 +40,7 @@ class AuthController extends GetxController {
           .then((response) => response.fold(
                 (error) {
                   isLoading.value = false;
+                  update(); // Add this line to notify GetBuilder
                   showCustomSnackbar(
                       context: context,
                       message: error,
@@ -46,11 +50,13 @@ class AuthController extends GetxController {
                   // Fetch user profile after successful login
                   await fetchUserProfile();
                   isLoading.value = false;
+                  update(); // Add this line to notify GetBuilder
                   AppNavigation.pushReplacementNamed("dashboard");
                 },
               ));
     } on Exception catch (e) {
       isLoading.value = false;
+      update(); // Add this line to notify GetBuilder
       showCustomSnackbar(
           context: context, message: e.toString(), type: SnackbarType.error);
     }

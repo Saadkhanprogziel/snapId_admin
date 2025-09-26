@@ -24,34 +24,37 @@ class OrdersResponse {
 class OrdersData {
   final String id;
   final String email;
-  final String planName;
+  final String? planName; // ✅ optional now
   final double amount;
-   String currency;
+  final String currency;
   final String status;
   final String platform;
   final DateTime createdAt;
+  final String userType; // ✅ new field
 
   OrdersData({
     required this.id,
     required this.email,
-    required this.planName,
+    this.planName,
     required this.amount,
     required this.currency,
     required this.status,
     required this.platform,
     required this.createdAt,
+    required this.userType,
   });
 
   factory OrdersData.fromJson(Map<String, dynamic> json) {
     return OrdersData(
       id: json['id'],
       email: json['email'],
-      planName: json['planName'],
+      planName: json['planName'], // can be null
       amount: (json['amount'] as num).toDouble(),
       currency: json['currency'],
       status: json['status'],
       platform: json['platform'],
       createdAt: DateTime.parse(json['createdAt']),
+      userType: json['userType'], // ✅ added
     );
   }
 
@@ -65,6 +68,7 @@ class OrdersData {
       'status': status,
       'platform': platform,
       'createdAt': createdAt.toIso8601String(),
+      'userType': userType,
     };
   }
 }

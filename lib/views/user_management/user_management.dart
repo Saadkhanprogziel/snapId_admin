@@ -11,7 +11,6 @@ class UserManagement extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(UserManagementController());
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
@@ -29,81 +28,86 @@ class UserManagement extends StatelessWidget {
                   ? screenWidth - 32
                   : (screenWidth - 80) / 4;
 
-          return Obx(() {
-            if (controller.isLoading.value) {
-              return Row(
-                children: [
-                  Spacer(),
-                  JumpingDots(numberOfDots: 3),
-                  Spacer(),
-                ],
-              );
-            }
-            return SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    Wrap(
-                      spacing: 16,
-                      runSpacing: 16,
+          return GetBuilder(
+            init: UserManagementController(),
+            builder: (controller) {
+              return Obx(() {
+                if (controller.isLoading.value) {
+                  return Row(
+                    children: [
+                      Spacer(),
+                      JumpingDots(numberOfDots: 3),
+                      Spacer(),
+                    ],
+                  );
+                }
+                return SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
                       children: [
-                        SizedBox(
-                          width: cardWidth,
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(
-                                minHeight: 300), // Ensure uniform height
-                            child: _buildTotalUsersCard(controller, isDark),
-                          ),
+                        Wrap(
+                          spacing: 16,
+                          runSpacing: 16,
+                          children: [
+                            SizedBox(
+                              width: cardWidth,
+                              child: ConstrainedBox(
+                                constraints: const BoxConstraints(
+                                    minHeight: 300), // Ensure uniform height
+                                child: _buildTotalUsersCard(controller, isDark),
+                              ),
+                            ),
+                            SizedBox(
+                              width: cardWidth,
+                              child: ConstrainedBox(
+                                constraints: const BoxConstraints(minHeight: 300),
+                                child: _buildUsersPlatformCard(controller, isDark),
+                              ),
+                            ),
+                            SizedBox(
+                              width: cardWidth,
+                              child: ConstrainedBox(
+                                constraints: const BoxConstraints(minHeight: 300),
+                                child: _buildUserStatusCard(controller, isDark),
+                              ),
+                            ),
+                            SizedBox(
+                              width: cardWidth,
+                              child: ConstrainedBox(
+                                constraints: const BoxConstraints(minHeight: 300),
+                                child: _buildSignupMethodsCard(controller, isDark),
+                              ),
+                            ),
+                          ],
                         ),
-                        SizedBox(
-                          width: cardWidth,
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(minHeight: 300),
-                            child: _buildUsersPlatformCard(controller, isDark),
+                        const SizedBox(height: 20),
+                        Container(
+                          height: isMobile
+                              ? 800
+                              : isTablet
+                                  ? 600
+                                  : 800,
+                          decoration: BoxDecoration(
+                            color: isDark ? Color(0xFF23272F) : Colors.white,
+                            border: Border.all(
+                                width: 0.4,
+                                color: isDark ? Colors.grey.shade600 : Colors.grey),
+                            borderRadius: BorderRadius.circular(isMobile ? 16 : 25),
                           ),
-                        ),
-                        SizedBox(
-                          width: cardWidth,
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(minHeight: 300),
-                            child: _buildUserStatusCard(controller, isDark),
-                          ),
-                        ),
-                        SizedBox(
-                          width: cardWidth,
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(minHeight: 300),
-                            child: _buildSignupMethodsCard(controller, isDark),
+                          child: UsersListWidget(
+                            controller: controller,
+                            isMobile: isMobile,
+                            isTablet: isTablet,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
-                    Container(
-                      height: isMobile
-                          ? 800
-                          : isTablet
-                              ? 600
-                              : 800,
-                      decoration: BoxDecoration(
-                        color: isDark ? Color(0xFF23272F) : Colors.white,
-                        border: Border.all(
-                            width: 0.4,
-                            color: isDark ? Colors.grey.shade600 : Colors.grey),
-                        borderRadius: BorderRadius.circular(isMobile ? 16 : 25),
-                      ),
-                      child: UsersListWidget(
-                        controller: controller,
-                        isMobile: isMobile,
-                        isTablet: isTablet,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          });
+                  ),
+                );
+              });
+            }
+          );
         },
       ),
     );

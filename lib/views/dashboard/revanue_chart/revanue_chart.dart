@@ -32,7 +32,7 @@ class RevanueChart extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "${controller.revenueChartData.value?.total ?? 0}",
+                  "${controller.revenueChartData.value?.total.toStringAsFixed(2) ?? 0}",
                   style: CustomTextTheme.regular20.copyWith(
                     color: isDark ? Colors.white : Colors.black,
                   ),

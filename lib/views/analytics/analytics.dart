@@ -12,8 +12,8 @@ class Analytics extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AnalyticsController analyticsController =
-        Get.put(AnalyticsController());
+    // final AnalyticsController analyticsController =
+    //     Get.put(AnalyticsController());
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -23,74 +23,79 @@ class Analytics extends StatelessWidget {
         final isMobile = screenWidth <= 600;
         final isDark = Theme.of(context).brightness == Brightness.dark;
 
-        return Obx(() {
-          if (analyticsController.isLoadingDocTypes.value && analyticsController.isLoadingProcessedDocs.value) {
-            return Row(
-              children: [
-                Spacer(),
-                JumpingDots(numberOfDots: 3),
-                Spacer(),
-              ],
-            );
-          }
-          return Container(
-            color: isDark
-                ? Theme.of(context).scaffoldBackgroundColor
-                : Colors.white,
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(isMobile
-                  ? 16
-                  : isTablet
-                      ? 20
-                      : 24),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: IntrinsicHeight(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Stat Cards Section
-
-                      // Chart Section
-                      _buildChartSection(analyticsController, isDesktop,
-                          isTablet, isMobile, isDark),
-
-                      SizedBox(
-                          height: isMobile
-                              ? 16
-                              : isTablet
-                                  ? 20
-                                  : 24),
-
-                      // List Widget Section
-                      Container(
-                        height: isMobile
-                            ? 500
-                            : isTablet
-                                ? 600
-                                : 700,
-                        decoration: BoxDecoration(
-                          color: isDark ? Color(0xFF23272F) : Colors.white,
-                          border: Border.all(
-                              width: 0.4,
-                              color:
-                                  isDark ? Colors.grey.shade800 : Colors.grey),
-                          borderRadius:
-                              BorderRadius.circular(isMobile ? 16 : 25),
-                        ),
-                        child: AnalyticsListWidget(
-                          controller: analyticsController,
-                          isMobile: isMobile,
-                          isTablet: isTablet,
-                        ),
+        return GetBuilder(
+          init: AnalyticsController(),
+          builder: (analyticsController) {
+            return Obx(() {
+              if (Get.find<AnalyticsController>().isLoadingDocTypes.value && Get.find<AnalyticsController>().isLoadingProcessedDocs.value) {
+                return Row(
+                  children: [
+                    Spacer(),
+                    JumpingDots(numberOfDots: 3),
+                    Spacer(),
+                  ],
+                );
+              }
+              return Container(
+                color: isDark
+                    ? Theme.of(context).scaffoldBackgroundColor
+                    : Colors.white,
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.all(isMobile
+                      ? 16
+                      : isTablet
+                          ? 20
+                          : 24),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    child: IntrinsicHeight(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Stat Cards Section
+            
+                          // Chart Section
+                          _buildChartSection(analyticsController, isDesktop,
+                              isTablet, isMobile, isDark),
+            
+                          SizedBox(
+                              height: isMobile
+                                  ? 16
+                                  : isTablet
+                                      ? 20
+                                      : 24),
+            
+                          // List Widget Section
+                          Container(
+                            height: isMobile
+                                ? 500
+                                : isTablet
+                                    ? 600
+                                    : 700,
+                            decoration: BoxDecoration(
+                              color: isDark ? Color(0xFF23272F) : Colors.white,
+                              border: Border.all(
+                                  width: 0.4,
+                                  color:
+                                      isDark ? Colors.grey.shade800 : Colors.grey),
+                              borderRadius:
+                                  BorderRadius.circular(isMobile ? 16 : 25),
+                            ),
+                            child: AnalyticsListWidget(
+                              controller: analyticsController,
+                              isMobile: isMobile,
+                              isTablet: isTablet,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
-              ),
-            ),
-          );
-        });
+              );
+            });
+          }
+        );
       },
     );
   }
