@@ -18,6 +18,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
   setUrlStrategy(PathUrlStrategy());
+
+  
   Get.put(AppController());
   runApp(
     ScreenUtilInit(
