@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <base href="/">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="A new Flutter project.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="admin">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png" />
+
+  <title>admin</title>
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    #loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      z-index: 9999;
+      transition: opacity 0.5s ease;
+    }
+
+    #loader.fade-out {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    #loader img {
+      max-width: 300px;
+      /* adjust size */
+      height: auto;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Loader with GIF -->
+  <div id="loader">
+    <img src="assets/images/splash_animation.gif" alt="Loading...">
+  </div>
+
+  <!-- Flutter script -->
+  <script src="flutter_bootstrap.js" async></script>
+
+  <script>
+    // Change this value to match your GIF duration (ms)
+    const gifDuration = 4000; // 4 seconds
+
+    window.addEventListener("load", function () {
+      const loader = document.getElementById("loader");
+
+      setTimeout(() => {
+        loader.classList.add("fade-out");
+        setTimeout(() => loader.remove(), 600);
+      }, gifDuration);
+    });
+  </script>
+</body>
+
+</html>
