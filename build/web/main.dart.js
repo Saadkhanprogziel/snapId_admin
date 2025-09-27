@@ -51732,7 +51732,7 @@ case 2:return A.F(o,r)}})
 return A.H($async$Ax,r)}}
 A.aqt.prototype={}
 A.aDG.prototype={
-a49(){var s,r,q,p,o,n,m,l,k,j,i,h=this,g="http://159.65.161.106/v1",f=null,e="query",d=t.N,c=t.z,b=A.r(d,c)
+a49(){var s,r,q,p,o,n,m,l,k,j,i,h=this,g="http://159.65.161.106:5000",f=null,e="query",d=t.N,c=t.z,b=A.r(d,c)
 b.n(0,"transports",A.a(["websocket"],t.s))
 b.G(0,"autoConnect")
 s=$.lL().a.c
@@ -51748,7 +51748,7 @@ o=q.gct(q)
 n=$.aWe.aa(0,p)&&$.aWe.h(0,p).d.aa(0,o)
 m=J.d(b.h(0,"forceNew"),!0)||J.d(b.h(0,"force new connection"),!0)||!1===b.h(0,"multiplex")||n
 l=A.bY("io")
-if(m){$.bdj().aY(B.A,"ignoring socket cache for http://159.65.161.106/v1",f,f)
+if(m){$.bdj().aY(B.A,"ignoring socket cache for http://159.65.161.106:5000",f,f)
 l.b=A.b52(b,g)}else{s=$.aWe.h(0,p)
 if(s==null){s=A.b52(b,g)
 $.aWe.n(0,p,s)}l.b=s}if(q.gmn(q).length!==0&&b.h(0,e)==null)b.n(0,e,q.gmn(q))
