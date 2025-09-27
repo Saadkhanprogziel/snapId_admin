@@ -1,7 +1,9 @@
+import 'package:admin/main.dart';
 import 'package:admin/models/support_model/support_status.dart';
 import 'package:admin/models/support_model/ticket_graph.dart';
 import 'package:admin/models/support_model/tickets_model.dart';
 import 'package:admin/repositories/support_repository/support_repository.dart';
+import 'package:admin/services/socket_service.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -54,6 +56,9 @@ class SupportController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    appSocket = SocketService();
+    appSocket.initializeSocketService();
+
     fetchTicketList();
     fetchSupportStatusData();
     fetchQuriesData();

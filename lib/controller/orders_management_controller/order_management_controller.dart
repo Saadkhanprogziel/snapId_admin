@@ -134,7 +134,7 @@ class OrderManagementController extends GetxController {
     }
     final result = await ordersRepository.getAllOrders(
       page: currentPage.value + 1,
-      pageSize: 10,
+      pageSize: 30,
       status: status,
       sortBy: sortBy,
       subscription: subscription,

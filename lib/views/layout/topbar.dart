@@ -100,7 +100,7 @@ class TopBar extends StatelessWidget {
               SizedBox(width: 16),
               GestureDetector(
                 onTap: () {
-                  drawerController.toggleDrawer(content: Settings());
+                  // drawerController.toggleDrawer(content: Settings());
                 },
                 child: Obx(() {
                   final user = authController.adminUser.value;

@@ -5,7 +5,6 @@
 *.swp
 .DS_Store
 .atom/
-.build/
 .buildlog/
 .history
 .svn/
@@ -29,10 +28,18 @@ migrate_working_dir/
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
+
+# Ignore everything in build except build/web
+build/*
+!build/web/
 .pub-cache/
 .pub/
+<<<<<<< HEAD
 /build/flutter_assets
 /build/cache.dill.track.dill
+=======
+
+>>>>>>> 49580b971a2a3593c6ad8a75819c46f6c78f93e1
 
 # Symbolication related
 app.*.symbols

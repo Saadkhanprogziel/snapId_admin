@@ -6,12 +6,13 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class SocketService {
   late IO.Socket _socket;
+  
 
   SocketService() {
-    _initializeSocketService();
+    initializeSocketService();
   }
 
-  void _initializeSocketService() {
+  void initializeSocketService() {
     _socket = IO.io(
       baseUrl,
       IO.OptionBuilder()
@@ -45,12 +46,16 @@ class SocketService {
       log("🚨 Chat error event: ${data["error"]}");
     });
     _socket.on("ticket_error", (data) {
+
+      
       // showCustomSnackbar(
-      //   context: c,
+      //   // context: context,
       //   message: data["error"],
       //   type: SnackbarType.error,
       // );
+
       log("Ticket event: ${data["error"]}");
+
     });
   }
 

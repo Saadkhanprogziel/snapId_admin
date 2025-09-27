@@ -13,13 +13,11 @@ import 'package:admin/views/layout/layout.dart';
 final networkRepository = NetworkRepository();
 final localStorage = LocalStorageService.instance;
   late SocketService appSocket;
-
+  
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
   setUrlStrategy(PathUrlStrategy());
-
-
   Get.put(AppController());
   runApp(
     ScreenUtilInit(
