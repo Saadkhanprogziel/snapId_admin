@@ -94,7 +94,9 @@ class OrdersListWidget extends StatelessWidget {
                           rows: controller.ordersData.map((order) {
                             return DataRow(cells: [
                               DataCell(Text(order.email)),
-                              DataCell(Text(order.planName)),
+                              DataCell(Text(order.planName.isEmpty
+                                  ? "Single Purchase"
+                                  : order.planName)),
                               DataCell(
                                   Text('\$${order.amount.toStringAsFixed(2)}')),
                               DataCell(Text(order.currency.toUpperCase())),

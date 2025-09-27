@@ -36,7 +36,6 @@ class AuthController extends GetxController {
           .login(email: emailController.text, password: passwordController.text)
           .then((response) => response.fold(
                 (error) {
-                  isLoading.value = false;
                   showCustomSnackbar(
                       context: context,
                       message: error,
@@ -45,14 +44,15 @@ class AuthController extends GetxController {
                 (success) async {
                   // Fetch user profile after successful login
                   await fetchUserProfile();
-                  isLoading.value = false;
                   AppNavigation.pushReplacementNamed("dashboard");
                 },
               ));
     } on Exception catch (e) {
-      isLoading.value = false;
       showCustomSnackbar(
           context: context, message: e.toString(), type: SnackbarType.error);
+    }
+    finally {
+      isLoading.value = false;
     }
   }
 

@@ -26,8 +26,9 @@ class OrdersData {
   final String email;
   final String planName;
   final double amount;
-   String currency;
+  String currency;
   final String status;
+  final String userType;
   final String platform;
   final DateTime createdAt;
 
@@ -38,6 +39,7 @@ class OrdersData {
     required this.amount,
     required this.currency,
     required this.status,
+    required this.userType,
     required this.platform,
     required this.createdAt,
   });
@@ -50,6 +52,7 @@ class OrdersData {
       amount: (json['amount'] as num).toDouble(),
       currency: json['currency'],
       status: json['status'],
+      userType: json['userType'],
       platform: json['platform'],
       createdAt: DateTime.parse(json['createdAt']),
     );

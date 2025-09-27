@@ -248,8 +248,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             ? DateFormat('MMM dd, yyyy - hh:mm a').format(order.createdAt)
             : '-',
         'pair': {
-          'label': '',
-          'value': '',
+          'label': 'User Type',
+          'value': order?.userType ?? '-',
         }
       },
     ];

@@ -139,24 +139,25 @@ class SnapIdLoginScreen extends StatelessWidget {
                                               BorderRadius.circular(14),
                                         ),
                                       ),
-                                      child: controller.isLoading.value
-                                          ? const SizedBox(
-                                              height: 24,
-                                              width: 24,
-                                              child: CircularProgressIndicator(
-                                                strokeWidth: 2.5,
-                                                color: Colors
-                                                    .white, 
+                                      child: Obx(
+                                        () => controller.isLoading.value
+                                            ? const SizedBox(
+                                                width: 24,
+                                                height: 24,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  color: Colors.white,
+                                                  strokeWidth: 2,
+                                                ),
+                                              )
+                                            : const Text(
+                                                'Sign In',
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
                                               ),
-                                            )
-                                          : const Text(
-                                              'Login',
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w600,
-                                                letterSpacing: 0.2,
-                                              ),
-                                            ),
+                                      ),
                                     ),
                                   ),
                                 ],
