@@ -29,35 +29,41 @@ class AuthController extends GetxController {
     // and fetch profile if authenticated
     await fetchUserProfile();
   }
-
-  void login(BuildContext context) {
-    isLoading.value = true;
-    update(); // Add this line to notify GetBuilder
+Future<void> login(BuildContext context) async {
+  isLoading.value = true;
+  update(); // Notify GetBuilder
+  
+  try {
+    final response = await authRepository.login(
+      email: emailController.text, 
+      password: passwordController.text
+    );
     
-    try {
-      authRepository
-          .login(email: emailController.text, password: passwordController.text)
-          .then((response) => response.fold(
-                (error) {
-                  showCustomSnackbar(
-                      context: context,
-                      message: error,
-                      type: SnackbarType.error);
-                },
-                (success) async {
-                  // Fetch user profile after successful login
-                  await fetchUserProfile();
-                  AppNavigation.pushReplacementNamed("dashboard");
-                },
-              ));
-    } on Exception catch (e) {
-      showCustomSnackbar(
-          context: context, message: e.toString(), type: SnackbarType.error);
-    }
-    finally {
-      isLoading.value = false;
-    }
+    response.fold(
+      (error) {
+        showCustomSnackbar(
+          context: context,
+          message: error,
+          type: SnackbarType.error
+        );
+      },
+      (success) async {
+        // Fetch user profile after successful login
+        await fetchUserProfile();
+        AppNavigation.pushReplacementNamed("dashboard");
+      },
+    );
+  } catch (e) {
+    showCustomSnackbar(
+      context: context, 
+      message: e.toString(), 
+      type: SnackbarType.error
+    );
+  } finally {
+    isLoading.value = false;
+    update(); // Notify GetBuilder to update UI
   }
+}
 
   Future<void> fetchUserProfile() async {
     try {
