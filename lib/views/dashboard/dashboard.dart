@@ -195,7 +195,9 @@ class DashboardContent extends StatelessWidget {
               Expanded(
                 child: statCard(
                   "Total Revenue",
-                  "${stats?.totalRevenue ?? ""}",
+                  stats?.totalRevenue != null
+                      ? stats!.totalRevenue.toStringAsFixed(2)
+                      : "",
                   'assets/icons/revanue.svg',
                   Colors.deepPurple,
                   isDark: isDark,
