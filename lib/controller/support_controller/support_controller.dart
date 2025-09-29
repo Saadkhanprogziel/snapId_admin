@@ -56,8 +56,8 @@ class SupportController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    appSocket = SocketService();
-    appSocket.initializeSocketService();
+    // appSocket = SocketService();
+    // appSocket.initializeSocketService();
 
     fetchTicketList();
     fetchSupportStatusData();

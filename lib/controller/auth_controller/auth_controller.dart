@@ -1,9 +1,7 @@
-import 'package:admin/main.dart';
 import 'package:admin/models/admin_model/admin_model.dart';
 import 'package:admin/repositories/auth_repository/auth_repository.dart';
-import 'package:admin/services/socket_service.dart';
 import 'package:admin/utils/utils.dart';
-import 'package:admin/views/navigations/app_navigation.dart';
+import 'package:admin/presentation/navigations/app_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -48,7 +46,11 @@ Future<void> login(BuildContext context) async {
         );
       },
       (success) async {
-        // Fetch user profile after successful login
+          showCustomSnackbar(
+          context: context,
+          message: "You are Successfully Logged In",
+          type: SnackbarType.success
+        );
         await fetchUserProfile();
         AppNavigation.pushReplacementNamed("dashboard");
       },

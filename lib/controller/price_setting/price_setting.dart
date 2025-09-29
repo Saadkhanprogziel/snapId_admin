@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:admin/models/price_item.dart';
+import 'package:admin/models/pricing/price_item_model.dart';
 
 class PriceSettingController extends GetxController {
   var priceList = <PriceItem>[].obs;

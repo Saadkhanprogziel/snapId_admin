@@ -8,12 +8,14 @@ import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:get/get.dart';
 import 'package:admin/controller/app_controller.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:admin/views/layout/layout.dart';
+import 'package:admin/presentation/layout/layout.dart';
 
 final networkRepository = NetworkRepository();
 final localStorage = LocalStorageService.instance;
-  late SocketService appSocket;
-  
+late SocketService appSocket;
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
+
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await GetStorage.init();
@@ -25,7 +27,6 @@ void main() async {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) => SnapIDDashboard(),
-      
     ),
   );
 }

@@ -1,6 +1,6 @@
 import 'package:admin/constants/app_routes.dart';
 import 'package:admin/constants/constants.dart';
-import 'package:admin/views/navigations/app_navigation.dart';
+import 'package:admin/presentation/navigations/app_navigation.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';

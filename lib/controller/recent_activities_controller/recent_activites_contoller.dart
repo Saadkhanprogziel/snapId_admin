@@ -1,4 +1,4 @@
-import 'package:admin/models/chartsTablesModel.dart';
+import 'package:admin/models/user_activity/userActivity.dart';
 import 'package:get/get.dart';
 
 class RecentActivitesContoller extends GetxController {

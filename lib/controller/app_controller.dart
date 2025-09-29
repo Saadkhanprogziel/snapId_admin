@@ -87,7 +87,7 @@ class AppController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    appSocket = SocketService();
+    // appSocket = SocketService();
     
   }
 
