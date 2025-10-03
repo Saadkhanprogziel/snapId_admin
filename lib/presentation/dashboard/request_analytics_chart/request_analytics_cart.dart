@@ -141,6 +141,10 @@ class RequestAnalyticsChart extends StatelessWidget {
         child: Text('Month', style: TextStyle(fontSize: 14)),
       ),
       DropdownMenuItem(
+        value: 'last_month',
+        child: Text('Last Month', style: TextStyle(fontSize: 14)),
+      ),
+      DropdownMenuItem(
         value: 'last_6_months',
         child: Text('6 Month', style: TextStyle(fontSize: 14)),
       ),

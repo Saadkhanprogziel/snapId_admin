@@ -22,8 +22,8 @@ class DashboardController extends GetxController {
   final subscriberChartData = Rxn<SubscriptionChartData>();
 
   // Filter observables
-  final selectedRevenueFilter = 'this_year'.obs;
-  final selectedRequestFilter = 'this_year'.obs;
+  final selectedRevenueFilter = 'last_month'.obs;
+  final selectedRequestFilter = 'last_month'.obs;
   final selectedSubscriberFilter = 'last_month'.obs;
 
   @override
@@ -34,7 +34,6 @@ class DashboardController extends GetxController {
 
   /// Initialize dashboard data
   void _initializeDashboard() {
-    
     fetchDashboardStats();
     fetchRequestsChartData();
     fetchRevenueChartData();
@@ -43,19 +42,22 @@ class DashboardController extends GetxController {
 
   /// Fetch main dashboard statistics
   Future<void> fetchDashboardStats() async {
+
     isLoading.value = true;
     try {
       final response = await _dashboardRepository.getDashboardStats();
       response.fold(
-        (error) => isLoading.value = false,
+        (error) {
+          isLoading.value = false;
+        },
         (success) {
+
           dashboardStatsData.value = success;
           isLoading.value = false;
         },
       );
     } catch (e) {
       isLoading.value = false;
-      // TODO: Handle error properly
     }
   }
 
@@ -63,10 +65,12 @@ class DashboardController extends GetxController {
   Future<void> fetchRequestsChartData() async {
     isTotalRequestLoading.value = true;
     try {
-      final response = await _dashboardRepository.getRequestChartData(selectedRequestFilter);
+      final response =
+          await _dashboardRepository.getRequestChartData(selectedRequestFilter);
       response.fold(
         (error) => isTotalRequestLoading.value = false,
         (success) {
+         
           totalOrdersChart.value = success;
           isTotalRequestLoading.value = false;
         },
@@ -81,9 +85,10 @@ class DashboardController extends GetxController {
   Future<void> fetchRevenueChartData() async {
     isRevenueChartLoading.value = true;
     try {
-      final response = await _dashboardRepository.getRevenueChartData(selectedRevenueFilter);
-          print("yssss ");
-   
+      final response =
+          await _dashboardRepository.getRevenueChartData(selectedRevenueFilter);
+      print("yssss ");
+
       response.fold(
         (error) => isRevenueChartLoading.value = false,
         (success) {
@@ -101,7 +106,8 @@ class DashboardController extends GetxController {
   Future<void> fetchSubscriberChartData() async {
     isSubscriberChartLoading.value = true;
     try {
-      final response = await _dashboardRepository.getSubscriberData(selectedSubscriberFilter);
+      final response = await _dashboardRepository
+          .getSubscriberData(selectedSubscriberFilter);
       response.fold(
         (error) => isSubscriberChartLoading.value = false,
         (success) {
@@ -133,5 +139,4 @@ class DashboardController extends GetxController {
     fetchSubscriberChartData();
     // loadSubscriberDataFor(filter);
   }
-
 }

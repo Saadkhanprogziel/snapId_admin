@@ -16,6 +16,7 @@ class DashboardContent extends StatelessWidget {
   Widget build(BuildContext context) {
   
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    
 
     return LayoutBuilder(
       builder: (context, constraints) {

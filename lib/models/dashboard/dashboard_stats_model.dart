@@ -15,7 +15,8 @@ class DashboardStatsModel {
   factory DashboardStatsModel.fromJson(Map<String, dynamic> json) {
     return DashboardStatsModel(
       users: Users.fromJson(json['users']),
-      totalRevenue: (json['totalRevenue'] as num).toDouble(),
+      totalRevenue: double.parse(json['totalRevenue'].toString()),
+
       orders: Orders.fromJson(json['orders']),
       support: Support.fromJson(json['support']),
     );

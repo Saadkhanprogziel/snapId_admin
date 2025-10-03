@@ -9,7 +9,7 @@ class RevenueChartModel {
 
   factory RevenueChartModel.fromJson(Map<String, dynamic> json) {
     return RevenueChartModel(
-      total: (json['annualRevenue'] as num).toDouble(),
+      total:  double.parse(json['annualRevenue'].toString()),
       revenue: (json['revenue'] as List<dynamic>)
           .map((e) => RevenueItem.fromJson(e))
           .toList(),
