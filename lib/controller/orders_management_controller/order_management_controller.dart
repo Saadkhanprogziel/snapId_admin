@@ -54,6 +54,7 @@ class OrderManagementController extends GetxController {
     'Family Pack',
     'Standard Pack',
     'Single Photo'
+    'Guest Purchase'
   ];
 
   var currentPage = 0.obs;
@@ -217,6 +218,7 @@ class OrderManagementController extends GetxController {
       "Family Pack": const Color(0xFF9787FF),
       "Single Photo": const Color(0xFFC6D2FD),
       "Standard Pack": const Color(0xFFC893FD),
+      "Guest Purchase":Color.fromRGBO(255, 159, 64, 1),
     };
 
     final barGroups = <BarChartGroupData>[];
@@ -261,6 +263,7 @@ class OrderManagementController extends GetxController {
       final familyPack = summary.items['Family Pack']?.count ?? 0;
       final standardPack = summary.items['Standard Pack']?.count ?? 0;
       final singlePhoto = summary.items['Single Photo']?.count ?? 0;
+      final guestUser = summary.items['Guest Purchase']?.count ?? 0;
       barGroups.add(
         BarChartGroupData(
           x: i,
@@ -274,6 +277,9 @@ class OrderManagementController extends GetxController {
             BarChartRodData(
                 toY: singlePhoto.toDouble(),
                 color: const Color.fromARGB(255, 198, 210, 253)),
+            BarChartRodData(
+                toY: guestUser.toDouble(),
+                color: Color.fromRGBO(255, 159, 64, 1)),
           ],
         ),
       );

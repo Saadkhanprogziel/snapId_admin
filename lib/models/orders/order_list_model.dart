@@ -44,19 +44,20 @@ class OrdersData {
     required this.createdAt,
   });
 
-  factory OrdersData.fromJson(Map<String, dynamic> json) {
-    return OrdersData(
-      id: json['id'],
-      email: json['email'],
-      planName: json['planName'], // can be null
-      amount: (json['amount'] as num).toDouble(),
-      currency: json['currency'],
-      status: json['status'],
-      userType: json['userType'],
-      platform: json['platform'],
-      createdAt: DateTime.parse(json['createdAt']),
-    );
-  }
+ factory OrdersData.fromJson(Map<String, dynamic> json) {
+  return OrdersData(
+    id: (json['id'] as String?) ?? "",
+    email: (json['email'] as String?) ?? "guest",
+    planName: json['planName'] as String?, // already nullable
+    amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
+    currency: (json['currency'] as String?) ?? "",
+    status: (json['status'] as String?) ?? "",
+    userType: (json['userType'] as String?) ?? "",
+    platform: (json['platform'] as String?) ?? "",
+    createdAt: DateTime.tryParse(json['createdAt'] ?? "") ?? DateTime.now(),
+  );
+}
+
 
   Map<String, dynamic> toJson() {
     return {

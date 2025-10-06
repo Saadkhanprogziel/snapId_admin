@@ -20,15 +20,14 @@ class DashboardRepository {
     }
   }
 
-  Future<Either<String, List<TotalOrdersChartModel>>> getRequestChartData(
+  Future<Either<String, TotalOrdersChartModel>> getRequestChartData(
       filter) async {
     final response = await networkRepository.get(
         url: "dashboard/get-total-orders?filterType=$filter");
-    final List<dynamic> totalOrders = response.data['data'];
+    final totalOrders = response.data['data'];
     if (!response.failed) {
-      List<TotalOrdersChartModel> data = totalOrders
-          .map((item) => TotalOrdersChartModel.fromJson(item))
-          .toList();
+      // Parse the JSON map to the model
+      TotalOrdersChartModel data = TotalOrdersChartModel.fromJson(totalOrders);
       return right(data);
     } else {
       return left(response.message);

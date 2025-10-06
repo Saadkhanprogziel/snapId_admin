@@ -82,7 +82,7 @@ class RequestAnalyticsChart extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          "${controller.dashboardStatsData.value?.orders.totalOrders ?? 0}",
+          "${controller.totalOrdersChartResponse.value?.filteredCount ?? 0}",
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w600,
@@ -202,7 +202,7 @@ class RequestAnalyticsChart extends StatelessWidget {
   }
 
   /// Build main bar chart
-  Widget _buildBarChart(List<TotalOrdersChartModel> data, bool isDark) {
+  Widget _buildBarChart(List<TotalOrders> data, bool isDark) {
     if (data.isEmpty) {
       return _buildEmptyState(isDark);
     }
@@ -260,7 +260,7 @@ class RequestAnalyticsChart extends StatelessWidget {
 
   /// Build chart titles data
   FlTitlesData _buildTitlesData(
-    List<TotalOrdersChartModel> data,
+    List<TotalOrders> data,
     double maxY,
     bool isDark,
   ) {
@@ -293,7 +293,7 @@ class RequestAnalyticsChart extends StatelessWidget {
   /// Build bottom axis title
   Widget _buildBottomTitle(
     double value,
-    List<TotalOrdersChartModel> data,
+    List<TotalOrders> data,
     bool isDark,
   ) {
     if (value.toInt() >= 0 && value.toInt() < data.length) {
@@ -341,7 +341,7 @@ class RequestAnalyticsChart extends StatelessWidget {
   }
 
   /// Build bar chart groups
-  List<BarChartGroupData> _buildBarGroups(List<TotalOrdersChartModel> data) {
+  List<BarChartGroupData> _buildBarGroups(List<TotalOrders> data) {
     return data.asMap().entries.map((entry) {
       final index = entry.key;
       final item = entry.value;
@@ -394,7 +394,7 @@ class RequestAnalyticsChart extends StatelessWidget {
   }
 
   /// Calculate maximum Y value for chart scaling
-  double _calculateMaxYValue(List<TotalOrdersChartModel> data) {
+  double _calculateMaxYValue(List<TotalOrders> data) {
     if (data.isEmpty) return 100;
 
     double maxMobile =

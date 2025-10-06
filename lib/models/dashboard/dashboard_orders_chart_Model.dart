@@ -1,34 +1,53 @@
 class TotalOrdersChartModel {
+  final int filteredCount;
+  final List<TotalOrders> data;
+
+  TotalOrdersChartModel({
+    required this.filteredCount,
+    required this.data,
+  });
+
+  factory TotalOrdersChartModel.fromJson(Map<String, dynamic> json) {
+    return TotalOrdersChartModel(
+      filteredCount: json['filteredCount'] ?? 0,
+      data: (json['data'] as List<dynamic>)
+          .map((item) => TotalOrders.fromJson(item))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'filteredCount': filteredCount,
+      'data': data.map((item) => item.toJson()).toList(),
+    };
+  }
+}
+
+class TotalOrders {
   final String label;
   final int webApp;
   final int mobileApp;
 
-  TotalOrdersChartModel({
+  TotalOrders({
     required this.label,
-    this.webApp = 0,
-    this.mobileApp = 0,
+    required this.webApp,
+    required this.mobileApp,
   });
 
-  // Factory constructor for creating an instance from JSON
-  factory TotalOrdersChartModel.fromJson(Map<String, dynamic> json) {
-    return TotalOrdersChartModel(
+  factory TotalOrders.fromJson(Map<String, dynamic> json) {
+    return TotalOrders(
       label: json['label'] ?? '',
       webApp: json['WEB_APP'] ?? 0,
       mobileApp: json['MOBILE_APP'] ?? 0,
     );
   }
 
-  // Method for converting instance back to JSON
   Map<String, dynamic> toJson() {
     return {
       'label': label,
       'WEB_APP': webApp,
       'MOBILE_APP': mobileApp,
     };
-  }
-
-  @override
-  String toString() {
-    return 'TotalOrderCard(label: $label, webApp: $webApp, mobileApp: $mobileApp)';
   }
 }

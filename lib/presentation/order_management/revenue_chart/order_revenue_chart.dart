@@ -192,13 +192,16 @@ class RevenueChartWidget extends StatelessWidget {
               "Family Pack": const Color(0xFF9787FF),
               "Single Photo": const Color(0xFFC6D2FD),
               "Standard Pack": const Color(0xFFC893FD),
+              "Guest Purchase": Color.fromRGBO(255, 159, 64, 1),
             };
 
             
             final productOrder = [
               "Single Photo",
               "Family Pack",
-              "Standard Pack"
+              "Standard Pack",
+              "Guest Purchase"
+
             ];
 
             return _buildChartLegend([
@@ -293,6 +296,7 @@ class RevenueChartWidget extends StatelessWidget {
           return DropdownButton(
             value: value,
             isDense: true,
+            focusColor: Colors.transparent,
             style: TextStyle(
               fontSize: 14,
               color: isDark ? Colors.white : Colors.grey,
@@ -313,7 +317,7 @@ class RevenueChartWidget extends StatelessWidget {
               ),
               DropdownMenuItem(
                 value: "last_month",
-                child: Text('Month', style: TextStyle(fontSize: 14)),
+                child: Text('Last Month', style: TextStyle(fontSize: 14)),
               ),
               DropdownMenuItem(
                 value: "last_6_months",

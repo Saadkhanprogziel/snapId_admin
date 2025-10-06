@@ -17,7 +17,8 @@ class DashboardController extends GetxController {
 
   // Data observables
   final dashboardStatsData = Rxn<DashboardStatsModel>();
-  final totalOrdersChart = <TotalOrdersChartModel>[].obs;
+  final totalOrdersChartResponse = Rxn<TotalOrdersChartModel>();
+  final totalOrdersChart = <TotalOrders>[].obs;
   final revenueChartData = Rxn<RevenueChartModel>();
   final subscriberChartData = Rxn<SubscriptionChartData>();
 
@@ -71,7 +72,8 @@ class DashboardController extends GetxController {
         (error) => isTotalRequestLoading.value = false,
         (success) {
          
-          totalOrdersChart.value = success;
+          totalOrdersChartResponse.value = success;
+          totalOrdersChart.value = success.data;
           isTotalRequestLoading.value = false;
         },
       );
